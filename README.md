@@ -1,5 +1,7 @@
 # Chcem vediet
 
+[![Join the chat at https://gitter.im/martinmacko47/chcemvediet](https://badges.gitter.im/martinmacko47/chcemvediet.svg)](https://gitter.im/martinmacko47/chcemvediet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Chcem vedieť -- Slovak for "I want to know" -- a server to ease access to information under the
 [Slovak Freedom Of Information Act 211/2000 Coll](http://www.urzd.sk/legislativa/211-00-en.pdf).
 
