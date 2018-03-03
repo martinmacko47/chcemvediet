@@ -158,9 +158,6 @@ class Categorized(ObligeeActionStep):
                 if legal_date > local_today():
                     msg = _(u'inforequests:obligee_action:Categorized:legal_date:error:from_future')
                     raise ValidationError(msg)
-                if legal_date < local_today() - relativedelta(months=1):
-                    msg = _(u'inforequests:obligee_action:Categorized:legal_date:error:older_than_month')
-                    raise ValidationError(msg)
             except ValidationError as e:
                 if u'legal_date' in cleaned_data:
                     self.add_error(u'legal_date', e)
@@ -840,9 +837,6 @@ class InputBasics(ObligeeActionStep):
                     raise ValidationError(msg.format(date=branch.last_action.legal_date))
                 if delivered_date > local_today():
                     msg = _(u'inforequests:obligee_action:InputBasics:delivered_date:error:from_future')
-                    raise ValidationError(msg)
-                if delivered_date < local_today() - relativedelta(months=1):
-                    msg = _(u'inforequests:obligee_action:InputBasics:delivered_date:error:older_than_month')
                     raise ValidationError(msg)
             except ValidationError as e:
                 if u'delivered_date' in cleaned_data:
