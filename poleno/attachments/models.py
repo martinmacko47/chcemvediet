@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 import logging
+import mimetypes
+import os
 
 import magic
 from django.core.files.base import ContentFile
@@ -14,7 +16,7 @@ from django.contrib.contenttypes import generic
 from poleno import datacheck
 from poleno.utils.models import QuerySet
 from poleno.utils.date import utc_now, utc_datetime_from_local
-from poleno.utils.misc import FormatMixin, random_string, squeeze, decorate
+from poleno.utils.misc import FormatMixin, random_string, squeeze, decorate, guess_extension
 
 
 class AttachmentQuerySet(QuerySet):
@@ -52,11 +54,11 @@ class Attachment(FormatMixin, models.Model):
     # May NOT be NULL; Random local filename is generated in save() when creating a new object.
     file = models.FileField(upload_to=u'attachments', max_length=255)
 
-    # May be empty; May NOT be trusted, set by client.
+    # May NOT be empty: Automatically computed in save() when creating a new object.
     name = models.CharField(max_length=255,
             help_text=squeeze(u"""
-                Attachment file name, e.g. "document.pdf". The value does not have to be a valid
-                filename. It may be set by the user.
+                Attachment file name, e.g. "document.pdf". Automatically computed when
+                creating a new object.
                 """))
 
     # May NOT be empty: Automatically computed in save() when creating a new object.
@@ -109,6 +111,8 @@ class Attachment(FormatMixin, models.Model):
                 self.created = utc_now()
             self.size = self.file.size
             self.content_type = magic.from_buffer(self.file.read(), mime=True)
+            if mimetypes.guess_type(self.name)[0] != self.content_type:
+                self.name = os.path.splitext(self.name)[0] + guess_extension(self.content_type, default=".bin")
 
         super(Attachment, self).save(*args, **kwargs)
 
