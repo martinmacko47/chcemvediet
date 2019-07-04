@@ -27,6 +27,7 @@ django-common-helpers==0.6.4  # django-cron
 django-appconf==1.0.1         # django-compressor
 libsass==0.8.3                # django-libsass
 jdcal==1.2                    # openpyxl
+python-magic==0.4.15          # python-magic
 
 # Dependencies between base requirements
 # requests==2.5.1             # django-allauth

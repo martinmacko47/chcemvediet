@@ -31,4 +31,4 @@ def upload(request, generic_object, download_url_func):
 def download(request, attachment):
     # FIXME: If ``attachment.content_type`` is among whitelisted content types, we should use it.
     path = os.path.join(settings.MEDIA_ROOT, attachment.file.name)
-    return send_file_response(request, path, attachment.name, u'application/octet-stream')
+    return send_file_response(request, path, attachment.name, attachment.content_type)

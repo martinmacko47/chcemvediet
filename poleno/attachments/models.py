@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import logging
+import magic
 
 from django.core.files.base import ContentFile
 from django.db import models
@@ -106,6 +107,8 @@ class Attachment(FormatMixin, models.Model):
                 self.created = utc_now()
             self.size = self.file.size
 
+        mime = magic.Magic(mime=True)
+        self.content_type = mime.from_buffer(self.file.read())
         super(Attachment, self).save(*args, **kwargs)
 
     def clone(self, generic_object):
