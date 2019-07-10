@@ -69,7 +69,6 @@ class EmailBackend(BaseEmailBackend):
             attachments.append(Attachment(
                     file=ContentFile(content),
                     name=name,
-                    content_type=content_type,
                     ))
 
         msg = Message(

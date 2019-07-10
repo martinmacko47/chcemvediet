@@ -63,14 +63,12 @@ def inbound_email_webhook_event(sender, event_type, data, **kwargs):
         for attch in (msg.get(u'attachments') or {}).values():
             filename = attch.get(u'name') or u''
             filename = full_decode_header(filename) # Mandrill does not decode '=?utf-8?...?=' in attachment names.
-            content_type = attch.get(u'type') or u''
             content = attch.get(u'content') or u''
             if attch.get(u'base64', False):
                 content = b64decode(content)
             attachments.append(Attachment(
                     file=ContentFile(content),
                     name=filename,
-                    content_type=content_type,
                     ))
 
         message = Message(

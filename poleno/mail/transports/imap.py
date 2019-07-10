@@ -80,7 +80,6 @@ class ImapTransport(BaseTransport):
                 attachments.append(Attachment(
                         file=ContentFile(content),
                         name=filename,
-                        content_type=content_type,
                         ))
 
         recipients = []

@@ -16,6 +16,7 @@ django-libsass==0.4
 django-bootstrap-sass==0.0.6-alpha
 jsonfield==1.0.2
 openpyxl==2.2.6
+python-magic==0.4.15
 
 # Dependencies for base requirements
 six==1.9.0                    # python-dateutil, django-aggregate-if, django-libsass
@@ -27,7 +28,6 @@ django-common-helpers==0.6.4  # django-cron
 django-appconf==1.0.1         # django-compressor
 libsass==0.8.3                # django-libsass
 jdcal==1.2                    # openpyxl
-python-magic==0.4.15          # python-magic
 
 # Dependencies between base requirements
 # requests==2.5.1             # django-allauth

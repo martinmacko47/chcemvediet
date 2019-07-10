@@ -17,7 +17,6 @@ def upload(request, generic_object, download_url_func):
                 generic_object=generic_object,
                 file=file,
                 name=file.name,
-                content_type=file.content_type,
                 )
         attachment.save()
         res.append({
@@ -29,6 +28,5 @@ def upload(request, generic_object, download_url_func):
     return JsonResponse({u'files': res})
 
 def download(request, attachment):
-    # FIXME: If ``attachment.content_type`` is among whitelisted content types, we should use it.
     path = os.path.join(settings.MEDIA_ROOT, attachment.file.name)
     return send_file_response(request, path, attachment.name, attachment.content_type)

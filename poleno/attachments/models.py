@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 import logging
-import magic
 
+import magic
 from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models import Q
@@ -58,10 +58,12 @@ class Attachment(FormatMixin, models.Model):
                 Attachment file name, e.g. "document.pdf". The value does not have to be a valid
                 filename. It may be set by the user.
                 """))
+
+    # May NOT be empty: Automatically computed in save() when creating a new object.
     content_type = models.CharField(max_length=255,
             help_text=squeeze(u"""
-                Attachment content type, e.g. "application/pdf". The value does not have to be
-                a valid content type. It may be set by the user.
+                Attachment content type, e.g. "application/pdf". Automatically computed when 
+                creating a new object.
                 """))
 
     # May NOT be NULL; Automaticly computed in save() when creating a new object if undefined.
@@ -106,9 +108,8 @@ class Attachment(FormatMixin, models.Model):
             if self.created is None:
                 self.created = utc_now()
             self.size = self.file.size
+            self.content_type = magic.from_buffer(self.file.read(), mime=True)
 
-        mime = magic.Magic(mime=True)
-        self.content_type = mime.from_buffer(self.file.read())
         super(Attachment, self).save(*args, **kwargs)
 
     def clone(self, generic_object):
@@ -117,7 +118,6 @@ class Attachment(FormatMixin, models.Model):
                 generic_object=generic_object,
                 file=ContentFile(self.content),
                 name=self.name,
-                content_type=self.content_type,
                 created=self.created,
                 )
 
