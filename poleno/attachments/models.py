@@ -62,7 +62,7 @@ class Attachment(FormatMixin, models.Model):
     # May NOT be empty: Automatically computed in save() when creating a new object.
     content_type = models.CharField(max_length=255,
             help_text=squeeze(u"""
-                Attachment content type, e.g. "application/pdf". Automatically computed when 
+                Attachment content type, e.g. "application/pdf". Automatically computed when
                 creating a new object.
                 """))
 

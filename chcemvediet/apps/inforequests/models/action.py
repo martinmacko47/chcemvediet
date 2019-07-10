@@ -498,9 +498,7 @@ class Action(FormatMixin, models.Model):
         sender_formatted = formataddr((squeeze(sender_name), sender_address))
         recipients = [formataddr(r) for r in self.branch.collect_obligee_emails]
 
-        # FIXME: Attachment name and content type are set by client and not to be trusted. The name
-        # must be sanitized and the content type white listed for known content types. Any unknown
-        # content type should be replaced with 'application/octet-stream'.
+        # FIXME: Attachment name is set by client and may not to be trusted. It must be sanitized.
 
         msg = EmailMessage(self.subject, self.content, sender_formatted, recipients)
         for attachment in self.attachments:
