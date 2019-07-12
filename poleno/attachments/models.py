@@ -54,10 +54,10 @@ class Attachment(FormatMixin, models.Model):
     # May NOT be NULL; Random local filename is generated in save() when creating a new object.
     file = models.FileField(upload_to=u'attachments', max_length=255)
 
-    # May NOT be empty: Automatically computed in save() when creating a new object.
+    # May NOT be empty: Automatically sanitized in save() when creating a new object.
     name = models.CharField(max_length=255,
             help_text=squeeze(u"""
-                Attachment file name, e.g. "document.pdf". Automatically computed when
+                Attachment file name, e.g. "document.pdf". Automatically sanitized when
                 creating a new object.
                 """))
 
@@ -111,10 +111,14 @@ class Attachment(FormatMixin, models.Model):
                 self.created = utc_now()
             self.size = self.file.size
             self.content_type = magic.from_buffer(self.file.read(), mime=True)
-            if mimetypes.guess_type(self.name)[0] != self.content_type:
-                self.name = os.path.splitext(self.name)[0] + guess_extension(self.content_type, default=".bin")
 
-        super(Attachment, self).save(*args, **kwargs)
+            base, extension = os.path.splitext(self.name)
+            base = ''.join([c for c in base if ord(c) < 32][:200])
+            if mimetypes.guess_type(self.name)[0] != self.content_type:
+                extension = guess_extension(self.content_type)
+            self.name = (base or u'attachment') + extension
+
+            super(Attachment, self).save(*args, **kwargs)
 
     def clone(self, generic_object):
         u""" The returned copy is not saved. """

@@ -32,9 +32,6 @@ def send_file_response(request, path, name, content_type, attachment=True):
     # serve the file. It's much faster. Possibly will be fixed in Django 1.8.
     # See: http://django.readthedocs.org/en/latest/ref/request-response.html#django.http.FileResponse
 
-    # FIXME: "Content-Disposition" filename is very fragile if contains non-ASCII characters.
-    # Current implementation works on Firefox, but probably fails on other browsers. We should test
-    # and fix it for them and/or sanitize and normalize file names.
     statobj = os.stat(path)
     if not stat.S_ISREG(statobj.st_mode):
         raise OSError(u'Not a regular file: {}'.format(path))

@@ -11,11 +11,14 @@ from poleno.utils.misc import guess_extension
 def forward(apps, schema_editor):
     Attachment = apps.get_model(u'attachments', u'Attachment')
     for attachment in Attachment.objects.all():
+        base, extension = os.path.splitext(attachment.name)
+        base = ''.join([c for c in base if not ord(c) < 32][:200])
         if mimetypes.guess_type(attachment.name)[0] != attachment.content_type:
-            name = os.path.splitext(attachment.name)[0] + guess_extension(attachment.content_type, default=".bin")
-            if attachment.name != name:
-                attachment.name = name
-                attachment.save()
+            extension = guess_extension(attachment.content_type)
+        name = (base or u'attachment') + extension
+        if attachment.name != name:
+            attachment.name = name
+            attachment.save()
 
 def backward(apps, schema_editor):
     # No need to change name back to untrusted
@@ -25,7 +28,7 @@ def backward(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('attachments', '0003_content_type'),
+        ('attachments', '0003_content_type_sanitization'),
     ]
 
     operations = [
@@ -34,7 +37,7 @@ class Migration(migrations.Migration):
             model_name='attachment',
             name='name',
             field=models.CharField(
-                help_text='Attachment file name, e.g. "document.pdf". Automatically computed when creating a new object.',
+                help_text='Attachment file name, e.g. "document.pdf". Automatically sanitized when creating a new object.',
                 max_length=255),
             preserve_default=True,
         ),

@@ -139,7 +139,7 @@ def flatten(l):
         else:
             yield el
 
-def guess_extension(content_type, default=None):
+def guess_extension(content_type, default=u'.bin'):
     u"""
     Guesses file extention based on file content type. Wrapper around ``mimetypes.guess_extension``
     to return ``default`` extension if the given content type is not known by ``mimetypes`` module,
