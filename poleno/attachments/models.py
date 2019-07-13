@@ -16,7 +16,7 @@ from django.contrib.contenttypes import generic
 from poleno import datacheck
 from poleno.utils.models import QuerySet
 from poleno.utils.date import utc_now, utc_datetime_from_local
-from poleno.utils.misc import FormatMixin, random_string, squeeze, decorate, guess_extension
+from poleno.utils.misc import FormatMixin, random_string, squeeze, decorate, sanitize_filename
 
 
 class AttachmentQuerySet(QuerySet):
@@ -111,12 +111,7 @@ class Attachment(FormatMixin, models.Model):
                 self.created = utc_now()
             self.size = self.file.size
             self.content_type = magic.from_buffer(self.file.read(), mime=True)
-
-            base, extension = os.path.splitext(self.name)
-            base = ''.join([c for c in base if ord(c) < 32][:200])
-            if mimetypes.guess_type(self.name)[0] != self.content_type:
-                extension = guess_extension(self.content_type)
-            self.name = (base or u'attachment') + extension
+            self.name = sanitize_filename(self.name, self.content_type)
 
             super(Attachment, self).save(*args, **kwargs)
 

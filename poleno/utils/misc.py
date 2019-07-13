@@ -1,5 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import os
 import sys
 import random
 import string
@@ -327,3 +328,16 @@ def print_invocations(func=None):
                 unicode(repr(res), u'utf-8')))
         return res
     return wrapped_func
+
+def sanitize_filename(filename, content_type):
+    u"""
+        Remove all 0-31 ASCII characters from base of filename and short the length to a maximum of 200 characters.
+        If it is empty after filtering out the forbidden characters set the base to u'attachment'.
+        Change extension of filename if the given content type differs from ``mimetypes.guess_type``to the result
+        of ``guess_extension``.
+        """
+    base, extension = os.path.splitext(filename)
+    base = ''.join([c for c in base if not ord(c) < 32][:200])
+    if mimetypes.guess_type(filename)[0] != content_type:
+        extension = guess_extension(content_type)
+    return (base or u'attachment') + extension

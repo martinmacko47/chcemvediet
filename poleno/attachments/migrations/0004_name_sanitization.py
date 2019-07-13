@@ -5,17 +5,13 @@ import os
 
 from django.db import models, migrations
 
-from poleno.utils.misc import guess_extension
+from poleno.utils.misc import sanitize_filename
 
 
 def forward(apps, schema_editor):
     Attachment = apps.get_model(u'attachments', u'Attachment')
     for attachment in Attachment.objects.all():
-        base, extension = os.path.splitext(attachment.name)
-        base = ''.join([c for c in base if not ord(c) < 32][:200])
-        if mimetypes.guess_type(attachment.name)[0] != attachment.content_type:
-            extension = guess_extension(attachment.content_type)
-        name = (base or u'attachment') + extension
+        name = sanitize_filename(attachment.name, attachment.content_type)
         if attachment.name != name:
             attachment.name = name
             attachment.save()
