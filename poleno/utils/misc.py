@@ -329,15 +329,20 @@ def print_invocations(func=None):
         return res
     return wrapped_func
 
-def sanitize_filename(filename, content_type):
+def sanitize_filename(filename, content_type, default_base=u'attachment'):
     u"""
         Remove all 0-31 ASCII characters from base of filename and short the length to a maximum of 200 characters.
-        If it is empty after filtering out the forbidden characters set the base to u'attachment'.
+        If it is empty after filtering out the forbidden characters set the base to default_base.
         Change extension of filename if the given content type differs from ``mimetypes.guess_type``to the result
         of ``guess_extension``.
+
+        Example:
+        "qwer\x01\x02ty.txt", "text/plain" -> "qwerty.txt"
+        "qwerty.txt", "application/octet-stream" -> "qwerty.bin"
+        "\x01.txt", "text/plain' -> "attachment.txt"
         """
     base, extension = os.path.splitext(filename)
     base = ''.join([c for c in base if not ord(c) < 32][:200])
     if mimetypes.guess_type(filename)[0] != content_type:
         extension = guess_extension(content_type)
-    return (base or u'attachment') + extension
+    return (base or default_base) + extension
