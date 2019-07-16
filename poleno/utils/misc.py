@@ -177,11 +177,35 @@ def sanitize_filename(filename, content_type, default_base=u'attachment'):
         "qwerty.txt", "application/octet-stream" -> "qwerty.bin"
         "\x01.txt", "text/plain" -> "attachment.txt"
     """
+    return adjust_extension(sanitize_basename(filename, default_base), content_type)
+
+def sanitize_basename(filename, default_base=u'attachment'):
+    u"""
+    Remove all control characters (with ASCII code below 32) from the base and shorten it to a
+    maximum of 200 characters. If the resulting base excluding the extension is empty,
+    use ``default_base`` instead of it.
+
+    Example:
+        "qwer\x01\x02ty.abc" -> "qwerty.abc"
+        "\x01.txt", "text/plain" -> "attachment.txt"
+    """
     base, extension = os.path.splitext(filename)
-    base = ''.join([c for c in base if ord(c) >= 32][:200])
-    if mimetypes.guess_type(filename)[0] != content_type:
-        extension = guess_extension(content_type)
-    return (base or default_base) + extension
+    base = ''.join([c for c in base if ord(c) >= 32][:200]) or default_base
+    return base + extension
+
+def adjust_extension(filename, content_type):
+    u"""
+    Adjust file extension if the given ``content_type`` differs from the content type represented by
+    the original file extension to a correct one.
+
+    Example:
+        "qwerty.txt", "application/pdf" -> "qwerty.pdf"
+        "qwerty.txt", "text/plain" -> "qwerty.txt"
+        "qwerty.bin", None -> "qwerty.bin"
+    """
+    if content_type and mimetypes.guess_type(filename)[0] != content_type:
+        return os.path.splitext(filename)[0] + guess_extension(content_type)
+    return filename
 
 def filesize(size):
     u"""
@@ -193,7 +217,10 @@ def filesize(size):
         49573834547 -> "46.2 GB"
         -3847 -> "-3.8 kB"
     """
-    for fmt in ['{:.0f} bytes', u'{:.1f} kB', u'{:.1f} MB', u'{:.1f} GB', u'{:.1f} TB']:
+    if size is None:
+        return None
+
+    for fmt in [u'{:.0f} bytes', u'{:.1f} kB', u'{:.1f} MB', u'{:.1f} GB', u'{:.1f} TB']:
         if abs(size) < 1024.0:
             return fmt.format(round(size + 0.05, 1))
         size /= 1024.0

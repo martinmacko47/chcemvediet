@@ -1,9 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import datetime
 import logging
-import mimetypes
-import os
+import itertools
 
 import magic
 from django.core.files.base import ContentFile
@@ -14,8 +12,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
 from poleno import datacheck
+from poleno.attachments.utils import attachment_file_check, attachment_orphaned_file_check
 from poleno.utils.models import QuerySet
-from poleno.utils.date import utc_now, utc_datetime_from_local
+from poleno.utils.date import utc_now
 from poleno.utils.misc import FormatMixin, random_string, squeeze, decorate, sanitize_filename
 
 
@@ -54,21 +53,21 @@ class Attachment(FormatMixin, models.Model):
     # May NOT be NULL; Random local filename is generated in save() when creating a new object.
     file = models.FileField(upload_to=u'attachments', max_length=255)
 
-    # May NOT be empty: Automatically sanitized in save() when creating a new object.
+    # May NOT be empty; Automatically sanitized in save() when creating a new object.
     name = models.CharField(max_length=255,
             help_text=squeeze(u"""
                 Attachment file name, e.g. "document.pdf". Automatically sanitized when creating
                 a new object.
                 """))
 
-    # May NOT be empty: Automatically computed in save() when creating a new object.
+    # May NOT be empty; Automatically computed in save() when creating a new object.
     content_type = models.CharField(max_length=255,
             help_text=squeeze(u"""
                 Attachment content type, e.g. "application/pdf". Automatically computed when
                 creating a new object.
                 """))
 
-    # May NOT be NULL; Automaticly computed in save() when creating a new object if undefined.
+    # May NOT be NULL; Automatically computed in save() when creating a new object if undefined.
     created = models.DateTimeField(blank=True,
             help_text=squeeze(u"""
                 Date and time the attachment was uploaded or received by an email. Leave blank for
@@ -113,7 +112,7 @@ class Attachment(FormatMixin, models.Model):
             self.content_type = magic.from_buffer(self.file.read(), mime=True)
             self.name = sanitize_filename(self.name, self.content_type)
 
-            super(Attachment, self).save(*args, **kwargs)
+        super(Attachment, self).save(*args, **kwargs)
 
     def clone(self, generic_object):
         u""" The returned copy is not saved. """
@@ -133,33 +132,11 @@ def datachecks(superficial, autofix):
     Checks that every ``Attachment`` instance has its file working, and there are not any orphaned
     attachment files.
     """
-    # This check is a bit slow. We skip it if running from cron or the user asked for
-    # superficial tests only.
+    # This check is a bit slow. We skip it if running from cron or the user asked for superficial
+    # tests only.
     if superficial:
         return
-
     attachments = Attachment.objects.all()
-    attachment_names = {a.file.name for a in attachments}
-
-    for attachment in attachments:
-        try:
-            try:
-                attachment.file.open(u'rb')
-            finally:
-                attachment.file.close()
-        except IOError:
-            yield datacheck.Error(u'{} is missing its file: "{}".',
-                    attachment, attachment.file.name)
-
     field = Attachment._meta.get_field(u'file')
-    if not field.storage.exists(field.upload_to):
-        return
-    for file_name in field.storage.listdir(field.upload_to)[1]:
-        attachment_name = u'{}/{}'.format(field.upload_to, file_name)
-        modified_time = utc_datetime_from_local(field.storage.modified_time(attachment_name))
-        timedelta = utc_now() - modified_time
-        if timedelta > datetime.timedelta(days=5) and attachment_name not in attachment_names:
-            yield datacheck.Info(squeeze(u"""
-                    There is no Attachment instance for file: "{}". The file is {} days old, so you
-                    can probably remove it.
-                    """), attachment_name, timedelta.days)
+    return itertools.chain(attachment_file_check(attachments), attachment_orphaned_file_check(
+        attachments, field, Attachment.__name__))
