@@ -57,8 +57,8 @@ class Attachment(FormatMixin, models.Model):
     # May NOT be empty: Automatically sanitized in save() when creating a new object.
     name = models.CharField(max_length=255,
             help_text=squeeze(u"""
-                Attachment file name, e.g. "document.pdf". Automatically sanitized when
-                creating a new object.
+                Attachment file name, e.g. "document.pdf". Automatically sanitized when creating
+                a new object.
                 """))
 
     # May NOT be empty: Automatically computed in save() when creating a new object.

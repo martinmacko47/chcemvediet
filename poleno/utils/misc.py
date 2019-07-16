@@ -164,6 +164,25 @@ def guess_extension(content_type, default=u'.bin'):
         res = default
     return res
 
+def sanitize_filename(filename, content_type, default_base=u'attachment'):
+    u"""
+    Sanitize file name and adjust its extension according to given ``content_type``. Remove all
+    control characters (with ASCII code below 32) from the file name and shorten it to a maximum of
+    200 characters. If the resulting file name excluding the extension is empty, use
+    ``default_base`` instead of it. Adjust file extension if the given ``content_type`` differs from
+    the content type represented by the original file extension to a correct one.
+
+    Example:
+        "qwer\x01\x02ty.txt", "text/plain" -> "qwerty.txt"
+        "qwerty.txt", "application/octet-stream" -> "qwerty.bin"
+        "\x01.txt", "text/plain" -> "attachment.txt"
+    """
+    base, extension = os.path.splitext(filename)
+    base = ''.join([c for c in base if ord(c) >= 32][:200])
+    if mimetypes.guess_type(filename)[0] != content_type:
+        extension = guess_extension(content_type)
+    return (base or default_base) + extension
+
 def filesize(size):
     u"""
     Formats file sizes in bytes into a human readable form.
@@ -328,21 +347,3 @@ def print_invocations(func=None):
                 unicode(repr(res), u'utf-8')))
         return res
     return wrapped_func
-
-def sanitize_filename(filename, content_type, default_base=u'attachment'):
-    u"""
-        Remove all 0-31 ASCII characters from base of filename and short the length to a maximum of 200 characters.
-        If it is empty after filtering out the forbidden characters set the base to default_base.
-        Change extension of filename if the given content type differs from ``mimetypes.guess_type``to the result
-        of ``guess_extension``.
-
-        Example:
-        "qwer\x01\x02ty.txt", "text/plain" -> "qwerty.txt"
-        "qwerty.txt", "application/octet-stream" -> "qwerty.bin"
-        "\x01.txt", "text/plain' -> "attachment.txt"
-        """
-    base, extension = os.path.splitext(filename)
-    base = ''.join([c for c in base if not ord(c) < 32][:200])
-    if mimetypes.guess_type(filename)[0] != content_type:
-        extension = guess_extension(content_type)
-    return (base or default_base) + extension
