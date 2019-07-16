@@ -75,7 +75,7 @@ class ImapTransport(BaseTransport):
             elif not html and content_type == u'text/html' and not is_attachment:
                 html = self._decode_content(content, charset)
             else:
-                default = u'attachment{}'.format(guess_extension(content_type, u'.bin'))
+                default = u'attachment{}'.format(guess_extension(content_type))
                 filename = part.get_filename(default)
                 attachments.append(Attachment(
                         file=ContentFile(content),

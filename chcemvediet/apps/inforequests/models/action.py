@@ -498,8 +498,6 @@ class Action(FormatMixin, models.Model):
         sender_formatted = formataddr((squeeze(sender_name), sender_address))
         recipients = [formataddr(r) for r in self.branch.collect_obligee_emails]
 
-        # FIXME: Attachment name is set by client and may not to be trusted. It must be sanitized.
-
         msg = EmailMessage(self.subject, self.content, sender_formatted, recipients)
         for attachment in self.attachments:
             msg.attach(attachment.name, attachment.content, attachment.content_type)

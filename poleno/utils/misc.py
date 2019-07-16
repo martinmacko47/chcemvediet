@@ -1,5 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import os
 import sys
 import random
 import string
@@ -139,7 +140,7 @@ def flatten(l):
         else:
             yield el
 
-def guess_extension(content_type, default=None):
+def guess_extension(content_type, default=u'.bin'):
     u"""
     Guesses file extention based on file content type. Wrapper around ``mimetypes.guess_extension``
     to return ``default`` extension if the given content type is not known by ``mimetypes`` module,
@@ -162,6 +163,25 @@ def guess_extension(content_type, default=None):
     if not res:
         res = default
     return res
+
+def sanitize_filename(filename, content_type, default_base=u'attachment'):
+    u"""
+    Sanitize file name and adjust its extension according to given ``content_type``. Remove all
+    control characters (with ASCII code below 32) from the file name and shorten it to a maximum of
+    200 characters. If the resulting file name excluding the extension is empty, use
+    ``default_base`` instead of it. Adjust file extension if the given ``content_type`` differs from
+    the content type represented by the original file extension to a correct one.
+
+    Example:
+        "qwer\x01\x02ty.txt", "text/plain" -> "qwerty.txt"
+        "qwerty.txt", "application/octet-stream" -> "qwerty.bin"
+        "\x01.txt", "text/plain" -> "attachment.txt"
+    """
+    base, extension = os.path.splitext(filename)
+    base = ''.join([c for c in base if ord(c) >= 32][:200])
+    if mimetypes.guess_type(filename)[0] != content_type:
+        extension = guess_extension(content_type)
+    return (base or default_base) + extension
 
 def filesize(size):
     u"""
