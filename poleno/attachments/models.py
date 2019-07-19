@@ -135,8 +135,8 @@ def datachecks(superficial, autofix):
     # This check is a bit slow. We skip it if running from cron or the user asked for superficial
     # tests only.
     if superficial:
-        return
+        return []
     attachments = Attachment.objects.all()
     field = Attachment._meta.get_field(u'file')
-    return itertools.chain(attachment_file_check(attachments), attachment_orphaned_file_check(
-        attachments, field, Attachment.__name__))
+    return itertools.chain(attachment_file_check(attachments),
+                           attachment_orphaned_file_check(attachments, field, Attachment))

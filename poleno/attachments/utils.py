@@ -22,7 +22,7 @@ def attachment_file_check(attachments):
             yield datacheck.Error(u'{} is missing its file: "{}".',
                                   attachment, attachment.file.name)
 
-def attachment_orphaned_file_check(attachments, field, class_name):
+def attachment_orphaned_file_check(attachments, field, model):
     u"""
     Checks that there are not any orphaned Attachment's (or Attachment's like) files.
     """
@@ -35,6 +35,6 @@ def attachment_orphaned_file_check(attachments, field, class_name):
         timedelta = utc_now() - modified_time
         if timedelta > datetime.timedelta(days=5) and attachment_name not in attachment_names:
             yield datacheck.Info(squeeze(u"""
-                    There is no {} instance for file: "{}". The file is {} days old, so you
-                    can probably remove it.
-                    """), class_name, attachment_name, timedelta.days)
+                    There is no {} instance for file: "{}". The file is {} days old, so you can
+                    probably remove it.
+                    """), model.__name__, attachment_name, timedelta.days)

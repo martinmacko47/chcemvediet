@@ -27,10 +27,10 @@ class AttachmentNormalization(FormatMixin, models.Model):
                 True if normalization has succeeded, False otherwise.
                 """))
 
-    # May be NULL; Random local filename is generated in save() when creating a new object.
-    file = models.FileField(upload_to=u'attachment_normalizations', max_length=255, null=True,
+    # Filename may be empty; Random local filename is generated in save() when creating a new object.
+    file = models.FileField(upload_to=u'attachment_normalizations', max_length=255, blank=True,
             help_text=squeeze(u"""
-                NULL if normalization failed or normalization didn't create any file.
+                Empty filename if normalization failed or normalization didn't create any file.
                 """))
 
     # May NOT be empty: Extension automatically adjusted in save() when creating new object.
@@ -73,7 +73,7 @@ class AttachmentNormalization(FormatMixin, models.Model):
     #     May be empty
 
     # Indexes:
-    #  -- attachment:       ForeignKey
+    #  -- attachment: ForeignKey
 
     objects = AttachmentNormalizationQuerySet.as_manager()
 
@@ -96,7 +96,7 @@ class AttachmentNormalization(FormatMixin, models.Model):
         if self.pk is None:  # Creating a new object
             if self.created is None:
                 self.created = utc_now()
-            if self.file:
+            if self.file._file:
                 self.file.name = random_string(10)
                 self.size = self.file.size
             self.name = adjust_extension(self.attachment.name, self.content_type)
@@ -115,9 +115,9 @@ def datachecks(superficial, autofix):
     # This check is a bit slow. We skip it if running from cron or the user asked for superficial
     # tests only.
     if superficial:
-        return
+        return []
     attachment_normalizations = AttachmentNormalization.objects.all()
     field = AttachmentNormalization._meta.get_field(u'file')
     return itertools.chain(attachment_file_check(attachment_normalizations),
                            attachment_orphaned_file_check(attachment_normalizations, field,
-                                                          AttachmentNormalization.__name__))
+                                                          AttachmentNormalization))

@@ -181,9 +181,9 @@ def sanitize_filename(filename, content_type, default_base=u'attachment'):
 
 def sanitize_basename(filename, default_base=u'attachment'):
     u"""
-    Remove all control characters (with ASCII code below 32) from the base and shorten it to a
-    maximum of 200 characters. If the resulting base excluding the extension is empty,
-    use ``default_base`` instead of it.
+    Remove all control characters (with ASCII code below 32) from the base and shorten it to
+    a maximum of 200 characters. If the resulting base excluding the extension is empty, use
+    ``default_base`` instead of it.
 
     Example:
         "qwer\x01\x02ty.abc" -> "qwerty.abc"
