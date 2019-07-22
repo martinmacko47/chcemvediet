@@ -68,6 +68,7 @@ INSTALLED_APPS = (
     u'chcemvediet.apps.geounits',
     u'chcemvediet.apps.obligees',
     u'chcemvediet.apps.inforequests',
+    u'chcemvediet.apps.anonymization',
 )
 
 MIDDLEWARE_CLASSES = (
