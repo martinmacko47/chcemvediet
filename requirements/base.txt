@@ -17,6 +17,7 @@ django-bootstrap-sass==0.0.6-alpha
 jsonfield==1.0.2
 openpyxl==2.2.6
 python-magic==0.4.15
+subprocess32==3.5.4
 
 # Dependencies for base requirements
 six==1.9.0                    # python-dateutil, django-aggregate-if, django-libsass
