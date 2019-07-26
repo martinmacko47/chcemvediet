@@ -1,9 +1,11 @@
 import os
 import shutil
 import traceback
+import tempfile
 
 import subprocess32
 from django.core.files.base import ContentFile
+from wand.image import Image
 
 from poleno.cron import cron_job, cron_logger
 from poleno.attachments.models import Attachment
@@ -62,6 +64,31 @@ def normalize_using_libreoffice(attachment):
                           u'unexpected error occured: {}\n{}'.format(
                                   attachment, e.__class__.__name__, trace))
 
+def normalize_using_imagemagic(attachment):
+    try:
+        with Image(filename=attachment.file.path) as original:
+            with original.convert(u'pdf') as converted:
+                with tempfile.NamedTemporaryFile() as temp:
+                    converted.save(filename=temp.name)
+                    AttachmentNormalization.objects.create(
+                        attachment=attachment,
+                        successful=True,
+                        file=ContentFile(temp.read()),
+                        content_type=content_types.PDF_CONTENT_TYPE,
+                    )
+        cron_logger.info(u'Normalized attachment using imagemagic: {}'.format(attachment))
+    except Exception as e:
+        trace = unicode(traceback.format_exc(), u'utf-8')
+        AttachmentNormalization.objects.create(
+            attachment=attachment,
+            successful=False,
+            content_type=content_types.PDF_CONTENT_TYPE,
+            debug=u'{}'.format(trace)
+        )
+        cron_logger.error(u'Normalizing attachment using imagemagic has failed: {}\n An '
+                          u'unexpected error occured: {}\n{}'.format(
+                                  attachment, e.__class__.__name__, trace))
+
 def skip_normalization(attachment):
     AttachmentNormalization.objects.create(
         attachment=attachment,
@@ -84,5 +111,7 @@ def attachment_normalization():
         normalize_pdf(attachment)
     elif attachment.content_type in content_types.LIBREOFFICE_CONTENT_TYPES:
         normalize_using_libreoffice(attachment)
+    elif attachment.content_type in content_types.IMAGEMAGICK_CONTENT_TYPES:
+        normalize_using_imagemagic(attachment)
     else:
         skip_normalization(attachment)

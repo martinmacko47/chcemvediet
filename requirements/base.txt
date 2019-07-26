@@ -18,6 +18,7 @@ jsonfield==1.0.2
 openpyxl==2.2.6
 python-magic==0.4.15
 subprocess32==3.5.4
+Wand==0.5.5
 
 # Dependencies for base requirements
 six==1.9.0                    # python-dateutil, django-aggregate-if, django-libsass
