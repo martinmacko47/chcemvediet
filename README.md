@@ -24,6 +24,7 @@ The following packages are also recommended, but you can configure `setup.py` to
 instead of them:
 
  * libreoffice
+ * imagemagick
 
 
 ### 1.2. Installation
@@ -107,6 +108,7 @@ You need the following packages installed
  * libmysqlclient-dev
  * libapache2-mod-wsgi
  * libreoffice
+ * imagemagick
 
 
 ### 2.2. Installation
