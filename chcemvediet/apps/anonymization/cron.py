@@ -6,6 +6,8 @@ import tempfile
 import subprocess32
 from django.core.files.base import ContentFile
 from wand.image import Image
+from wand.resource import limits
+import wand
 
 from poleno.cron import cron_job, cron_logger
 from poleno.attachments.models import Attachment
@@ -68,14 +70,12 @@ def normalize_using_imagemagic(attachment):
     try:
         with Image(filename=attachment.file.path) as original:
             with original.convert(u'pdf') as converted:
-                with tempfile.NamedTemporaryFile() as temp:
-                    converted.save(filename=temp.name)
-                    AttachmentNormalization.objects.create(
-                        attachment=attachment,
-                        successful=True,
-                        file=ContentFile(temp.read()),
-                        content_type=content_types.PDF_CONTENT_TYPE,
-                    )
+                AttachmentNormalization.objects.create(
+                    attachment=attachment,
+                    successful=True,
+                    file=ContentFile(converted.make_blob()),
+                    content_type=content_types.PDF_CONTENT_TYPE,
+                )
         cron_logger.info(u'Normalized attachment using imagemagic: {}'.format(attachment))
     except Exception as e:
         trace = unicode(traceback.format_exc(), u'utf-8')

@@ -24,13 +24,21 @@ The following packages are also recommended, but you can configure `setup.py` to
 instead of them:
 
  * libreoffice
+ * libmagickwand-dev
+ 
+ 
+ #### 1.1.1. ImageMagick Configuration
+  In the Imagemagick `policy.xml` file change the `rights` of `PDF` format type from `"none"` 
+  to `"read|write"`.
+  
+    <policy domain="coder" rights="read|write" pattern="PDF" />
 
 
 ### 1.2. Installation
 
 To prepare your local development environment, run the following commands:
 
-	$ git clone https://github.com/martinmacko47/chcemvediet.git
+    $ git clone https://github.com/martinmacko47/chcemvediet.git
 	$ cd chcemvediet
 	$ python setup.py
 
@@ -107,6 +115,14 @@ You need the following packages installed
  * libmysqlclient-dev
  * libapache2-mod-wsgi
  * libreoffice
+ * libmagicwand-dev
+ 
+ 
+  #### 2.1.1. ImageMagick Configuration
+  In the Imagemagick `policy.xml` file change the `rights` of `PDF` format type from `"none"` 
+  to `"read|write"`.
+  
+    <policy domain="coder" rights="read|write" pattern="PDF" />
 
 
 ### 2.2. Installation
