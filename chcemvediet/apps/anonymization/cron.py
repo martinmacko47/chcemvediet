@@ -30,18 +30,17 @@ def normalize_pdf(attachment):
 def normalize_using_libreoffice(attachment):
     try:
         p = None
-        with temporary_directory() as directory_name:
-            filename = os.path.join(directory_name,
-                                    u'file' + guess_extension(attachment.content_type))
+        with temporary_directory() as directory:
+            filename = os.path.join(directory, u'file' + guess_extension(attachment.content_type))
             shutil.copy2(attachment.file.path, filename)
             p = subprocess32.run(
-                [u'libreoffice', u'--headless', u'--convert-to', u'pdf', u'--outdir',
-                 directory_name, filename],
+                [u'libreoffice', u'--headless', u'--convert-to', u'pdf', u'--outdir', directory,
+                 filename],
                 stdout=subprocess32.PIPE,
                 stderr=subprocess32.PIPE,
                 timeout=LIBREOFFICE_TIMEOUT
             )
-            with open(os.path.join(directory_name, u'file.pdf'), u'rb') as file_pdf:
+            with open(os.path.join(directory, u'file.pdf'), u'rb') as file_pdf:
                 AttachmentNormalization.objects.create(
                     attachment=attachment,
                     successful=True,
@@ -67,17 +66,16 @@ def normalize_using_libreoffice(attachment):
 def normalize_using_imagemagic(attachment):
     try:
         p = None
-        with temporary_directory() as directory_name:
-            filename = os.path.join(directory_name,
-                                    u'image' + guess_extension(attachment.content_type))
+        with temporary_directory() as directory:
+            filename = os.path.join(directory, u'file' + guess_extension(attachment.content_type))
             shutil.copy2(attachment.file.path, filename)
             p = subprocess32.run(
-                [u'convert', filename, filename + u'.pdf'],
+                [u'convert', filename, os.path.join(directory, u'file.pdf')],
                 stdout=subprocess32.PIPE,
                 stderr=subprocess32.PIPE,
                 timeout=IMAGEMAGIC_TIMEOUT
             )
-            with open(filename + u'.pdf', u'rb') as file_pdf:
+            with open(os.path.join(directory, u'file.pdf'), u'rb') as file_pdf:
                 AttachmentNormalization.objects.create(
                     attachment=attachment,
                     successful=True,
