@@ -14,3 +14,10 @@ LIBREOFFICE_CONTENT_TYPES = (
     u'text/plain',
     u'text/rtf',
 )
+
+IMAGEMAGICK_CONTENT_TYPES = (
+    u'image/gif',
+    u'image/jpeg',
+    u'image/png',
+    u'image/tiff',
+)
