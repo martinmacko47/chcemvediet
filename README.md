@@ -25,13 +25,16 @@ instead of them:
 
  * libreoffice
  * imagemagick
- 
- 
-  #### 1.1.1. ImageMagick Configuration
-  In the Imagemagick `policy.xml` file change the `rights` of `PDF` format type from `"none"` 
-  to `"read|write"`.
-  
-    <policy domain="coder" rights="read|write" pattern="PDF" />
+
+
+#### 1.1.1. ImageMagick Configuration
+
+In the Imagemagick `policy.xml` file change the `rights` of `PDF` format type from `"none"`
+to `"read|write"`. See the related [Imagemagick issue] why.
+
+  <policy domain="coder" rights="read|write" pattern="PDF" />
+
+[Imagemagick issue]: https://bugs.launchpad.net/ubuntu/+source/imagemagick/+bug/1796563
 
 
 ### 1.2. Installation
@@ -116,13 +119,15 @@ You need the following packages installed
  * libapache2-mod-wsgi
  * libreoffice
  * imagemagick
- 
- 
- #### 2.1.1. ImageMagick Configuration
- In the Imagemagick `policy.xml` file change the `rights` of `PDF` format type from `"none"` 
- to `"read|write"`.
-  
+
+#### 2.1.1. ImageMagick Configuration
+
+In the Imagemagick `policy.xml` file change the `rights` of `PDF` format type from `"none"`
+to `"read|write"`. See the related [Imagemagick issue] why.
+
     <policy domain="coder" rights="read|write" pattern="PDF" />
+
+[Imagemagick issue]: https://bugs.launchpad.net/ubuntu/+source/imagemagick/+bug/1796563
 
 
 ### 2.2. Installation
