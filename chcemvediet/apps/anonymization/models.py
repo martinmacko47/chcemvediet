@@ -33,11 +33,11 @@ class AttachmentNormalization(FormatMixin, models.Model):
                 Empty filename if normalization failed or normalization didn't create any file.
                 """))
 
-    # May NOT be empty: Extension automatically adjusted in save() when creating new object.
-    name = models.CharField(max_length=255,
+    # May be empty: Extension automatically adjusted in save() when creating new object.
+    name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
                 Attachment file name, e.g. "document.pdf". Extension automatically adjusted when
-                creating a new object.
+                creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
@@ -99,7 +99,7 @@ class AttachmentNormalization(FormatMixin, models.Model):
             if self.file._file:
                 self.file.name = random_string(10)
                 self.size = self.file.size
-            self.name = adjust_extension(self.attachment.name, self.content_type)
+                self.name = adjust_extension(self.attachment.name, self.content_type)
 
         super(AttachmentNormalization, self).save(*args, **kwargs)
 
