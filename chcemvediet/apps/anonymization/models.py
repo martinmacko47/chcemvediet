@@ -37,7 +37,7 @@ class AttachmentNormalization(FormatMixin, models.Model):
     name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
                 Attachment file name, e.g. "document.pdf". Extension automatically adjusted when
-                creating a new object. Is empty, if file is empty.
+                creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
