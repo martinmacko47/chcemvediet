@@ -18,7 +18,7 @@ def clear_expired_sessions():
 
 @cron_job(run_every_mins=60)
 def send_admin_error_logs():
-    logfile = os.path.abspath(os.path.join(os.path.dirname(__file__), u'../logs/mail_admins.log'))
+    logfile = os.path.join(settings.PROJECT_PATH, u'logs/mail_admins.log')
     tmpfile = logfile + u'.tmp'
 
     if not os.path.isfile(logfile):

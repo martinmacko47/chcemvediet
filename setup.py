@@ -90,7 +90,7 @@ class Configure(object):
         configured = self.data.get(key, default)
         prompt = u'\n{} [{}]: '.format(prompt, configured)
         while True:
-            inputed = raw_input(PROMPT + prompt + RESET) or configured
+            inputed = unicode(raw_input(PROMPT + prompt + RESET)) or configured
             if required and not inputed:
                 print(ERROR + u'\nError: The value is required.' + RESET)
                 continue
@@ -119,7 +119,7 @@ class Configure(object):
         configured = self.data.get(key, default)
         prompt = u'\n{} Y/N [{}]: '.format(prompt, configured)
         while True:
-            inputed = raw_input(PROMPT + prompt + RESET) or configured
+            inputed = unicode(raw_input(PROMPT + prompt + RESET)) or configured
             if not inputed:
                 print(ERROR + u'\nError: The value is required.' + RESET)
                 continue
@@ -142,7 +142,7 @@ class Configure(object):
                 configured_choice = format(idx+1)
         prompt = u'\n{} [{}]: '.format(prompt, configured_choice)
         while True:
-            inputed = raw_input(PROMPT + prompt + RESET) or configured_choice
+            inputed = unicode(raw_input(PROMPT + prompt + RESET)) or configured_choice
             if not inputed:
                 print(ERROR + u'\nError: The value is required.' + RESET)
                 continue
@@ -231,6 +231,23 @@ def configure_server_mode(configure, settings):
             }[server_mode]
     for include in includes:
         settings.include(include)
+
+def configure_libreoffice(configure, settings):
+    print(INFO + textwrap.dedent(u"""
+            The application uses libreoffice package. You can install it by yourself or use
+            included mocked version.""") + RESET)
+    mock_libreoffice = configure.input_yes_no(u'mock_libreoffice', u'Mock libreoffice?',
+                                              default=u'N')
+    mock_libreoffice = True if mock_libreoffice == u'Y' else False
+    settings.setting(u'MOCK_LIBREOFFICE', mock_libreoffice)
+
+def configure_imagemagick(configure, settings):
+    print(INFO + textwrap.dedent(u"""
+            The application uses imagemagic package. You can install it by yourself or use
+            included mocked version.""") + RESET)
+    mock_imagemagic = configure.input_yes_no(u'mock_imagemagic', u'Mock imagemagic?', default=u'N')
+    mock_imagemagic = True if mock_imagemagic == u'Y' else False
+    settings.setting(u'MOCK_IMAGEMAGIC', mock_imagemagic)
 
 def install_requirements(configure):
     server_mode = configure.get(u'server_mode')
@@ -574,6 +591,8 @@ def main():
         # Configure project settings
         with Settings() as settings:
             configure_server_mode(configure, settings)
+            configure_libreoffice(configure, settings)
+            configure_imagemagick(configure, settings)
             install_requirements(configure)
             download_fontello(configure)
             configure_secret_key(configure, settings)
