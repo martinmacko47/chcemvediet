@@ -39,7 +39,8 @@ to `"read|write"`. See the related [Imagemagick issue] why.
 
 
 #### 2.1.2. Libmagic Configuration
-Some word documents can sometimes fail to identify correctly. You can solve it by editing 
+
+Some word documents can sometimes fail to identify correctly. You can solve it by editing
 `/etc/magic` file with add rules for this documents. See the related [Libmagic issue] why.
 
 [Libmagic issue]: https://serverfault.com/questions/338087/making-libmagic-file-detect-docx-files/377792
@@ -128,7 +129,7 @@ You need the following packages installed
  * libreoffice
  * imagemagick
  * libmagic (ver. 5.25+)
- 
+
 
 #### 2.1.1. ImageMagick Configuration
 
@@ -141,7 +142,8 @@ to `"read|write"`. See the related [Imagemagick issue] why.
 
 
 #### 2.1.2. Libmagic Configuration
-Some word documents can sometimes fail to identify correctly. You can solve it by editing 
+
+Some word documents can sometimes fail to identify correctly. You can solve it by editing
 `/etc/magic` file with add rules for this documents. See the related [Libmagic issue] why.
 
 [Libmagic issue]: https://serverfault.com/questions/338087/making-libmagic-file-detect-docx-files/377792
