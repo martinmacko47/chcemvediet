@@ -19,6 +19,7 @@ You need the following packages installed:
 
  * python (ver. 2.7.x)
  * python-virtualenv
+ * libmagic (ver. 5.25+)
 
 The following packages are also recommended, but you can configure `setup.py` to use mocks
 instead of them:
@@ -35,6 +36,14 @@ to `"read|write"`. See the related [Imagemagick issue] why.
   <policy domain="coder" rights="read|write" pattern="PDF" />
 
 [Imagemagick issue]: https://bugs.launchpad.net/ubuntu/+source/imagemagick/+bug/1796563
+
+
+#### 2.1.2. Libmagic Configuration
+
+Some word documents can sometimes fail to identify correctly. You can solve it by editing
+`/etc/magic` file with add rules for this documents. See the related [Libmagic issue] why.
+
+[Libmagic issue]: https://serverfault.com/questions/338087/making-libmagic-file-detect-docx-files/377792
 
 
 ### 1.2. Installation
@@ -119,6 +128,8 @@ You need the following packages installed
  * libapache2-mod-wsgi
  * libreoffice
  * imagemagick
+ * libmagic (ver. 5.25+)
+
 
 #### 2.1.1. ImageMagick Configuration
 
@@ -128,6 +139,14 @@ to `"read|write"`. See the related [Imagemagick issue] why.
     <policy domain="coder" rights="read|write" pattern="PDF" />
 
 [Imagemagick issue]: https://bugs.launchpad.net/ubuntu/+source/imagemagick/+bug/1796563
+
+
+#### 2.1.2. Libmagic Configuration
+
+Some word documents can sometimes fail to identify correctly. You can solve it by editing
+`/etc/magic` file with add rules for this documents. See the related [Libmagic issue] why.
+
+[Libmagic issue]: https://serverfault.com/questions/338087/making-libmagic-file-detect-docx-files/377792
 
 
 ### 2.2. Installation
