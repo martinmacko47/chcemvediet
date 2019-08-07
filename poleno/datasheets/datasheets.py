@@ -393,7 +393,7 @@ class Importer(object):
                     inputed = default
                 self.stdout.write(inputed)
             else:
-                inputed = raw_input() or default
+                inputed = unicode(raw_input()) or default
 
             if not inputed:
                 error = u'The value is required.'

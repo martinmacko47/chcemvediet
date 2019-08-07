@@ -4,6 +4,7 @@ import traceback
 
 import subprocess32
 from django.core.files.base import ContentFile
+from django.conf import settings
 
 from poleno.cron import cron_job, cron_logger
 from poleno.attachments.models import Attachment
@@ -27,7 +28,22 @@ def normalize_pdf(attachment):
     )
     cron_logger.info(u'Normalized attachment: {}'.format(attachment))
 
+def normalize_mocks(attachment, package):
+    with open(u'chcemvediet/apps/anonymization/mocks/normalized.pdf', u'rb') as file:
+        AttachmentNormalization.objects.create(
+            attachment=attachment,
+            successful=True,
+            file=ContentFile(file.read()),
+            content_type=content_types.PDF_CONTENT_TYPE,
+            debug=u'Was created using mocked {}.'.format(package)
+        )
+    cron_logger.info(u'Normalized attachment using mocked {}: {}'.format(package, attachment))
+
 def normalize_using_libreoffice(attachment):
+    if settings.MOCK_LIBREOFFICE:
+        normalize_mocks(attachment, u'libreoffice')
+        return
+
     try:
         p = None
         with temporary_directory() as directory:
@@ -64,6 +80,10 @@ def normalize_using_libreoffice(attachment):
                                   attachment, e.__class__.__name__, trace))
 
 def normalize_using_imagemagic(attachment):
+    if settings.MOCK_IMAGEMAGIC:
+        normalize_mocks(attachment, u'imagemagic')
+        return
+
     try:
         p = None
         with temporary_directory() as directory:
