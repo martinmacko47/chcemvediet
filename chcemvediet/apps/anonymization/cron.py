@@ -37,7 +37,7 @@ def normalize_using_mock(attachment, package):
             successful=True,
             file=ContentFile(file.read()),
             content_type=content_types.PDF_CONTENT_TYPE,
-            debug=u'Was created using mocked {}.'.format(package)
+            debug=u'Created using mocked {}.'.format(package)
         )
     cron_logger.info(u'Normalized attachment using mocked {}: {}'.format(package, attachment))
 

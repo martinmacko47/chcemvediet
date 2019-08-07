@@ -234,7 +234,7 @@ def configure_server_mode(configure, settings):
 
 def configure_libreoffice(configure, settings):
     print(INFO + textwrap.dedent(u"""
-            The application uses libreoffice package. You can install it by yourself or use 
+            The application uses libreoffice package. You can install it by yourself or use
             included mocked version.""") + RESET)
     mock_libreoffice = configure.input_yes_no(u'mock_libreoffice', u'Mock libreoffice?',
                                               default=u'N')
@@ -243,7 +243,7 @@ def configure_libreoffice(configure, settings):
 
 def configure_imagemagick(configure, settings):
     print(INFO + textwrap.dedent(u"""
-            The application uses imagemagic package. You can install it by yourself or use 
+            The application uses imagemagic package. You can install it by yourself or use
             included mocked version.""") + RESET)
     mock_imagemagic = configure.input_yes_no(u'mock_imagemagic', u'Mock imagemagic?', default=u'N')
     mock_imagemagic = True if mock_imagemagic == u'Y' else False
