@@ -234,16 +234,17 @@ def configure_server_mode(configure, settings):
 
 def configure_libreoffice(configure, settings):
     print(INFO + textwrap.dedent(u"""
-            Application uses libreoffice package. If you don't have this package installed, 
-            it can be used for mock its function.""") + RESET)
-    mock_libre = configure.input_yes_no(u'mock_libreoffice', u'Mock libreoffice?', default=u'N')
-    mock_libre = True if mock_libre == u'Y' else False
-    settings.setting(u'MOCK_LIBREOFFICE', mock_libre)
+            The application uses libreoffice package. You can install it by yourself or use 
+            included mocked version.""") + RESET)
+    mock_libreoffice = configure.input_yes_no(u'mock_libreoffice', u'Mock libreoffice?',
+                                              default=u'N')
+    mock_libreoffice = True if mock_libreoffice == u'Y' else False
+    settings.setting(u'MOCK_LIBREOFFICE', mock_libreoffice)
 
 def configure_imagemagick(configure, settings):
     print(INFO + textwrap.dedent(u"""
-            Application uses imagemagic package. If you don't have this package installed, 
-            it can be used for mock its function.""") + RESET)
+            The application uses imagemagic package. You can install it by yourself or use 
+            included mocked version.""") + RESET)
     mock_imagemagic = configure.input_yes_no(u'mock_imagemagic', u'Mock imagemagic?', default=u'N')
     mock_imagemagic = True if mock_imagemagic == u'Y' else False
     settings.setting(u'MOCK_IMAGEMAGIC', mock_imagemagic)

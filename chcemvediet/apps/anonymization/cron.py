@@ -28,8 +28,10 @@ def normalize_pdf(attachment):
     )
     cron_logger.info(u'Normalized attachment: {}'.format(attachment))
 
-def normalize_mocks(attachment, package):
-    with open(u'chcemvediet/apps/anonymization/mocks/normalized.pdf', u'rb') as file:
+def normalize_using_mock(attachment, package):
+    normalized = os.path.join(settings.PROJECT_PATH,
+                              u'chcemvediet/apps/anonymization/mocks/normalized.pdf')
+    with open(normalized, u'rb') as file:
         AttachmentNormalization.objects.create(
             attachment=attachment,
             successful=True,
@@ -41,7 +43,7 @@ def normalize_mocks(attachment, package):
 
 def normalize_using_libreoffice(attachment):
     if settings.MOCK_LIBREOFFICE:
-        normalize_mocks(attachment, u'libreoffice')
+        normalize_using_mock(attachment, u'libreoffice')
         return
 
     try:
@@ -81,7 +83,7 @@ def normalize_using_libreoffice(attachment):
 
 def normalize_using_imagemagic(attachment):
     if settings.MOCK_IMAGEMAGIC:
-        normalize_mocks(attachment, u'imagemagic')
+        normalize_using_mock(attachment, u'imagemagic')
         return
 
     try:
