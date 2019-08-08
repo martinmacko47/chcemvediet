@@ -111,7 +111,6 @@ class Attachment(FormatMixin, models.Model):
             self.size = self.file.size
             self.content_type = magic.from_buffer(self.file.read(), mime=True)
             self.name = sanitize_filename(self.name, self.content_type)
-
         super(Attachment, self).save(*args, **kwargs)
 
     def clone(self, generic_object):

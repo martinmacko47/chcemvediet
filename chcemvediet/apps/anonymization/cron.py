@@ -11,13 +11,14 @@ from poleno.attachments.models import Attachment
 from poleno.utils.misc import guess_extension
 from chcemvediet.apps.inforequests.models import Action
 
-from .models import AttachmentNormalization
+from .models import AttachmentNormalization, AttachmentRecognition
 from .utils import temporary_directory
 from . import content_types
 
 
 LIBREOFFICE_TIMEOUT = 300
 IMAGEMAGIC_TIMEOUT = 300
+OCR_TIMEOUT = 300
 
 def normalize_pdf(attachment):
     AttachmentNormalization.objects.create(
@@ -130,12 +131,7 @@ def skip_normalization(attachment):
     cron_logger.info(u'Skipping normalization of attachment with not supported content '
                      u'type: {}'.format(attachment))
 
-@cron_job(run_every_mins=1)
-def attachment_normalization():
-    attachment = (Attachment.objects.attached_to(Action)
-            .filter(attachmentnormalization__isnull=True)
-            .first()
-            )
+def normalize_attachment(attachment):
     if attachment is None:
         return
     elif attachment.content_type == content_types.PDF_CONTENT_TYPE:
@@ -146,3 +142,72 @@ def attachment_normalization():
         normalize_using_imagemagic(attachment)
     else:
         skip_normalization(attachment)
+
+def recognize_using_ocr(attachment_normalization):
+    try:
+        p = None
+        with temporary_directory() as directory:
+            filename = os.path.join(directory, u'file.pdf')
+            shutil.copy2(attachment_normalization.file.path, filename)
+            p = subprocess32.run(
+                [u'abbyocr11', u'--recognitionLanguage', u'Slovak', u'--splitDualPages', u'-if',
+                 filename, u'-f', u'ODT', u'--rtfKeepLines', u'--rtfRemoveSoftHyphens',
+                 u'--rtfPageSynthesisMode', u'ExactCopy', u'-of', os.path.join(directory, u'file.odt')],
+                stdout=subprocess32.PIPE,
+                stderr=subprocess32.PIPE,
+                timeout=OCR_TIMEOUT
+            )
+            with open(os.path.join(directory, u'file.odt'), u'rb') as file_odt:
+                AttachmentRecognition.objects.create(
+                    attachment=attachment_normalization.attachment,
+                    successful=True,
+                    file=ContentFile(file_odt.read()),
+                    content_type=content_types.ODT_CONTENT_TYPE,
+                    debug=u'STDOUT:\n{}\nSTDERR:\n{}'.format(p.stdout, p.stderr)
+                )
+            cron_logger.info(u'Recognized attachment normalization using ocr: {}'.format(
+                attachment_normalization))
+    except Exception as e:
+        trace = unicode(traceback.format_exc(), u'utf-8')
+        stdout = p.stdout if p else getattr(e, u'stdout', u'')
+        stderr = p.stderr if p else getattr(e, u'stderr', u'')
+        AttachmentRecognition.objects.create(
+            attachment=attachment_normalization.attachment,
+            successful=False,
+            content_type=content_types.ODT_CONTENT_TYPE,
+            debug=u'STDOUT:\n{}\nSTDERR:\n{}\n{}'.format(stdout, stderr, trace)
+        )
+        cron_logger.error(u'Recognizing attachment normalization using ocr has failed: {}\n An '
+                          u'unexpected error occured: {}\n{}'.format(
+                          attachment_normalization, e.__class__.__name__, trace))
+
+def skip_recognition(attachment_normalization):
+    AttachmentRecognition.objects.create(
+        attachment=attachment_normalization.attachment,
+        successful=False,
+        content_type=None,
+        debug=u'Not supported content type'
+    )
+    cron_logger.info(u'Skipping recognition of attachment with not supported content '
+                     u'type: {}'.format(attachment_normalization.attachment))
+
+def recognize_attachment(attachment_normalization):
+    if attachment_normalization is None:
+        return
+    elif attachment_normalization.content_type == content_types.PDF_CONTENT_TYPE:
+        recognize_using_ocr(attachment_normalization)
+    else:
+        skip_recognition(attachment_normalization)
+
+
+@cron_job(run_every_mins=1)
+def anonymization():
+    attachment = (Attachment.objects.attached_to(Action)
+            .filter(attachmentnormalization__isnull=True)
+            .first()
+            )
+    normalize_attachment(attachment)
+    attachment_normalization = (AttachmentNormalization.objects.filter( successful=True,
+                                                                        content_type=content_types.PDF_CONTENT_TYPE,
+                                                                        attachment__attachmentrecognition__isnull=True))
+    recognize_attachment(attachment_normalization)
