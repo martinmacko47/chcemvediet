@@ -15,5 +15,6 @@
 /logs/*.log.*
 /media/attachments
 /media/attachment_normalizations
+/media/attachment_recognitions
 /fixtures/*.configured.json
 /chcemvediet/settings/configured.py
