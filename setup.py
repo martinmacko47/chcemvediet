@@ -249,6 +249,14 @@ def configure_imagemagick(configure, settings):
     mock_imagemagic = True if mock_imagemagic == u'Y' else False
     settings.setting(u'MOCK_IMAGEMAGIC', mock_imagemagic)
 
+def configure_ocr(configure, settings):
+    print(INFO + textwrap.dedent(u"""
+            The application uses abbyyocr11 package. You can install it by yourself or use
+            included mocked version.""") + RESET)
+    mock_ocr = configure.input_yes_no(u'mock_ocr', u'Mock abbyyocr11?', default=u'N')
+    mock_ocr = True if mock_ocr == u'Y' else False
+    settings.setting(u'MOCK_OCR', mock_ocr)
+
 def install_requirements(configure):
     server_mode = configure.get(u'server_mode')
     enable_unittests = configure.input_yes_no(u'enable_unittests',
@@ -593,6 +601,7 @@ def main():
             configure_server_mode(configure, settings)
             configure_libreoffice(configure, settings)
             configure_imagemagick(configure, settings)
+            configure_ocr(configure, settings)
             install_requirements(configure)
             download_fontello(configure)
             configure_secret_key(configure, settings)

@@ -26,6 +26,7 @@ instead of them:
 
  * libreoffice
  * imagemagick
+ * abbyyocr11
 
 
 #### 1.1.1. ImageMagick Configuration
@@ -129,6 +130,7 @@ You need the following packages installed
  * libreoffice
  * imagemagick
  * libmagic (ver. 5.25+)
+ * abbyyocr11
 
 
 #### 2.1.1. ImageMagick Configuration
