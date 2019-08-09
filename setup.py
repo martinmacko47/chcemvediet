@@ -232,30 +232,18 @@ def configure_server_mode(configure, settings):
     for include in includes:
         settings.include(include)
 
-def configure_libreoffice(configure, settings):
+def configure_mock(configure, settings, package, config_key, setting_name):
     print(INFO + textwrap.dedent(u"""
-            The application uses libreoffice package. You can install it by yourself or use
-            included mocked version.""") + RESET)
-    mock_libreoffice = configure.input_yes_no(u'mock_libreoffice', u'Mock libreoffice?',
-                                              default=u'N')
-    mock_libreoffice = True if mock_libreoffice == u'Y' else False
-    settings.setting(u'MOCK_LIBREOFFICE', mock_libreoffice)
+            The application uses {} package. You can install it by yourself or use
+            included mocked version.""".format(package)) + RESET)
+    mock = configure.input_yes_no(config_key, u'Mock {}?'.format(package), default=u'N')
+    mock = True if mock == u'Y' else False
+    settings.setting(setting_name, mock)
 
-def configure_imagemagick(configure, settings):
-    print(INFO + textwrap.dedent(u"""
-            The application uses imagemagic package. You can install it by yourself or use
-            included mocked version.""") + RESET)
-    mock_imagemagic = configure.input_yes_no(u'mock_imagemagic', u'Mock imagemagic?', default=u'N')
-    mock_imagemagic = True if mock_imagemagic == u'Y' else False
-    settings.setting(u'MOCK_IMAGEMAGIC', mock_imagemagic)
-
-def configure_ocr(configure, settings):
-    print(INFO + textwrap.dedent(u"""
-            The application uses abbyyocr11 package. You can install it by yourself or use
-            included mocked version.""") + RESET)
-    mock_ocr = configure.input_yes_no(u'mock_ocr', u'Mock abbyyocr11?', default=u'N')
-    mock_ocr = True if mock_ocr == u'Y' else False
-    settings.setting(u'MOCK_OCR', mock_ocr)
+def configure_mocks(configure, settings):
+    configure_mock(configure, settings, u'libreoffice', u'mock_libreoffice', u'MOCK_LIBREOFFICE')
+    configure_mock(configure, settings, u'imagemagic', u'mock_imagemagic', u'MOCK_IMAGEMAGIC')
+    configure_mock(configure, settings, u'abbyyocr11', u'mock_ocr', u'MOCK_OCR')
 
 def install_requirements(configure):
     server_mode = configure.get(u'server_mode')
@@ -599,9 +587,7 @@ def main():
         # Configure project settings
         with Settings() as settings:
             configure_server_mode(configure, settings)
-            configure_libreoffice(configure, settings)
-            configure_imagemagick(configure, settings)
-            configure_ocr(configure, settings)
+            configure_mocks(configure, settings)
             install_requirements(configure)
             download_fontello(configure)
             configure_secret_key(configure, settings)

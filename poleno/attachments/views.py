@@ -28,5 +28,8 @@ def upload(request, generic_object, download_url_func):
     return JsonResponse({u'files': res})
 
 def download(request, attachment):
+    u"""
+    Download view for attachments and attachment like objects
+    """
     path = os.path.join(settings.MEDIA_ROOT, attachment.file.name)
     return send_file_response(request, path, attachment.name, attachment.content_type)

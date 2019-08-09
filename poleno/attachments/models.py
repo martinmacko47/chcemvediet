@@ -137,5 +137,7 @@ def datachecks(superficial, autofix):
         return []
     attachments = Attachment.objects.all()
     field = Attachment._meta.get_field(u'file')
-    return itertools.chain(attachment_file_check(attachments),
-                           attachment_orphaned_file_check(attachments, field, Attachment))
+    return itertools.chain(
+        attachment_file_check(attachments),
+        attachment_orphaned_file_check(attachments, field, Attachment),
+    )

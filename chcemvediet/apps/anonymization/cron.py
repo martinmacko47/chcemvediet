@@ -131,7 +131,11 @@ def skip_normalization(attachment):
     cron_logger.info(u'Skipping normalization of attachment with not supported content '
                      u'type: {}'.format(attachment))
 
-def normalize_attachment(attachment):
+def normalize_attachment():
+    attachment = (Attachment.objects.attached_to(Action)
+                  .filter(attachmentnormalization__isnull=True)
+                  .first()
+                  )
     if attachment is None:
         return
     elif attachment.content_type == content_types.PDF_CONTENT_TYPE:
@@ -200,34 +204,18 @@ def recognize_using_ocr(attachment_normalization):
                           u'unexpected error occured: {}\n{}'.format(
                           attachment_normalization, e.__class__.__name__, trace))
 
-def skip_recognition(attachment_normalization):
-    AttachmentRecognition.objects.create(
-        attachment=attachment_normalization.attachment,
-        successful=False,
-        content_type=None,
-        debug=u'Not supported content type'
-    )
-    cron_logger.info(u'Skipping recognition of attachment_normalization with not supported content '
-                     u'type: {}'.format(attachment_normalization.attachment))
-
-def recognize_attachment(attachment_normalization):
+def recognize_attachment():
+    attachment_normalization = (AttachmentNormalization.objects
+            .filter(successful=True,
+                    content_type=content_types.PDF_CONTENT_TYPE,
+                    attachment__attachmentrecognition__isnull=True)
+            .first())
     if attachment_normalization is None:
         return
-    elif attachment_normalization.content_type == content_types.PDF_CONTENT_TYPE:
-        recognize_using_ocr(attachment_normalization)
     else:
-        skip_recognition(attachment_normalization)
+        recognize_using_ocr(attachment_normalization)
 
 @cron_job(run_every_mins=1)
 def anonymization():
-    attachment = (Attachment.objects.attached_to(Action)
-            .filter(attachmentnormalization__isnull=True)
-            .first()
-            )
-    normalize_attachment(attachment)
-    attachment_normalization = (AttachmentNormalization.objects
-            .filter(successful=True,
-                   content_type=content_types.PDF_CONTENT_TYPE,
-                   attachment__attachmentrecognition__isnull=True)
-            .first())
-    recognize_attachment(attachment_normalization)
+    normalize_attachment()
+    recognize_attachment()

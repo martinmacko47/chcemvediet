@@ -26,7 +26,9 @@ instead of them:
 
  * libreoffice
  * imagemagick
- * abbyyocr11
+ * abbyyocr11 ([download])
+ 
+ [download]: https://www.ocr4linux.com/en:download:start
 
 
 #### 1.1.1. ImageMagick Configuration
@@ -130,7 +132,9 @@ You need the following packages installed
  * libreoffice
  * imagemagick
  * libmagic (ver. 5.25+)
- * abbyyocr11
+ * abbyyocr11 ([download])
+ 
+ [download]: https://www.ocr4linux.com/en:download:start
 
 
 #### 2.1.1. ImageMagick Configuration

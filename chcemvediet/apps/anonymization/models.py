@@ -36,15 +36,15 @@ class AttachmentNormalization(FormatMixin, models.Model):
     # May be empty: Extension automatically adjusted in save() when creating new object.
     name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
-                Attachment file name, e.g. "document.pdf". Extension automatically adjusted when
-                creating a new object. Empty, if file.name is empty.
+                Attachment normalization file name, e.g. "document.pdf". Extension automatically 
+                adjusted when creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment content type, e.g. "application/pdf". The value may be specified even if
-                normalization failed.
+                Attachment normalization content type, e.g. "application/pdf". The value may be 
+                specified even if normalization failed.
                 """))
 
     # May NOT be NULL; Automatically computed in save() when creating a new object if undefined.
@@ -56,8 +56,8 @@ class AttachmentNormalization(FormatMixin, models.Model):
     # May be NULL; Automatically computed in save() when creating a new object.
     size = models.IntegerField(null=True, blank=True,
             help_text=squeeze(u"""
-                Attachment file size in bytes. NULL if file is NULL. Automatically computed when
-                creating a new object.
+                Attachment normalization file size in bytes. NULL if file is NULL. Automatically 
+                computed when creating a new object.
                 """))
 
     # May NOT be NULL
@@ -122,21 +122,21 @@ class AttachmentRecognition(FormatMixin, models.Model):
     # Filename may be empty; Random local filename is generated in save() when creating a new object
     file = models.FileField(upload_to=u'attachment_recognitions', max_length=255, blank=True,
             help_text=squeeze(u"""
-                Empty filename if recognition failed or recognition didn't create any file.
+                Empty filename if recognition failed.
                 """))
 
     # May be empty: Extension automatically adjusted in save() when creating new object.
     name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
-                Attachment file name, e.g. "document.pdf". Extension automatically adjusted when
-                creating a new object. Empty, if file.name is empty.
+                Attachment recognition file name, e.g. "document.pdf". Extension automatically 
+                adjusted when creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment content type, e.g. "application/pdf". The value may be specified even if
-                recognition failed.
+                Attachment recognition content type, e.g. "application/pdf". The value may be 
+                specified even if recognition failed.
                 """))
 
     # May NOT be NULL; Automatically computed in save() when creating a new object if undefined.
@@ -148,8 +148,8 @@ class AttachmentRecognition(FormatMixin, models.Model):
     # May be NULL; Automatically computed in save() when creating a new object.
     size = models.IntegerField(null=True, blank=True,
             help_text=squeeze(u"""
-                Attachment file size in bytes. NULL if file is NULL. Automatically computed when
-                creating a new object.
+                Attachment recognition file size in bytes. NULL if file is NULL. Automatically 
+                computed when creating a new object.
                 """))
 
     # May NOT be NULL
@@ -208,9 +208,10 @@ def datachecks_AttachmentNormalization(superficial, autofix):
         return []
     attachment_normalizations = AttachmentNormalization.objects.all()
     field = AttachmentNormalization._meta.get_field(u'file')
-    return itertools.chain(attachment_file_check(attachment_normalizations),
-                           attachment_orphaned_file_check(attachment_normalizations, field,
-                                                          AttachmentNormalization))
+    return itertools.chain(
+        attachment_file_check(attachment_normalizations),
+        attachment_orphaned_file_check(attachment_normalizations, field, AttachmentNormalization),
+    )
 
 @datacheck.register
 def datachecks_AttachmentRecognition(superficial, autofix):
@@ -224,6 +225,7 @@ def datachecks_AttachmentRecognition(superficial, autofix):
         return []
     attachment_recognitions = AttachmentRecognition.objects.all()
     field = AttachmentRecognition._meta.get_field(u'file')
-    return itertools.chain(attachment_file_check(attachment_recognitions),
-                           attachment_orphaned_file_check(attachment_recognitions, field,
-                                                          AttachmentRecognition))
+    return itertools.chain(
+        attachment_file_check(attachment_recognitions),
+        attachment_orphaned_file_check(attachment_recognitions, field, AttachmentRecognition),
+    )

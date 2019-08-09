@@ -5,8 +5,8 @@ from django.contrib import admin
 
 from poleno.utils.misc import decorate, filesize
 from poleno.utils.admin import admin_obj_format
+from poleno.attachments.views import download
 
-from .views import download
 from .models import AttachmentNormalization, AttachmentRecognition
 
 
@@ -62,7 +62,8 @@ class AttachmentNormalizationAdmin(admin.ModelAdmin):
 
     def download_view(self, request, attachment_normalization_pk):
         attachment_normalization = AttachmentNormalization.objects.get_or_404(
-            pk=attachment_normalization_pk)
+                pk=attachment_normalization_pk
+        )
         return download(request, attachment_normalization)
 
     def get_urls(self):
@@ -123,9 +124,10 @@ class AttachmentRecognitionAdmin(admin.ModelAdmin):
     inlines = [
             ]
 
-    def download_view(self, request, attachment_normalization_pk):
+    def download_view(self, request, attachment_recognition_pk):
         attachment_recognition = AttachmentRecognition.objects.get_or_404(
-            pk=attachment_normalization_pk)
+            pk=attachment_recognition_pk
+        )
         return download(request, attachment_recognition)
 
     def get_urls(self):
