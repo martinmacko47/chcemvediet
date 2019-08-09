@@ -19,3 +19,13 @@ Properties:
 
 Computed Properties:
 * `content`: String; May be empty; Read-only.
+
+## Administration
+
+~~List of orphaned attachments:~~
+* ~~Clean orphaned attachments~~
+* ~~Clean orphaned local files of deleted attachments~~
+* ~~Integrity check for local files of existing attachments.~~
+
+
+<sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>
