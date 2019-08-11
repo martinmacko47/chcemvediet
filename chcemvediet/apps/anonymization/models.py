@@ -128,14 +128,14 @@ class AttachmentRecognition(FormatMixin, models.Model):
     # May be empty: Extension automatically adjusted in save() when creating new object.
     name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
-                Attachment recognition file name, e.g. "document.pdf". Extension automatically 
+                Attachment recognition file name, e.g. "document.pdf". Extension automatically
                 adjusted when creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment recognition content type, e.g. "application/pdf". The value may be 
+                Attachment recognition content type, e.g. "application/pdf". The value may be
                 specified even if recognition failed.
                 """))
 
@@ -148,7 +148,7 @@ class AttachmentRecognition(FormatMixin, models.Model):
     # May be NULL; Automatically computed in save() when creating a new object.
     size = models.IntegerField(null=True, blank=True,
             help_text=squeeze(u"""
-                Attachment recognition file size in bytes. NULL if file is NULL. Automatically 
+                Attachment recognition file size in bytes. NULL if file is NULL. Automatically
                 computed when creating a new object.
                 """))
 
@@ -160,7 +160,7 @@ class AttachmentRecognition(FormatMixin, models.Model):
 
     # Backward relations added to other models:
     #
-    #  -- Attachment.attachment_normalization_set
+    #  -- Attachment.attachment_recognition_set
     #     May be empty
 
     # Indexes:
