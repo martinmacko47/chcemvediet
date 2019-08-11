@@ -27,7 +27,7 @@ class AttachmentNormalization(FormatMixin, models.Model):
                 True if normalization has succeeded, False otherwise.
                 """))
 
-    # Filename may be empty; Random local filename is generated in save() when creating a new object.
+    # Filename may be empty; Random local filename is generated in save() when creating a new object
     file = models.FileField(upload_to=u'attachment_normalizations', max_length=255, blank=True,
             help_text=squeeze(u"""
                 Empty filename if normalization failed or normalization didn't create any file.
@@ -36,29 +36,28 @@ class AttachmentNormalization(FormatMixin, models.Model):
     # May be empty: Extension automatically adjusted in save() when creating new object.
     name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
-                Attachment file name, e.g. "document.pdf". Extension automatically adjusted when
-                creating a new object. Empty, if file.name is empty.
+                Attachment normalization file name, e.g. "document.pdf". Extension automatically 
+                adjusted when creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment content type, e.g. "application/pdf". The value may be specified even if
-                normalization failed.
+                Attachment normalization content type, e.g. "application/pdf". The value may be 
+                specified even if normalization failed.
                 """))
 
     # May NOT be NULL; Automatically computed in save() when creating a new object if undefined.
     created = models.DateTimeField(blank=True,
             help_text=squeeze(u"""
-                Date and time the attachment was uploaded or received by an email. Leave blank for
-                current time.
+                Date and time the attachment was normalized. Leave blank for current time.
                 """))
 
     # May be NULL; Automatically computed in save() when creating a new object.
     size = models.IntegerField(null=True, blank=True,
             help_text=squeeze(u"""
-                Attachment file size in bytes. NULL if file is NULL. Automatically computed when
-                creating a new object.
+                Attachment normalization file size in bytes. NULL if file is NULL. Automatically 
+                computed when creating a new object.
                 """))
 
     # May NOT be NULL
@@ -100,14 +99,105 @@ class AttachmentNormalization(FormatMixin, models.Model):
                 self.file.name = random_string(10)
                 self.size = self.file.size
                 self.name = adjust_extension(self.attachment.name, self.content_type)
-
         super(AttachmentNormalization, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return format(self.pk)
 
+class AttachmentRecognitionQuerySet(QuerySet):
+    def order_by_pk(self):
+        return self.order_by(u'pk')
+
+class AttachmentRecognition(FormatMixin, models.Model):
+
+    # May NOT be NULL
+    attachment = models.ForeignKey(Attachment)
+
+    # May NOT be NULL
+    successful = models.BooleanField(default=False,
+            help_text=squeeze(u"""
+                True if recognition has succeeded, False otherwise.
+                """))
+
+    # Filename may be empty; Random local filename is generated in save() when creating a new object
+    file = models.FileField(upload_to=u'attachment_recognitions', max_length=255, blank=True,
+            help_text=squeeze(u"""
+                Empty filename if recognition failed.
+                """))
+
+    # May be empty: Extension automatically adjusted in save() when creating new object.
+    name = models.CharField(max_length=255, blank=True,
+            help_text=squeeze(u"""
+                Attachment recognition file name, e.g. "document.pdf". Extension automatically
+                adjusted when creating a new object. Empty, if file.name is empty.
+                """))
+
+    # May be NULL
+    content_type = models.CharField(max_length=255, null=True,
+            help_text=squeeze(u"""
+                Attachment recognition content type, e.g. "application/pdf". The value may be
+                specified even if recognition failed.
+                """))
+
+    # May NOT be NULL; Automatically computed in save() when creating a new object if undefined.
+    created = models.DateTimeField(blank=True,
+            help_text=squeeze(u"""
+                Date and time the attachment was recognized. Leave blank for current time.
+                """))
+
+    # May be NULL; Automatically computed in save() when creating a new object.
+    size = models.IntegerField(null=True, blank=True,
+            help_text=squeeze(u"""
+                Attachment recognition file size in bytes. NULL if file is NULL. Automatically
+                computed when creating a new object.
+                """))
+
+    # May NOT be NULL
+    debug = models.TextField(blank=True,
+            help_text=squeeze(u"""
+                Debug message from recognition.
+                """))
+
+    # Backward relations added to other models:
+    #
+    #  -- Attachment.attachment_recognition_set
+    #     May be empty
+
+    # Indexes:
+    #  -- attachment: ForeignKey
+
+    objects = AttachmentRecognitionQuerySet.as_manager()
+
+    @cached_property
+    def content(self):
+        if not self.file:
+            return None
+        try:
+            self.file.open(u'rb')
+            return self.file.read()
+        except IOError:
+            logger = logging.getLogger(u'chcemvediet.apps.anonymization')
+            logger.error(u'{} is missing its file: "{}".'.format(self, self.file.name))
+            raise
+        finally:
+            self.file.close()
+
+    @decorate(prevent_bulk_create=True)
+    def save(self, *args, **kwargs):
+        if self.pk is None:  # Creating a new object
+            if self.created is None:
+                self.created = utc_now()
+            if self.file._file:
+                self.file.name = random_string(10)
+                self.size = self.file.size
+                self.name = adjust_extension(self.attachment.name, self.content_type)
+        super(AttachmentRecognition, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return format(self.pk)
+
 @datacheck.register
-def datachecks(superficial, autofix):
+def datachecks_AttachmentNormalization(superficial, autofix):
     u"""
     Checks that every ``AttachmentNormalization`` instance, which file is not NULL, has its file
     working, and there are not any orphaned attachment_normalization files.
@@ -118,6 +208,24 @@ def datachecks(superficial, autofix):
         return []
     attachment_normalizations = AttachmentNormalization.objects.all()
     field = AttachmentNormalization._meta.get_field(u'file')
-    return itertools.chain(attachment_file_check(attachment_normalizations),
-                           attachment_orphaned_file_check(attachment_normalizations, field,
-                                                          AttachmentNormalization))
+    return itertools.chain(
+        attachment_file_check(attachment_normalizations),
+        attachment_orphaned_file_check(attachment_normalizations, field, AttachmentNormalization),
+    )
+
+@datacheck.register
+def datachecks_AttachmentRecognition(superficial, autofix):
+    u"""
+    Checks that every ``AttachmentRecognition`` instance, which file is not NULL, has its file
+    working, and there are not any orphaned attachment_recognition files.
+    """
+    # This check is a bit slow. We skip it if running from cron or the user asked for superficial
+    # tests only.
+    if superficial:
+        return []
+    attachment_recognitions = AttachmentRecognition.objects.all()
+    field = AttachmentRecognition._meta.get_field(u'file')
+    return itertools.chain(
+        attachment_file_check(attachment_recognitions),
+        attachment_orphaned_file_check(attachment_recognitions, field, AttachmentRecognition),
+    )

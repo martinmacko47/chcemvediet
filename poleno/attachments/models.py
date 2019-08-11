@@ -111,7 +111,6 @@ class Attachment(FormatMixin, models.Model):
             self.size = self.file.size
             self.content_type = magic.from_buffer(self.file.read(), mime=True)
             self.name = sanitize_filename(self.name, self.content_type)
-
         super(Attachment, self).save(*args, **kwargs)
 
     def clone(self, generic_object):
@@ -138,5 +137,7 @@ def datachecks(superficial, autofix):
         return []
     attachments = Attachment.objects.all()
     field = Attachment._meta.get_field(u'file')
-    return itertools.chain(attachment_file_check(attachments),
-                           attachment_orphaned_file_check(attachments, field, Attachment))
+    return itertools.chain(
+        attachment_file_check(attachments),
+        attachment_orphaned_file_check(attachments, field, Attachment),
+    )
