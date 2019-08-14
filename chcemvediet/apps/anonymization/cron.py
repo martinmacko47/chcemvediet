@@ -1,18 +1,21 @@
 import os
 import shutil
 import traceback
+import zipfile
+import StringIO
 
+import magic
 import subprocess32
 from django.core.files.base import ContentFile
 from django.conf import settings
 
 from poleno.cron import cron_job, cron_logger
 from poleno.attachments.models import Attachment
-from poleno.utils.misc import guess_extension
+from poleno.utils.misc import guess_extension, random_string
 from chcemvediet.apps.inforequests.models import Action
 
-from .models import AttachmentNormalization, AttachmentRecognition
-from .utils import temporary_directory
+from .models import AttachmentNormalization, AttachmentRecognition, AttachmentAnonymization
+from .utils import temporary_directory, anonymize_xml
 from . import content_types
 
 
@@ -215,7 +218,58 @@ def recognize_attachment():
     else:
         recognize_using_ocr(attachment_normalization)
 
+def anonymize_using_xml(attachment_recognition):
+    try:
+        zipfile_attachment = zipfile.ZipFile(StringIO.StringIO(attachment_recognition.content))
+        inforequest = attachment_recognition.attachment.generic_object.branch.inforequest
+        namespace = {u'text': u'urn:oasis:names:tc:opendocument:xmlns:text:1.0'}
+        filename_relative = os.path.join(u'attachment_anonymizations', random_string(10))
+        filename = os.path.join(settings.PROJECT_PATH, u'media/' + filename_relative)
+        with zipfile.ZipFile(filename, u'w') as zf:
+            for f in zipfile_attachment.filelist:
+                content = zipfile_attachment.read(f)
+                if magic.from_buffer(content, mime=True) == content_types.XML_CONTENT_TYPE:
+                    zf.writestr(f, anonymize_xml(inforequest, content, u'.//text:span', namespace))
+                else:
+                    zf.writestr(f, content)
+
+        AttachmentAnonymization.objects.create(
+            attachment=attachment_recognition.attachment,
+            successful=True,
+            file=filename_relative,
+            content_type=content_types.ODT_CONTENT_TYPE,
+            debug=u'STDOUT:\n{}\nSTDERR:\n{}'.format('', '')
+        )
+        cron_logger.info(u'Anonymized attachment_recognition: {}'.format(attachment_recognition))
+
+    except Exception as e:
+        trace = unicode(traceback.format_exc(), u'utf-8')
+        stdout = getattr(e, u'stdout', u'')
+        stderr = getattr(e, u'stderr', u'')
+        AttachmentAnonymization.objects.create(
+            attachment=attachment_recognition.attachment,
+            successful=False,
+            content_type=content_types.ODT_CONTENT_TYPE,
+            debug=u'STDOUT:\n{}\nSTDERR:\n{}\n{}'.format(stdout, stderr, trace)
+        )
+        cron_logger.error(u'Anonymizing attachment_recognition has failed: {}\n An '
+                          u'unexpected error occured: {}\n{}'.format(
+            attachment_recognition, e.__class__.__name__, trace))
+
+def anonymize_attachment():
+    attachment_recognition = (AttachmentRecognition.objects
+                              .filter(successful=True,
+                                      content_type=content_types.ODT_CONTENT_TYPE,
+                                      attachment__attachmentanonymization__isnull=True)
+                              .first())
+    if attachment_recognition is None:
+        return
+    else:
+        anonymize_using_xml(attachment_recognition)
+
+
 @cron_job(run_every_mins=1)
 def anonymization():
     normalize_attachment()
     recognize_attachment()
+    anonymize_attachment()

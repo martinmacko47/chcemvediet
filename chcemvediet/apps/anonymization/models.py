@@ -212,7 +212,7 @@ class AttachmentAnonymization(FormatMixin, models.Model):
                 """))
 
     # Filename may be empty; Random local filename is generated in save() when creating a new object
-    file = models.FileField(upload_to=u'attachment_annonymizations', max_length=255, blank=True,
+    file = models.FileField(upload_to=u'attachment_anonymizations', max_length=255, blank=True,
             help_text=squeeze(u"""
                 Empty filename if anonymization failed.
                 """))
@@ -279,8 +279,7 @@ class AttachmentAnonymization(FormatMixin, models.Model):
         if self.pk is None:  # Creating a new object
             if self.created is None:
                 self.created = utc_now()
-            if self.file._file:
-                self.file.name = random_string(10)
+            if self.file:
                 self.size = self.file.size
                 self.name = adjust_extension(self.attachment.name, self.content_type)
         super(AttachmentAnonymization, self).save(*args, **kwargs)
