@@ -128,14 +128,14 @@ class AttachmentRecognition(FormatMixin, models.Model):
     # May be empty: Extension automatically adjusted in save() when creating new object.
     name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
-                Attachment recognition file name, e.g. "document.pdf". Extension automatically
+                Attachment recognition file name, e.g. "document.odt". Extension automatically
                 adjusted when creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment recognition content type, e.g. "application/pdf". The value may be
+                Attachment recognition content type, e.g. "application/vnd.oasis.opendocument.text". The value may be
                 specified even if recognition failed.
                 """))
 
@@ -220,14 +220,14 @@ class AttachmentAnonymization(FormatMixin, models.Model):
     # May be empty: Extension automatically adjusted in save() when creating new object.
     name = models.CharField(max_length=255, blank=True,
             help_text=squeeze(u"""
-                Attachment anonymization file name, e.g. "document.pdf". Extension automatically
+                Attachment anonymization file name, e.g. "document.odt". Extension automatically
                 adjusted when creating a new object. Empty, if file.name is empty.
                 """))
 
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment anonymization content type, e.g. "application/pdf". The value may be
+                Attachment anonymization content type, e.g. "application/vnd.oasis.opendocument.text". The value may be
                 specified even if anonymization failed.
                 """))
 
@@ -258,7 +258,7 @@ class AttachmentAnonymization(FormatMixin, models.Model):
     # Indexes:
     #  -- attachment: ForeignKey
 
-    objects = AttachmentRecognitionQuerySet.as_manager()
+    objects = AttachmentAnonymizationQuerySet.as_manager()
 
     @cached_property
     def content(self):
@@ -279,7 +279,8 @@ class AttachmentAnonymization(FormatMixin, models.Model):
         if self.pk is None:  # Creating a new object
             if self.created is None:
                 self.created = utc_now()
-            if self.file:
+            if self.file._file:
+                self.file.name = random_string(10)
                 self.size = self.file.size
                 self.name = adjust_extension(self.attachment.name, self.content_type)
         super(AttachmentAnonymization, self).save(*args, **kwargs)
