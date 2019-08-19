@@ -25,6 +25,7 @@ Computed Properties:
 * `content`: String; May be NULL; May be empty; Read-only.
 
 ## `AttachmentRecognition`
+
 Represents a single local file, which was created by recognition of Attachment file.
 
 Relations:
@@ -40,12 +41,13 @@ Properties:
 * `content_type`: String; May be NULL.
 * `created`: Datetime; May NOT be NULL.
 * `size`: Number; May be NULL.
-* `debug`: String; May NOT be NULL; May be empty. 
+* `debug`: String; May NOT be NULL; May be empty.
 
 Computed Properties:
 * `content`: String; May be NULL; May be empty; Read-only.
 
 ## `AttachmentAnonymization`
+
 Represents a single local file, which was created by anonymization of Attachment file.
 
 Relations:
@@ -68,4 +70,3 @@ Computed Properties:
 
 
 <sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>
-
