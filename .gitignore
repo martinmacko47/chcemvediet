@@ -16,5 +16,6 @@
 /media/attachments
 /media/attachment_normalizations
 /media/attachment_recognitions
+/media/attachment_anonymizations
 /fixtures/*.configured.json
 /chcemvediet/settings/configured.py

@@ -1,5 +1,6 @@
 PDF_CONTENT_TYPE = u'application/pdf'
 ODT_CONTENT_TYPE = u'application/vnd.oasis.opendocument.text'
+XML_CONTENT_TYPE = u'application/xml'
 
 LIBREOFFICE_CONTENT_TYPES = (
     u'application/CDFV2-corrupt',
