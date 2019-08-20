@@ -148,7 +148,7 @@ def anonymize_odt(attachment_recognition):
                           u'unexpected error occured: {}\n{}'.format(
             attachment_recognition, e.__class__.__name__, trace))
 
-def anonymize_attachment():
+def anonymize_attachment_odt():
     attachment_recognition = (AttachmentRecognition.objects
                               .filter(successful=True,
                                       content_type=content_types.ODT_CONTENT_TYPE,
