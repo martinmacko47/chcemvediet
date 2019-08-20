@@ -135,8 +135,8 @@ class AttachmentRecognition(FormatMixin, models.Model):
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment recognition content type, e.g. "application/vnd.oasis.opendocument.text". The value may be
-                specified even if recognition failed.
+                Attachment recognition content type, e.g. "application/vnd.oasis.opendocument.text".
+                The value may be specified even if recognition failed.
                 """))
 
     # May NOT be NULL; Automatically computed in save() when creating a new object if undefined.
@@ -227,8 +227,9 @@ class AttachmentAnonymization(FormatMixin, models.Model):
     # May be NULL
     content_type = models.CharField(max_length=255, null=True,
             help_text=squeeze(u"""
-                Attachment anonymization content type, e.g. "application/vnd.oasis.opendocument.text". The value may be
-                specified even if anonymization failed.
+                Attachment anonymization content type, e.g.
+                "application/vnd.oasis.opendocument.text". The value may be specified even if
+                anonymization failed.
                 """))
 
     # May NOT be NULL; Automatically computed in save() when creating a new object if undefined.
