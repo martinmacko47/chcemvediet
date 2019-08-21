@@ -1,0 +1,60 @@
+<svg version="1.1" viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+      text {
+        font-family: sans-serif;
+      }
+      .caption {
+        font-size: 12pt;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+      .note {
+        font-size: 9pt;
+        text-anchor: middle;
+        dominant-baseline: ideographic;
+      }
+      .relation {
+        fill: none;
+        stroke: black;
+        stroke-width: 1pt;
+      }
+      .relation.from-many {
+        marker-start: url(#relation-many)
+      }
+      .relation.polymorphic {
+        marker-start: url(#relation-polymorphic)
+      }
+  </style>
+
+  <defs>
+    <marker id="relation-many" orient="auto" markerWidth="6" markerHeight="6" refX="0" refY="3">
+      <circle cx="3" cy="3" r="3" />
+    </marker>
+    <marker id="relation-polymorphic" orient="auto" markerWidth="6" markerHeight="6" refX="0" refY="3">
+      <circle cx="3" cy="3" r="3" fill="white" stroke="black" />
+    </marker>
+    <g id="model">
+      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" />
+    </g>
+    <g id="external">
+      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="3pt" />
+    </g>
+  </defs>
+
+  <g transform="translate(300 300)">
+    <use href="#external" />
+    <text class="caption">Attachment</text>
+    <path class="relation from-many to-one" d="M 0,-20 0,-80" />
+  </g>
+    <g transform="translate(700 200)">
+    <use href="#model" />
+    <text class="caption">Recipient</text>
+    <path class="relation from-many to-one" d="M -100,0 -300,0" />
+    <text class="note" x="-120" y="20">1+</text>
+  </g>
+  <g id="message" transform="translate(300 200)">
+    <use href="#model" />
+    <text class="caption">Message</text>
+    <path class="relation polymorphic" d="M 0,20 0,80" />
+  </g>
+</svg>
