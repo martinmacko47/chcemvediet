@@ -447,5 +447,5 @@ def datachecks_AttachmentFinalization(superficial, autofix):
     field = AttachmentFinalization._meta.get_field(u'file')
     return itertools.chain(
         attachment_file_check(attachment_finalization),
-        attachment_orphaned_file_check(attachment_finalization, field, AttachmentAnonymization),
+        attachment_orphaned_file_check(attachment_finalization, field, AttachmentFinalization),
     )
