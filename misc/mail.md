@@ -11,7 +11,7 @@ Relations:
 * `attachment_set`: List of Attachments; May be empty; Ordered by id.
 
 Properties:
-* `type`: Choice; May NOT be NULL.\
+* `type`: Choice; May NOT be NULL.
   - inbound, outbound
 * `processed`: Datetime ; May be NULL.\
   Time the message was sent/received. NULL for queued outbound messages.
@@ -44,9 +44,9 @@ Relations:
 Properties:
 * `name`: String; May be empty.
 * `mail`: E-mail; May NOT be empty.
-* `type`: Choice; May NOT be NULL.\
+* `type`: Choice; May NOT be NULL.
   - to, cc, bcc
-* `status`: Choice; May NOT be NULL.\
+* `status`: Choice; May NOT be NULL.
   - For inbound messages:
     - inbound
   - For outbound messages:

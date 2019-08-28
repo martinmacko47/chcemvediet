@@ -19,7 +19,7 @@
   </style>
 
   <defs>
-    <marker id="relation-many" orient="auto" markerWidth="6" markerHeight="6" refX="0" refY="3">
+    <marker id="relation-many" orient="auto-start-reverse" markerWidth="6" markerHeight="6" refX="6" refY="3">
       <circle cx="3" cy="3" r="3" />
     </marker>
     <g id="model-wide">
