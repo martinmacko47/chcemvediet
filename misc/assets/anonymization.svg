@@ -1,4 +1,4 @@
-<svg version="1.1" viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
   <style>
       text {
         font-family: sans-serif;
@@ -33,20 +33,25 @@
   <g transform="translate(300 100)">
     <use href="#model-wide" />
     <text class="caption">AttachmentNormalization</text>
-    <path class="relation from-many to-one" d="M 125,0 213,0 213,0 213,100"/>
+    <path class="relation from-many to-one" d="M 125,0 300,0"/>
   </g>
   <g transform="translate(300 200)">
     <use href="#model-wide" />
     <text class="caption">AttachmentRecognition</text>
-    <path class="relation from-many to-one" d="M 125,0 300,0" />
+    <path class="relation from-many to-one" d="M 125,0 213,0 213,-100 300,-100" />
   </g>
   <g transform="translate(300 300)">
     <use href="#model-wide" />
     <text class="caption">AttachmentAnonymization</text>
-    <path class="relation from-many to-one" d="M 125,0 213,0 213,0 213,-100" />
+    <path class="relation from-many to-one" d="M 125,0 213,0 213,-200 300,-200" />
   </g>
-  <g transform="translate(700 200)">
-    <use href="#external" class="wide" />
+  <g transform="translate(300 400)">
+    <use href="#model-wide" />
+    <text class="caption">AttachmentFinalization</text>
+    <path class="relation from-many to-one" d="M 125,0 213,0 213,-300 300,-300" />
+  </g>
+  <g transform="translate(700 100)">
+    <use href="#external" />
     <text class="caption">Attachment</text>
   </g>
 </svg>
