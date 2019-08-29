@@ -56,7 +56,8 @@ def normalize_using_libreoffice(attachment):
                  filename],
                 stdout=subprocess32.PIPE,
                 stderr=subprocess32.PIPE,
-                timeout=LIBREOFFICE_TIMEOUT
+                timeout=LIBREOFFICE_TIMEOUT,
+                check=True,
             )
             with open(os.path.join(directory, u'file.pdf'), u'rb') as file_pdf:
                 AttachmentNormalization.objects.create(
@@ -95,7 +96,8 @@ def normalize_using_imagemagic(attachment):
                 [u'convert', filename, os.path.join(directory, u'file.pdf')],
                 stdout=subprocess32.PIPE,
                 stderr=subprocess32.PIPE,
-                timeout=IMAGEMAGIC_TIMEOUT
+                timeout=IMAGEMAGIC_TIMEOUT,
+                check=True,
             )
             with open(os.path.join(directory, u'file.pdf'), u'rb') as file_pdf:
                 AttachmentNormalization.objects.create(
