@@ -68,5 +68,26 @@ Properties:
 Computed Properties:
 * `content`: String; May be NULL; May be empty; Read-only.
 
+## `AttachmentFinalization`
+
+Represents a single local file, which was created by finalization of Attachment file.
+
+Relations:
+* `attachment`: Attachment; May NOT be NULL.\
+  The Attachment from which AttachmentFinalization was created.
+
+Properties:
+* `successful`: Boolean; May NOT be NULL.
+* `file`: File; May NOT be NULL.\
+  Empty filename if finalization failed.
+* `name`: String; May be empty.\
+  Automatically computed when creating a new object. Empty, if file.name is empty.
+* `content_type`: String; May be NULL.
+* `created`: Datetime; May NOT be NULL.
+* `size`: Number; May be NULL.
+* `debug`: String; May NOT be NULL; May be empty.
+
+Computed Properties:
+* `content`: String; May be NULL; May be empty; Read-only.
 
 <sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>
