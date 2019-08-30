@@ -1,0 +1,115 @@
+<svg version="1.1" viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg">
+  <style>
+      text {
+        font-family: sans-serif;
+      }
+      .caption {
+        font-size: 12pt;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+      .note {
+        font-size: 9pt;
+        text-anchor: middle;
+        dominant-baseline: ideographic;
+      }
+      .relation {
+        fill: none;
+        stroke: black;
+        stroke-width: 1pt;
+      }
+      .relation.from-many {
+        marker-start: url(#relation-many)
+      }
+      .relation.to-many {
+        marker-end: url(#relation-many)
+      }
+    .relation.from-optional {
+        marker-start: url(#relation-optional)
+      }
+    .relation.to-optional {
+        marker-end: url(#relation-optional)
+      }
+  </style>
+
+  <defs>
+    <marker id="relation-many" orient="auto-start-reverse" markerWidth="6" markerHeight="6" refX="6" refY="3">
+      <circle cx="3" cy="3" r="3" />
+    </marker>
+    <marker id="relation-optional" orient="auto-start-reverse" markerWidth="6" markerHeight="6" refX="6" refY="3">
+      <circle cx="3" cy="3" r="2.5" fill="white" stroke="black" stroke-width="1" />
+    </marker>
+    <g id="model">
+      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" />
+    </g>
+    <g id="model-narrow">
+      <rect class="box" x="-50" y="-20" width="100" height="40" fill="none" stroke="black" stroke-width="1pt" />
+    </g>
+    <g id="external">
+      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="3pt" />
+    </g>
+    <g id="external-narrow">
+      <rect class="box" x="-50" y="-20" width="100" height="40" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="3pt" />
+    </g>
+  </defs>
+
+  <g transform="translate(100 100)">
+    <use href="#external-narrow" />
+    <text class="caption">User</text>
+    <path class="relation from-one to-many" d="M 0,20 0,80" />
+    <path class="relation from-one to-many" d="M 50,0 100,0" />
+  </g>
+  <g transform="translate(100 200)">
+    <use href="#model-narrow" />
+    <text class="caption">Inforequest</text>
+    <path class="relation from-optional to-many" d="M 0,20 0,180" />
+    <path class="relation from-one to-many" d="M 20,-20 20,-40 450,-40 450,-80" />
+    <path class="relation from-one to-many" d="M 50,0 450,0" />
+    <text class="note" x="430" y="0">1+</text>
+  </g>
+  <g transform="translate(150 400)">
+    <use href="#external" />
+    <text class="caption">E-mail Message</text>
+    <path class="relation from-optional to-optional" d="M 100,0 400,0" />
+  </g>
+  <g transform="translate(300 100)">
+    <use href="#model" />
+    <text class="caption">Inforequest Draft</text>
+    <path class="relation from-many to-optional" d="M 0,-20 0,-40 500,-40 500,-20" />
+  </g>
+  <g transform="translate(300 300)">
+    <use href="#model" />
+    <text class="caption">Inforequest E-mail</text>
+    <path class="relation from-one to-optional" d="M -100,0 -200,0" />
+  </g>
+  <g transform="translate(600 100)">
+    <use href="#model" />
+    <text class="caption">Action Draft</text>
+    <path class="relation from-many to-optional" d="M 0,20 0,80" />
+    <path class="relation from-many to-many" d="M 100,0 150,0" />
+  </g>
+  <g transform="translate(600 200)">
+    <use href="#model-narrow" />
+    <text class="caption">Branch</text>
+    <path class="relation from-many to-one" d="M 25,-20 25,-60 175,-60 175,-80" />
+    <path class="relation from-many to-one" d="M 50,0 100,0" />
+    <path class="relation from-one to-many" d="M -25,20 -25,180" />
+    <text class="note" x="-10" y="180">1+</text>
+    <text class="note" transform="rotate(-90)" x="-140" y="-30">Contained</text>
+    <path class="relation from-many to-optional" d="M 25,20 25,180" />
+    <text class="note" transform="rotate(90)" x="130" y="-30">Advanced by</text>
+  </g>
+  <g transform="translate(600 400)">
+    <use href="#model-narrow" />
+    <text class="caption">Action</text>
+  </g>
+  <g transform="translate(800 100)">
+    <use href="#external-narrow" />
+    <text class="caption">Obligee</text>
+    <path class="relation from-one to-many" stroke-dasharray="3pt" d="M 25,20 25,80" />
+  </g>
+  <g transform="translate(800 200)">
+    <use href="#external" />
+    <text class="caption">Historical Obligee</text>
+  </g>
+</svg>
