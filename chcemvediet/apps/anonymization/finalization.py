@@ -47,7 +47,8 @@ def finalize_using_libreoffice(attachment_anonymization):
                  filename],
                 stdout=subprocess32.PIPE,
                 stderr=subprocess32.PIPE,
-                timeout=LIBREOFFICE_TIMEOUT
+                timeout=LIBREOFFICE_TIMEOUT,
+                check=True,
             )
             with open(os.path.join(directory, u'file.pdf'), u'rb') as file_pdf:
                 AttachmentFinalization.objects.create(

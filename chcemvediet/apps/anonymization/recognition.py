@@ -46,7 +46,8 @@ def recognize_using_ocr(attachment_normalization):
                  os.path.join(directory, u'file.odt')],
                 stdout=subprocess32.PIPE,
                 stderr=subprocess32.PIPE,
-                timeout=OCR_TIMEOUT
+                timeout=OCR_TIMEOUT,
+                check=True,
             )
             with open(os.path.join(directory, u'file.odt'), u'rb') as file_odt:
                 AttachmentRecognition.objects.create(
