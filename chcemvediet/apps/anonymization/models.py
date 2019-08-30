@@ -11,8 +11,19 @@ from poleno.utils.models import QuerySet
 from poleno.utils.date import utc_now
 from poleno.utils.misc import FormatMixin, random_string, squeeze, decorate, adjust_extension
 
+from . import content_types
+
 
 class AttachmentNormalizationQuerySet(QuerySet):
+    def successful(self):
+        return self.filter(successful=True)
+
+    def normalized_to_pdf(self):
+        return self.filter(content_type=content_types.PDF_CONTENT_TYPE)
+
+    def not_recognized(self):
+        return self.filter(attachment__attachmentrecognition__isnull=True)
+
     def order_by_pk(self):
         return self.order_by(u'pk')
 
@@ -105,6 +116,15 @@ class AttachmentNormalization(FormatMixin, models.Model):
         return format(self.pk)
 
 class AttachmentRecognitionQuerySet(QuerySet):
+    def successful(self):
+        return self.filter(successful=True)
+
+    def recognized_to_odt(self):
+        return self.filter(content_type=content_types.ODT_CONTENT_TYPE)
+
+    def not_anonymized(self):
+        return self.filter(attachment__attachmentanonymization__isnull=True)
+
     def order_by_pk(self):
         return self.order_by(u'pk')
 
@@ -197,6 +217,15 @@ class AttachmentRecognition(FormatMixin, models.Model):
         return format(self.pk)
 
 class AttachmentAnonymizationQuerySet(QuerySet):
+    def successful(self):
+        return self.filter(successful=True)
+
+    def anonymized_to_odt(self):
+        return self.filter(content_type=content_types.ODT_CONTENT_TYPE)
+
+    def not_finalized(self):
+        return self.filter(attachment__attachmentfinalization__isnull=True)
+
     def order_by_pk(self):
         return self.order_by(u'pk')
 

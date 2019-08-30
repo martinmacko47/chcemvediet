@@ -133,8 +133,9 @@ def skip_normalization(attachment):
                      u'type: {}'.format(attachment))
 
 def normalize_attachment():
-    attachment = (Attachment.objects.attached_to(Action)
-                  .filter(attachmentnormalization__isnull=True)
+    attachment = (Attachment.objects
+                  .attached_to(Action)
+                  .not_normalized()
                   .first()
                   )
     if attachment is None:

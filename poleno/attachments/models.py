@@ -41,6 +41,10 @@ class AttachmentQuerySet(QuerySet):
                 raise TypeError(u'Expecting QuerySet, Model instance, or Model class.')
         q = reduce((lambda a, b: a | b), q, Q())
         return self.filter(q)
+
+    def not_normalized(self):
+        return self.filter(attachmentnormalization__isnull=True)
+
     def order_by_pk(self):
         return self.order_by(u'pk')
 

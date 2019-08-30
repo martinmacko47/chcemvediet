@@ -75,9 +75,9 @@ def recognize_using_ocr(attachment_normalization):
 
 def recognize_attachment():
     attachment_normalization = (AttachmentNormalization.objects
-            .filter(successful=True,
-                    content_type=content_types.PDF_CONTENT_TYPE,
-                    attachment__attachmentrecognition__isnull=True)
+            .successful()
+            .normalized_to_pdf()
+            .not_recognized()
             .first())
     if attachment_normalization is None:
         return
