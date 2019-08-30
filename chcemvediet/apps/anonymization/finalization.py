@@ -75,10 +75,10 @@ def finalize_using_libreoffice(attachment_anonymization):
 
 def finalize_attachment():
     attachment_anonymization = (AttachmentAnonymization.objects
-                                .filter(successful=True,
-                                        content_type=content_types.ODT_CONTENT_TYPE,
-                                        attachment__attachmentfinalization__isnull=True)
-                                .first())
+            .successful()
+            .anonnymized_to_odt()
+            .not_finalized()
+            .first())
     if attachment_anonymization is None:
         return
     else:

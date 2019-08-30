@@ -150,10 +150,10 @@ def anonymize_odt(attachment_recognition):
 
 def anonymize_attachment():
     attachment_recognition = (AttachmentRecognition.objects
-                              .filter(successful=True,
-                                      content_type=content_types.ODT_CONTENT_TYPE,
-                                      attachment__attachmentanonymization__isnull=True)
-                              .first())
+            .successful()
+            .recognized_to_odt()
+            .not_anonymized()
+            .first())
     if attachment_recognition is None:
         return
     else:
