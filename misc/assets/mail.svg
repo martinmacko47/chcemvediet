@@ -3,6 +3,9 @@
       text {
         font-family: sans-serif;
       }
+      .external{
+        stroke-dasharray: 3pt;
+      }
       .caption {
         font-size: 12pt;
         text-anchor: middle;
@@ -36,9 +39,6 @@
     <g id="model">
       <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" />
     </g>
-    <g id="external">
-      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="3pt" />
-    </g>
   </defs>
 
   <g transform="translate(300 100)">
@@ -46,7 +46,7 @@
     <text class="caption">Message</text>
   </g>
   <g transform="translate(300 200)">
-    <use href="#external" />
+    <use href="#model" class="external" />
     <text class="caption">Attachment</text>
     <path class="relation from-many to-optional" d="M 0,-20 0,-80" />
   </g>
