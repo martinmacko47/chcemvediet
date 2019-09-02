@@ -54,6 +54,10 @@ class InforequestQuerySet(QuerySet):
             .prefetch_related(Message.prefetch_recipients(u'undecided_emails'))
             .prefetch_related(Message.prefetch_attachments(u'undecided_emails'))
             )
+    def published(self):
+        return self.filter(published=True)
+    def not_published(self):
+        return self.filter(published=False)
 
 class Inforequest(FormatMixin, models.Model):
     # May NOT be NULL
@@ -111,6 +115,13 @@ class Inforequest(FormatMixin, models.Model):
             help_text=squeeze(u"""
                 True if the inforequest is closed and the applicant may not act on it any more.
                 """))
+
+    # May NOT be NULL
+    published = models.BooleanField(default=False,
+            help_text=squeeze(u"""
+                True if the inforequest is published and everybody can see it. Non-published
+                inforequests can be seen only by the user who created them.
+            """))
 
     # May be NULL; Used by ``cron.undecided_email_reminder``
     last_undecided_email_reminder = models.DateTimeField(blank=True, null=True)

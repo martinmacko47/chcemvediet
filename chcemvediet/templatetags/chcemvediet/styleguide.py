@@ -5,6 +5,7 @@ import re
 from django.contrib.staticfiles.finders import find as staticfiles_find
 
 from poleno.utils.template import Library
+from chcemvediet.apps.anonymization.anonymization import generate_user_pattern, ANONYMIZATION_STRING
 
 register = Library()
 sass_variable_re = re.compile(r'^([$][\w-]+):(.*)$')
@@ -27,3 +28,10 @@ def sass_variables(asset):
     for name, value in res.items():
         res[name.lstrip(u'$').replace(u'-', u'_')] = value
     return res
+
+@register.simple_tag()
+def anonymize_user(inforequest, content):
+    prog = generate_user_pattern(inforequest)
+    if not prog.pattern:
+        return content
+    return prog.sub(ANONYMIZATION_STRING, content)

@@ -3,7 +3,7 @@
 from django.core.exceptions import SuspiciousOperation
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.sessions.models import Session
 from django.shortcuts import render
 from allauth.account.decorators import verified_email_required
@@ -89,10 +89,12 @@ def inforequest_create(request, draft_pk=None):
     raise SuspiciousOperation()
 
 @require_http_methods([u'HEAD', u'GET'])
-@login_required
 def inforequest_detail(request, inforequest_slug, inforequest_pk):
-    inforequest = (Inforequest.objects.owned_by(request.user).prefetch_detail()
+    inforequest = (Inforequest.objects.prefetch_detail()
                     .get_or_404(pk=inforequest_pk))
+
+    if inforequest.applicant != request.user and not inforequest.published:
+        raise Http404()
 
     if inforequest_slug != inforequest.slug:
         return HttpResponseRedirect(
