@@ -13,10 +13,25 @@
 
 <div class="pln-attachments-list">
   {% for attachment in action.attachments %}
-    <div class="pln-attachment">
-      <a href="{% url 'inforequests:download_attachment' attachment=attachment %}">
-        {{ attachment.name }}
-      </a>
-    </div>
+      {% if request.user == inforequest.applicant %}
+        <div class="pln-attachment">
+          <a href="{% url 'inforequests:download_attachment' attachment=attachment %}">
+            {{ attachment.name }}
+          </a>
+        </div>
+      {% elif attachment.attachmentfinalization_set.first %}
+        {% for attachment_finalization in attachment.attachmentfinalization_set.all %}
+          <div class="pln-attachment">
+            <a href="{% url 'inforequests:download_attachment_finalization' attachment_finalization=attachment_finalization %}">
+              {{attachment_finalization.name}}
+            </a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="pln-attachment">
+          {{ attachment.name }}
+        </div>
+      {% endif %}
+
   {% endfor %}
 </div>

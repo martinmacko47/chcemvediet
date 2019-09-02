@@ -18,6 +18,7 @@ parts = {
     u'draft_pk':                  r'(?P<draft_pk>\d+)/',
     u'draft_pk?':              r'(?:(?P<draft_pk>\d+)/)?',
     u'attachment_pk':             r'(?P<attachment_pk>\d+)/',
+    u'attachment_finalization_pk':r'(?P<attachment_finalization_pk>\d+)/',
     u'step_idx':                  r'(?P<step_idx>\d+)/',
     u'step_idx?':              r'(?:(?P<step_idx>\d+)/)?',
     u'create':                    lazy_concat(_(u'inforequests:urls:create'), u'/'),
@@ -28,20 +29,22 @@ parts = {
     u'appeal':                    lazy_concat(_(u'inforequests:urls:appeal'), u'/'),
     u'snooze':                    lazy_concat(_(u'inforequests:urls:snooze'), u'/'),
     u'attachments':               lazy_concat(_(u'inforequests:urls:attachments'), u'/'),
+    u'attachment_finalizations':  lazy_concat(_(u'inforequests:urls:attachment_finalizations'), u'/'),
     }
 
 urlpatterns = patterns(u'',
-    url(lazy_format(r'^$'),                                                                             views.inforequest_index,         name=u'index'),
-    url(lazy_format(r'^{create}{draft_pk?}$', **parts),                                                 views.inforequest_create,        name=u'create'),
-    url(lazy_format(r'^{delete_draft}{draft_pk}$', **parts),                                            views.inforequest_delete_draft,  name=u'delete_draft'),
-    url(lazy_format(r'^{obligee_action_dispatcher}$', **parts),                                         views.obligee_action_dispatcher, name=u'obligee_action_dispatcher'),
-    url(lazy_format(r'^{inforequest_slug_pk}$', **parts),                                               views.inforequest_detail,        name=u'detail'),
-    url(lazy_format(r'^{inforequest_slug_pk}{obligee_action}{step_idx?}$', **parts),                    views.obligee_action,            name=u'obligee_action'),
-    url(lazy_format(r'^{inforequest_slug_pk}{clarification_response}{branch_pk}{step_idx?}$', **parts), views.clarification_response,    name=u'clarification_response'),
-    url(lazy_format(r'^{inforequest_slug_pk}{appeal}{branch_pk}{step_idx?}$', **parts),                 views.appeal,                    name=u'appeal'),
-    url(lazy_format(r'^{inforequest_slug_pk}{snooze}{branch_pk}{action_pk}$', **parts),                 views.snooze,                    name=u'snooze'),
-    url(lazy_format(r'^{attachments}$', **parts),                                                       views.attachment_upload,         name=u'upload_attachment'),
-    url(lazy_format(r'^{attachments}{attachment_pk}$', **parts),                                        views.attachment_download,       name=u'download_attachment'),
+    url(lazy_format(r'^$'),                                                                             views.inforequest_index,                name=u'index'),
+    url(lazy_format(r'^{create}{draft_pk?}$', **parts),                                                 views.inforequest_create,               name=u'create'),
+    url(lazy_format(r'^{delete_draft}{draft_pk}$', **parts),                                            views.inforequest_delete_draft,         name=u'delete_draft'),
+    url(lazy_format(r'^{obligee_action_dispatcher}$', **parts),                                         views.obligee_action_dispatcher,        name=u'obligee_action_dispatcher'),
+    url(lazy_format(r'^{inforequest_slug_pk}$', **parts),                                               views.inforequest_detail,               name=u'detail'),
+    url(lazy_format(r'^{inforequest_slug_pk}{obligee_action}{step_idx?}$', **parts),                    views.obligee_action,                   name=u'obligee_action'),
+    url(lazy_format(r'^{inforequest_slug_pk}{clarification_response}{branch_pk}{step_idx?}$', **parts), views.clarification_response,           name=u'clarification_response'),
+    url(lazy_format(r'^{inforequest_slug_pk}{appeal}{branch_pk}{step_idx?}$', **parts),                 views.appeal,                           name=u'appeal'),
+    url(lazy_format(r'^{inforequest_slug_pk}{snooze}{branch_pk}{action_pk}$', **parts),                 views.snooze,                           name=u'snooze'),
+    url(lazy_format(r'^{attachments}$', **parts),                                                       views.attachment_upload,                name=u'upload_attachment'),
+    url(lazy_format(r'^{attachments}{attachment_pk}$', **parts),                                        views.attachment_download,              name=u'download_attachment'),
+    url(lazy_format(r'^{attachment_finalizations}{attachment_finalization_pk}$', **parts),              views.attachment_finalization_download, name=u'download_attachment_finalization'),
 )
 
 if settings.DEBUG: # pragma: no cover
@@ -96,6 +99,10 @@ def action_adaptor(action):
 @reverse_adaptor(u'inforequests:download_attachment', u'attachment')
 def attachment_adaptor(attachment):
     return dict(attachment_pk=attachment.pk)
+
+@reverse_adaptor(u'inforequests:download_attachment_finalization', u'attachment_finalization')
+def attachment_finalization_adaptor(attachment_finalization):
+    return dict(attachment_finalization_pk=attachment_finalization.pk)
 
 @reverse_adaptor(u'inforequests:obligee_action', u'step')
 @reverse_adaptor(u'inforequests:clarification_response', u'step')

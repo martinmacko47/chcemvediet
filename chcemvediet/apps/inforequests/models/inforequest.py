@@ -24,6 +24,10 @@ class InforequestQuerySet(QuerySet):
         return self.filter(closed=True)
     def not_closed(self):
         return self.filter(closed=False)
+    def published(self):
+        return self.filter(published=True)
+    def not_published(self):
+        return self.filter(published=False)
     def with_undecided_email(self):
         return self.filter(inforequestemail__type=InforequestEmail.TYPES.UNDECIDED).distinct()
     def without_undecided_email(self):
@@ -54,10 +58,6 @@ class InforequestQuerySet(QuerySet):
             .prefetch_related(Message.prefetch_recipients(u'undecided_emails'))
             .prefetch_related(Message.prefetch_attachments(u'undecided_emails'))
             )
-    def published(self):
-        return self.filter(published=True)
-    def not_published(self):
-        return self.filter(published=False)
 
 class Inforequest(FormatMixin, models.Model):
     # May NOT be NULL

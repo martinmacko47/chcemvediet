@@ -13,6 +13,7 @@ from poleno.utils.urls import reverse
 from poleno.utils.views import require_ajax, login_required
 from chcemvediet.apps.wizards.models import WizardDraft
 from chcemvediet.apps.inforequests.models import InforequestDraft, Action
+from chcemvediet.apps.anonymization.models import AttachmentFinalization
 
 
 @require_http_methods([u'POST'])
@@ -49,3 +50,11 @@ def attachment_download(request, attachment_pk):
         raise Http404()
 
     return attachments_views.download(request, attachment)
+
+@require_http_methods([u'HEAD', u'GET'])
+def attachment_finalization_download(request, attachment_finalization_pk):
+    attachment_finalization = AttachmentFinalization.objects.get_or_404(
+            pk=attachment_finalization_pk)
+    if not attachment_finalization.attachment.generic_object.branch.inforequest.published:
+        raise Http404()
+    return attachments_views.download(request, attachment_finalization)
