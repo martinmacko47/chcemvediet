@@ -90,7 +90,7 @@ Computed Properties:
 ## Mandrill transport views
 
 * **Mandrill webhook**\
-  URL: /mandrill/webhook/
+  URL: `/mandrill/webhook/`
 
 
 ## Administration

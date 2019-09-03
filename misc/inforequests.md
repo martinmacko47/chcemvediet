@@ -2,10 +2,7 @@
 
 ![](assets/inforequests.svg)
 
-## Inforequest Flow
-![](assets/infore)
-
-## `Inforequest Draft`
+## `InforequestDraft`
 
 Relations:
 * `applicant`: User; May NOT be NULL.\
@@ -60,7 +57,7 @@ Properties:
   To freeze applicant current contact information for the case he changes it in the future. The
 information is frozen to its state at the moment the inforequest was submitted.
 * `unique_email`: E-mail; May NOT be empty; Unique.\
-  Every inforequest has a unique e‑mail address of the form *@mail.chcemvediet.sk. This address is
+  Every inforequest has a unique e‑mail address of the form \*@mail.chcemvediet.sk. This address is
   used to identify which obligee e‑mail belongs to which inforequest. However, if the inforequest
   was advanced to other obligees, the same e‑mail address is used for communication with all such
   obligees, as there is no way to tell them to send their response to a different e‑mail address.
@@ -81,7 +78,7 @@ Computed Properties:
   `can_add_obligee_email_action`: True/False; May NOT be NULL; Read-only.\
   Whether the user can append applicant/obligee action received by s‑mail or e‑mail.
 
-## `Inforequest E‑mail`
+## `InforequestEmail`
 
 Represents a relation between an inforequest and an inbound or outbound e‑mail message. Every
 inforequest has its unique e‑mail address which is used for communication with all obligees the
@@ -210,7 +207,7 @@ Computed Properties:
   Read-only.\
   Whether the action sets a deadline, and whether it is set for the applicant or for the obligee.
 
-## `Action Draft`
+## `ActionDraft` <sup>[1](#footnote1)</sup>
 
 Relations:
 * `inforequest`: Inforequest; May NOT be NULL
@@ -238,18 +235,18 @@ Properties:
 
 ### `User`
 
-* `inforequestdraft_set`: List of Inforequest Drafts; May be empty; Ordered by id.
+* `inforequestdraft_set`: List of InforequestDrafts; May be empty; Ordered by id.
 * `inforequest_set`: List of Inforequest; May be empty; Ordered by submission date.
 
 ### `Obligee`
-* `inforequestdraft_set`: List of Inforequest Drafts; May be empty; Ordered by id.
+* `inforequestdraft_set`: List of InforequestDrafts; May be empty; Ordered by id.
 * `branch_set`: List of Branches; May be empty; Ordered by obligee name.
 * `actiondraft_set`: List of Action Drafts; May be empty; Ordered by id.
 
-### `Historical Obligee`
+### `HistoricalObligee`
 * `branch_set`: List of Branches; May be empty; Ordered by obligee name.
 
-### `E-mail Message`
+### `EmailMessage`
 * `inforequest_set`: List of Inforequest; May be empty; Ordered by submission date.
 * `inforequestemail_set`: List of InforequestEmail; May be empty; Ordered by id.
 * `action`: Action; May be undefined.
@@ -527,7 +524,7 @@ list of all undecided e‑mails assigned to closed inforequests.
 
 ### Decide Undecided E‑mail
 
-URL: /en/inforequests/decide-email/\<action>/<inforequest_id>/<email_id>/
+URL: `/en/inforequests/decide-email/<action>/<inforequest_id>/<email_id>/`
 
 Conditions:
 * User is authenticated.
@@ -570,7 +567,7 @@ e‑mail was received.
 
 ### Add Obligee Action received by S‑mail
 
-URL: /en/inforequests/add-smail/\<action>/<inforequest_id>/
+URL: `/en/inforequests/add-smail/<action>/<inforequest_id>/`
 
 Conditions:
 
@@ -598,7 +595,7 @@ If there is undecided e‑mail waiting in the inforequest the user may not add a
 
 ### Extend Missed Obligee Deadline
 
-URL: /en/inforequests/extend-deadline/<inforequest_id>/<branch_id>/<action_id>
+URL: `/en/inforequests/extend-deadline/<inforequest_id>/<branch_id>/<action_id>`
 
 Conditions:
 * User is authenticated.
@@ -617,7 +614,7 @@ The following actions set obligee deadlines that can be extended:
 
 ### Make a Clarification Response Action
 
-URL: /en/inforequests/new-action/clarification-response/<inforequest_id>/
+URL: `/en/inforequests/new-action/clarification-response/<inforequest_id>/`
 
 Conditions:
 * User is authenticated.
@@ -644,7 +641,7 @@ the date it was generated if it was sent by s‑mail.
 
 ### Make an Appeal Action
 
-URL: /en/inforequests/new-action/appeal/<inforequest_id>/
+URL: `/en/inforequests/new-action/appeal/<inforequest_id>/`
 
 Conditions:
 * User is authenticated.
@@ -668,7 +665,7 @@ The effective date of an appeal is the date it was generated.
 
 ### ~~Resend Undelivered E-mail by S-mail~~
 
-~~URL: /en/inforequests/...~~
+~~URL: `/en/inforequests/...`~~
 
 Conditions:
 * ~~User is authenticated.~~
@@ -683,20 +680,23 @@ by s‑mail.~~\
 * ~~Request~~
 * ~~Clarification Response~~
 
-### Create a New Inforequest / Inforequest Draft
+### Create a New Inforequest / InforequestDraft
 
-URL: /en/inforequests/create/\
-URL: /en/inforequests/create/<draft_id>/
+URL: `/en/inforequests/create/`\
+URL: `/en/inforequests/create/<draft_id>/`
 
 Conditions:
 * User is authenticated.
 * User has a verified e-mail address
 
-Instead of submitting the created inforequest directly, the user may decide to save it as a inforequest draft and submit it later. The user may edit the draft until he submits it. The obligee property does not have to be set while the inforequest is just a draft. The user may own multiple unfinished request drafts.
+Instead of submitting the created inforequest directly, the user may decide to save it as a
+inforequestdraft and submit it later. The user may edit the draft until he submits it. The obligee
+property does not have to be set while the inforequest is just a draft. The user may own multiple
+unfinished request drafts.
 
-### Delete a Inforequest Draft
+### Delete a InforequestDraft
 
-URL: /en/inforequests/delete-draft/<draft_id>/
+URL: `/en/inforequests/delete-draft/<draft_id>/`
 
 Conditions:
 * User is authenticated.
@@ -706,18 +706,18 @@ Conditions:
 
 ### ~~List of all Inforequests~~
 
-~~URL: /en/inforequests/...~~\
+~~URL: `/en/inforequests/...~~`\
 ~~Visibility: Public~~\
 ~~The view contains a link to create a new inforequest.~~
 
 ### List of Inforequests Created by the User
-URL: /en/inforequests/\
+URL: `/en/inforequests/`\
 Visibility: Authenticated user\
-The user may see his inforequest drafts besides his submitted and closed inforequests as well. The
+The user may see his inforequestdrafts besides his submitted and closed inforequests as well. The
 view contains a link to create a new inforequest.
 
 ### Inforequest Detail
-URL: /en/inforequests/detail/<inforequest_id>/\
+URL: `/en/inforequests/detail/<inforequest_id>/`\
 Visibility: Public
 1. _For the applicant_:\
    The applicant sees basic inforequest information, branch of actions in chronological order by
@@ -738,30 +738,27 @@ If the inforequest was advanced, details of all its descendant branches are show
 structure as well.
 
 ### Upload Attachment
-URL: /en/inforequests/attachments/\
+URL: `/en/inforequests/attachments/`\
 Visibility: Authenticated user\
 Uploaded files are attached to the user. The user may use uploaded files while composing an
 inforequest or an action. He may use only his uploaded files.
 
 ### Download Attachment
-URL: /en/inforequests/attachments/<attachment_id>/\
+URL: `/en/inforequests/attachments/<attachment_id>/`\
 ~~Visibility: Public~~\
 ~~Anonymous user may download only files attached to actions connected to public inforequests.~~
-Authenticated user may also download files attached to him, to his inforequest drafts or to any
+Authenticated user may also download files attached to him, to his inforequestdrafts or to any
 e‑mails, actions or action drafts connected to his inforequests.
 
 
 ## Administration
 
-### List of Unassigned Received E‑mails
+* **List of Unassigned Received E‑mails**
+  - May assign an unassigned e‑mail to a case
+* **List of Undecided Raw E‑mails Assigned to Closed Inforequests**
+* **List of E‑mails Marked as Unrelated**
+* **List of E‑mails the Users didn't Know how to Decide**
+* **May decide the e‑mail**
 
-* May assign an unassigned e‑mail to a case
-
-### List of Undecided Raw E‑mails Assigned to Closed Inforequests
-
-### List of E‑mails Marked as Unrelated
-
-### List of E‑mails the Users didn't Know how to Decide
-* May decide the e‑mail
-
+<sub><a name="footnote1">1</a>: `ActionDraft` was replaced with `WizardDraft`</sub>\
 <sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>

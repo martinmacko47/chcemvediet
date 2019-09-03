@@ -29,12 +29,12 @@ Computed Properties:
 ## Views
 
 **List of all Obligees**\
-  URL: /en/obligees/\
+  URL: `/en/obligees/`\
   Visibility: Public\
   Paginated list of all obligees.
 
 **Obligee autocomplete**\
-  URL: /en/autocomplete/\
+  URL: `/en/autocomplete/`\
   Visibility: Public
 
 ## Administration
