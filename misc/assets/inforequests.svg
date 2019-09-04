@@ -24,6 +24,9 @@
         transform: rotate(90deg);
         text-anchor: start;
       }
+      .note.bellow {
+        dominant-baseline: hanging;
+      }
       .relation {
         fill: none;
         stroke: black;
@@ -109,17 +112,18 @@
     <use href="#model-narrow" />
     <text class="caption">Branch</text>
     <path class="relation from-many to-one" d="M -50,0 -450,0" />
+    <text class="note" x="-65" y="0">1+</text>
     <path class="relation from-many to-one" d="M 25,-20 25,-60 175,-60 175,-80" />
     <path class="relation from-many to-one" d="M 50,0 100,0" />
     <path class="relation from-many to-optional" d="M 25,20 25,180" />
-    <text class="note right foo" x="30" y="-30">Advanced by</text>
+    <text class="note right" x="30" y="-25">Advanced by</text>
   </g>
   <g transform="translate(600 400)">
     <use href="#model-narrow" />
     <text class="caption">Action</text>
     <path class="relation from-many to-one" d="M -25,-20 -25,-180" />
-    <text class="note left" x="30" y="0">1+</text>
-    <text class="note left" x="30" y="-30">Contained</text>
+    <text class="note left bellow" x="30" y="-25">1+</text>
+    <text class="note left" x="30" y="-25">Contained</text>
     <path class="relation from-optional to-optional" d="M -50,0 -350,0" />
   </g>
   <g transform="translate(800 100)">
