@@ -28,14 +28,19 @@ Computed Properties:
 
 ## Views
 
-**List of all Obligees**\
-  URL: /en/obligees/\
-  Visibility: Public\
-  Paginated list of all obligees.
+**List of all Obligees**
 
-**Obligee autocomplete**\
-  URL: /en/autocomplete/\
-  Visibility: Public
+URL: `/en/obligees/`
+
+Visibility: Public
+
+Paginated list of all obligees.
+
+**Obligee autocomplete**
+
+URL: `/en/autocomplete/`
+
+Visibility: Public
 
 ## Administration
 
@@ -45,6 +50,7 @@ Computed Properties:
 * Disable an individual obligee that does not exist any more.
 * ~~Bulk export do csv/xls.~~
 * ~~Bulk import from csv/xls tracking historical versions of all obligees with some heuristics and
-    UI to manage matching created/deleted obligees and obligees with changed names.~~
+  UI to manage matching created/deleted obligees and obligees with changed names.~~
+
 
 <sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>

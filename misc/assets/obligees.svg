@@ -3,6 +3,9 @@
       text {
         font-family: sans-serif;
       }
+      .external{
+        stroke-dasharray: 3pt;
+      }
       .caption {
         font-size: 12pt;
         text-anchor: middle;
@@ -30,9 +33,6 @@
     <g id="model">
       <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" />
     </g>
-    <g id="external">
-      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="3pt" />
-    </g>
   </defs>
 
   <g transform="translate(300 100)">
@@ -40,7 +40,7 @@
     <text class="caption">Obligee</text>
   </g>
   <g transform="translate(700 100)">
-    <use href="#external" />
+    <use href="#model" class="external" />
     <text class="caption">Historical Obligee</text>
     <path class="relation from-many to-one" d="M -100,0 -300,0" />
     <text class="note" x="-120" y="0">1+</text>

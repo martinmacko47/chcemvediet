@@ -3,6 +3,9 @@
       text {
         font-family: sans-serif;
       }
+      .external{
+        stroke-dasharray: 3pt;
+      }
       .caption {
         font-size: 12pt;
         text-anchor: middle;
@@ -22,11 +25,11 @@
     <marker id="relation-many" orient="auto-start-reverse" markerWidth="6" markerHeight="6" refX="6" refY="3">
       <circle cx="3" cy="3" r="3" />
     </marker>
+    <g id="model">
+      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" />
+    </g>
     <g id="model-wide">
       <rect class="box" x="-125" y="-20" width="250" height="40" fill="none" stroke="black" stroke-width="1pt" />
-    </g>
-    <g id="external">
-      <rect class="box" x="-100" y="-20" width="200" height="40" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="3pt" />
     </g>
   </defs>
 
@@ -51,7 +54,7 @@
     <path class="relation from-many to-one" d="M 125,0 213,0 213,-300 300,-300" />
   </g>
   <g transform="translate(700 100)">
-    <use href="#external" />
+    <use href="#model" class="external" />
     <text class="caption">Attachment</text>
   </g>
 </svg>

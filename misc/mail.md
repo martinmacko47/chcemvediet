@@ -68,34 +68,42 @@ Computed Properties:
 
 ## SMTP transport events
 
-**Send outbound e-mails**\
-  Trigger: every few minutes if there are any queued outbound messages waiting.
+**Send outbound e-mails**
+
+Trigger: every few minutes if there are any queued outbound messages waiting.
 
 ## IMAP transport events
 
-**Poll for inbound e-mails**\
-  Trigger: every few minutes.
+**Poll for inbound e-mails**
+
+Trigger: every few minutes.
 
 ## Mandrill transport events
 
-**Send outbound e-mails**\
-  Trigger: every few minutes if there are any queued outbound messages waiting.
+**Send outbound e-mails**
 
-**Message status webhook event**\
-  Trigger: request to Mandrill webhook\
-  Updates message recipient status according to the Mandrill event received. The message and its
-  recipients are identified by `remote_id`.
+Trigger: every few minutes if there are any queued outbound messages waiting.
 
-**Inbound e-mail webhook event**\
-  Trigger: request to Mandrill webhook
+**Message status webhook event**
+
+Trigger: request to Mandrill webhook
+
+Updates message recipient status according to the Mandrill event received. The message and its
+recipients are identified by `remote_id`.
+
+**Inbound e-mail webhook event**
+
+Trigger: request to Mandrill webhook
 
 ## Mandrill transport views
-**Mandrill webhook**\
-  URL: /mandrill/webhook/
 
+**Mandrill webhook**
+
+URL: `/mandrill/webhook/`
 
 ## Administration
 
-**List of All E-mails** 
+**List of All E-mails**
+
 
 <sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>

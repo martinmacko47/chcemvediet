@@ -25,7 +25,7 @@ Computed Properties:
 
 ## Administration
 
-~~List of orphaned attachments:~~
+~~**List of orphaned attachments**~~
 * ~~Clean orphaned attachments~~
 * ~~Clean orphaned local files of deleted attachments~~
 * ~~Integrity check for local files of existing attachments.~~
