@@ -55,6 +55,8 @@ def attachment_download(request, attachment_pk):
 def attachment_finalization_download(request, attachment_finalization_pk):
     attachment_finalization = AttachmentFinalization.objects.get_or_404(
             pk=attachment_finalization_pk)
-    if not attachment_finalization.attachment.generic_object.branch.inforequest.published:
-        raise Http404()
-    return attachments_views.download(request, attachment_finalization)
+    generic_object = attachment_finalization.attachment.generic_object
+    if isinstance(generic_object, Action):
+        if generic_object.branch.inforequest.published:
+            return attachments_views.download(request, attachment_finalization)
+    raise Http404()

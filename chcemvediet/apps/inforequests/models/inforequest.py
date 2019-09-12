@@ -424,6 +424,12 @@ class Inforequest(FormatMixin, models.Model):
                 return True
         return False
 
+    def anonymized_for(self, user):
+        u"""
+        Returns True, if inforequest needs to be anonymized for user, False otherwise.
+        """
+        return user != self.applicant
+
     def branches_advanced_by(self, action):
         u"""
         Returns list of branches advanced by ``action``. Takes advantage of cached list of all

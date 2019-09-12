@@ -15,8 +15,6 @@
 {% block content %}
   <h1>{% trans 'inforequests:detail:heading' %}</h1>
   {% include "inforequests/detail/request.html" %}
-  {% if request.user == inforequest.applicant %}
-    {% include "inforequests/detail/response.html" %}
-  {% endif %}
+  {% include "inforequests/detail/response.html" %}
   {% include "inforequests/detail/branch/main.html" %}
 {% endblock %}

@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% load anonymize from chcemvediet.anonymization %}
+{% load chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -16,6 +16,8 @@
   {% if action.content_type == action.CONTENT_TYPES.PLAIN_TEXT %}
     <p class="chv-preline">{% anonymize inforequest action.content %}</p>
   {% elif action.content_type == action.CONTENT_TYPES.HTML %}
-    {% anonymize inforequest action.content|safe %}
+    {% autoescape off %}
+      {% anonymize_html inforequest action.content %}
+    {% endautoescape %}
   {% endif %}
 </div>

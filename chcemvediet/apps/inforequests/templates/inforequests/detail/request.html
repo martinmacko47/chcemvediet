@@ -1,5 +1,6 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load anonymize from chcemvediet.anonymization %}
+{% load anonymized from chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -22,7 +23,11 @@
       </li>
       <li>
         <i class="chv-icon chv-icon-li chv-icon-lg icon-user"></i>
-        {% anonymize inforequest inforequest.applicant_name %}
+        {% if inforequest|anonymized %}
+          {{ ANONYMIZATION_STRING }} {{ ANONYMIZATION_STRING }}
+        {% else %}
+          {{ inforequest.applicant_name }}
+        {% endif %}
       </li>
       <li>
         <i class="chv-icon chv-icon-li chv-icon-lg icon-calendar"></i>

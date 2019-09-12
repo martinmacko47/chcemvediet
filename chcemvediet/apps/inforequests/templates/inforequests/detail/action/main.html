@@ -1,7 +1,7 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load trans from i18n %}
 {% load method call_with from poleno.utils %}
-{% load anonymize from chcemvediet.anonymization %}
+{% load chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -19,15 +19,7 @@
     <div class="panel panel-border-gray">
       <div class="panel-heading">
         <div class="pull-right">
-          {% if request.user == inforequest.applicant %}
-            {% include "inforequests/detail/action/controls.html" %}
-          {% elif action.content %}
-            <button class="btn btn-link pln-print" type="button" data-target="#{{ print_id }}"
-                    title="{% trans 'inforequests:detail:action:print' %}">
-              <i class="chv-icon icon-print"></i>
-            </button>
-          {% endif %}
-
+          {% include "inforequests/detail/action/controls.html" %}
         </div>
         <h3>{{ action.get_extended_type_display }}</h3>
         {% if action.subject %}
@@ -39,18 +31,18 @@
       </div>
       <div class="panel-body chv-scheme-gray">
         {% if action.email %}
-          <div class="row">
-            {% if request.user == inforequest.applicant or action.email.type == 1 %}
+          {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.INBOUND %}
+            <div class="row">
               <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_from' %}:</p>
               <p class="col-sm-9 col-md-10 chv-semidense">{{ action.email.from_formatted }}</p>
-            {% endif %}
-          </div>
-          <div class="row">
-            {% if request.user == inforequest.applicant or action.email.type == 2 %}
+            </div>
+          {% endif %}
+          {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.OUTBOUND %}
+            <div class="row">
               <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_to' %}:</p>
               <div class="col-sm-9 col-md-10">{% include "inforequests/detail/action/recipients.html" %}</div>
-            {% endif %}
-          </div>
+            </div>
+          {% endif %}
         {% endif %}
         {% if action.legal_date %}
           <div class="row">

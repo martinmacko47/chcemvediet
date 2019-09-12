@@ -1,5 +1,6 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load url from poleno.utils %}
+{% load anonymized from chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -13,25 +14,26 @@
 
 <div class="pln-attachments-list">
   {% for attachment in action.attachments %}
-      {% if request.user == inforequest.applicant %}
+    {% if not inforequest|anonymized %}
+      <div class="pln-attachment">
+        <a href="{% url 'inforequests:download_attachment' attachment=attachment %}">
+          {{ attachment.name }}
+        </a>
+      </div>
+    {% else %}
+      {% for attachment_finalization in attachment.attachmentfinalization_set.all %}
         <div class="pln-attachment">
-          <a href="{% url 'inforequests:download_attachment' attachment=attachment %}">
+          <a href="{% url 'inforequests:download_attachment_finalization' attachment_finalization=attachment_finalization %}">
+            {{ attachment_finalization.name }}
+          </a>
+        </div>
+      {% empty %}
+        <div class="pln-attachment">
+          <a>
             {{ attachment.name }}
           </a>
         </div>
-      {% elif attachment.attachmentfinalization_set.first %}
-        {% for attachment_finalization in attachment.attachmentfinalization_set.all %}
-          <div class="pln-attachment">
-            <a href="{% url 'inforequests:download_attachment_finalization' attachment_finalization=attachment_finalization %}">
-              {{attachment_finalization.name}}
-            </a>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="pln-attachment">
-          {{ attachment.name }}
-        </div>
-      {% endif %}
-
+      {% endfor %}
+    {% endif %}
   {% endfor %}
 </div>
