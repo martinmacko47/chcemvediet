@@ -83,6 +83,9 @@ msgstr "Spravovať pripojenia"
 msgid "accounts:profile:invitations"
 msgstr "Spravovať pozvánky"
 
+msgid "annonymization:anonymization:anonymize_html:error"
+msgstr "Obsah sa nepodarilo načítať."
+
 msgid "inforequests:appeal:advancement:AdvancementAppeal:label"
 msgstr "Postúpenie žiadosti"
 
