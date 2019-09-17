@@ -16,19 +16,19 @@ register = Library()
 @register.simple_tag(takes_context=True)
 def anonymize(context, inforequest, content):
     request = context[u'request']
-    prog = generate_user_pattern(inforequest)
     if not inforequest.anonymized_for(request.user):
         return content
+    prog = generate_user_pattern(inforequest)
     return anonymize_string(prog, content)
 
 @register.simple_tag(takes_context=True)
 def anonymize_html(context, inforequest, html_content):
     request = context[u'request']
-    prog = generate_user_pattern(inforequest)
     if not inforequest.anonymized_for(request.user):
         return html_content
+    prog = generate_user_pattern(inforequest)
     try:
-        return anonymize_markup(prog, html_content, etree.HTMLParser(), u'.//', {})
+        return anonymize_markup(prog, html_content, etree.HTMLParser())
     except Exception as e:
         trace = unicode(traceback.format_exc(), u'utf-8')
         cron_logger.error(u'anonymize_html has failed.\n An '

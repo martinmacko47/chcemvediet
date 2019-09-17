@@ -102,7 +102,7 @@ def anonymize_string(prog, content):
         return content
     return prog.sub(ANONYMIZATION_STRING, content)
 
-def anonymize_markup(prog, content, parser, xpath, namespace):
+def anonymize_markup(prog, content, parser, xpath=u'.//', namespace=None):
     u"""
     Anonymize user in each xpath of markup (xml or html) content, using defined namespace.
     """
