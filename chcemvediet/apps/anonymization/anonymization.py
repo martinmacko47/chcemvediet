@@ -3,10 +3,10 @@ import re
 import zipfile
 import StringIO
 import traceback
-from xml.etree import ElementTree
 from contextlib import closing
 
 import magic
+from lxml import etree
 from django.core.files.base import ContentFile
 
 from poleno.cron import cron_logger
@@ -97,13 +97,18 @@ def generate_user_pattern(inforequest):
     )
     return re.compile(u'|'.join(patterns), re.IGNORECASE | re.UNICODE)
 
-def anonymize_xml(prog, xml_content, xpath, namespace):
-    """
-    Anonymize user in each xpath of xml_content, using defined namespace.
+def anonymize_string(prog, content):
+    if not prog.pattern:
+        return content
+    return prog.sub(ANONYMIZATION_STRING, content)
+
+def anonymize_markup(prog, content, parser, xpath=u'.//', namespace=None):
+    u"""
+    Anonymize user in each xpath of markup (xml or html) content, using defined namespace.
     """
     if not prog.pattern:
-        return xml_content
-    root = ElementTree.fromstring(xml_content)
+        return content
+    root = etree.fromstring(content, parser)
     for t in root.findall(xpath, namespace):
         for tt in list(t):
             if tt.tail is None:
@@ -112,11 +117,12 @@ def anonymize_xml(prog, xml_content, xpath, namespace):
         if t.text is None:
             continue
         t.text = prog.sub(ANONYMIZATION_STRING, t.text)
-    return ElementTree.tostring(root)
+    return etree.tostring(root)
 
 def anonymize_odt(attachment_recognition):
     try:
         inforequest = attachment_recognition.attachment.generic_object.branch.inforequest
+        parser = etree.XMLParser()
         pattern = generate_user_pattern(inforequest)
         namespace = {u'text': u'urn:oasis:names:tc:opendocument:xmlns:text:1.0'}
         with closing(StringIO.StringIO(attachment_recognition.content)) as buffer_in:
@@ -126,7 +132,8 @@ def anonymize_odt(attachment_recognition):
                         for f in zipfile_in.filelist:
                             content = zipfile_in.read(f)
                             if magic.from_buffer(content, mime=True) == content_types.XML_CONTENT_TYPE:
-                                zipfile_out.writestr(f, anonymize_xml(pattern, content, u'.//text:span', namespace))
+                                zipfile_out.writestr(f, anonymize_markup(
+                                        pattern, content, parser, u'.//text:span', namespace))
                             else:
                                 zipfile_out.writestr(f, content)
                 AttachmentAnonymization.objects.create(
@@ -135,7 +142,8 @@ def anonymize_odt(attachment_recognition):
                     file=ContentFile(buffer_out.getvalue()),
                     content_type=content_types.ODT_CONTENT_TYPE,
                 )
-                cron_logger.info(u'Anonymized attachment_recognition: {}'.format(attachment_recognition))
+                cron_logger.info(u'Anonymized attachment_recognition: {}'.format(
+                        attachment_recognition))
     except Exception as e:
         trace = unicode(traceback.format_exc(), u'utf-8')
         AttachmentAnonymization.objects.create(
@@ -146,7 +154,7 @@ def anonymize_odt(attachment_recognition):
         )
         cron_logger.error(u'Anonymizing attachment_recognition has failed: {}\n An '
                           u'unexpected error occured: {}\n{}'.format(
-            attachment_recognition, e.__class__.__name__, trace))
+                                  attachment_recognition, e.__class__.__name__, trace))
 
 def anonymize_attachment():
     attachment_recognition = (AttachmentRecognition.objects

@@ -1,6 +1,7 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load trans from i18n %}
 {% load url from poleno.utils %}
+{% load anonymized from chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -10,7 +11,7 @@
 {% endcomment %}
 
 
-{% if not inforequest.closed %}
+{% if not inforequest.closed and not inforequest|anonymized %}
   <div class="chv-bar chv-bar-red">
     <div class="chv-bar-icon">
       <span class="chv-icon-stack">

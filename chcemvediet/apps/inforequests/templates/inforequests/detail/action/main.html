@@ -1,6 +1,7 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load trans from i18n %}
 {% load method call_with from poleno.utils %}
+{% load anonymize anonymized from chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -24,20 +25,24 @@
         {% if action.subject %}
           <div class="row">
             <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:subject' %}:</p>
-            <p class="col-sm-9 col-md-10"><strong>{{ action.subject }}</strong></p>
+            <p class="col-sm-9 col-md-10"><strong>{% anonymize inforequest action.subject %}</strong></p>
           </div>
         {% endif %}
       </div>
       <div class="panel-body chv-scheme-gray">
         {% if action.email %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_from' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{{ action.email.from_formatted }}</p>
-          </div>
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_to' %}:</p>
-            <div class="col-sm-9 col-md-10">{% include "inforequests/detail/action/recipients.html" %}</div>
-          </div>
+          {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.INBOUND %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_from' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.email.from_formatted }}</p>
+            </div>
+          {% endif %}
+          {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.OUTBOUND %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_to' %}:</p>
+              <div class="col-sm-9 col-md-10">{% include "inforequests/detail/action/recipients.html" %}</div>
+            </div>
+          {% endif %}
         {% endif %}
         {% if action.legal_date %}
           <div class="row">

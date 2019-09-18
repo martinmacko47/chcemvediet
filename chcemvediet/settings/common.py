@@ -109,6 +109,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     u'poleno.utils.context_processors.idgenerator',
     u'chcemvediet.apps.obligees.context_processors.constants',
     u'chcemvediet.apps.inforequests.context_processors.constants',
+    u'chcemvediet.apps.anonymization.context_processors.constants',
     u'chcemvediet.context_processors.settings',
     )
 

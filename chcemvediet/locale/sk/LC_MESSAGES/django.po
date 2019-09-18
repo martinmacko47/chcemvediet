@@ -83,6 +83,9 @@ msgstr "Spravovať pripojenia"
 msgid "accounts:profile:invitations"
 msgstr "Spravovať pozvánky"
 
+msgid "annonymization:anonymization:anonymize_html:error"
+msgstr "Obsah sa nepodarilo načítať."
+
 msgid "inforequests:appeal:advancement:AdvancementAppeal:label"
 msgstr "Postúpenie žiadosti"
 
@@ -976,6 +979,9 @@ msgstr "pockat"
 
 msgid "inforequests:urls:attachments"
 msgstr "prilohy"
+
+msgid "inforequests:urls:attachment_finalizations"
+msgstr "prilohy-anonymizovane"
 
 msgid "obligees:ObligeeField:error:invalid_obligee"
 msgstr "Neplatný názov inštitúcie, zvoľte z menu."

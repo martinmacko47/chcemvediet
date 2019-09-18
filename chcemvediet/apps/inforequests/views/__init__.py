@@ -12,6 +12,7 @@ from .action import appeal
 from .action import snooze
 from .attachment import attachment_upload
 from .attachment import attachment_download
+from .attachment import attachment_finalization_download
 from .devtools import devtools_mock_response
 from .devtools import devtools_undo_last_action
 from .devtools import devtools_push_history

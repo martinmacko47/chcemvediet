@@ -1,6 +1,7 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load trans from i18n %}
 {% load url from poleno.utils %}
+{% load anonymized from chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -14,7 +15,7 @@
 {% endcomment %}
 
 
-{% if forloop.last and not inforequest.closed and not inforequest.has_undecided_emails %}
+{% if forloop.last and not inforequest.closed and not inforequest.has_undecided_emails and not inforequest|anonymized %}
   {% if action.can_applicant_snooze %}
     {% with modal_id=idgenerator.next %}
       <button class="btn btn-default pln-ajax pln-ajax-modal-once pln-with-tooltip"
@@ -32,7 +33,7 @@
   {% endif %}
 {% endif %}
 
-{% if forloop.last and not inforequest.closed and not inforequest.has_undecided_emails %}
+{% if forloop.last and not inforequest.closed and not inforequest.has_undecided_emails and not inforequest|anonymized %}
   {% if branch.can_add_clarification_response %}
     <a class="btn btn-default pln-with-tooltip" data-toggle="tooltip"
        href="{% url 'inforequests:clarification_response' branch=branch %}"
@@ -44,7 +45,7 @@
   {% endif %}
 {% endif %}
 
-{% if forloop.last and not inforequest.closed and not inforequest.has_undecided_emails %}
+{% if forloop.last and not inforequest.closed and not inforequest.has_undecided_emails and not inforequest|anonymized %}
   {% if branch.can_add_appeal %}
     <a class="btn btn-default pln-with-tooltip" data-toggle="tooltip"
        href="{% url 'inforequests:appeal' branch=branch %}"

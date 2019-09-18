@@ -32,6 +32,7 @@ class InforequestAdmin(admin.ModelAdmin):
                 admin_order_field=u'undecided_emails_count',
                 ),
             u'closed',
+            u'published',
             ]
     list_filter = [
             u'submission_date',
@@ -40,6 +41,7 @@ class InforequestAdmin(admin.ModelAdmin):
                 (u'0', u'Without', lambda qs: qs.filter(undecided_emails_count=0)),
                 ]),
             u'closed',
+            u'published',
             ]
     search_fields = [
             u'=id',
