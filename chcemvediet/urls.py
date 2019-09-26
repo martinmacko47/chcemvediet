@@ -10,10 +10,10 @@ from django.utils.translation import ugettext_lazy as _
 from poleno.utils.lazy import lazy_format
 
 from . import views
+from .sitemaps import sitemaps
 
 # Initializes the project
 from . import ready
-from .sitemaps import sitemaps
 
 
 urlpatterns = patterns(u'',

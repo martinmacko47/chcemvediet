@@ -13,11 +13,12 @@ from django.http import JsonResponse
 
 from .models import Obligee
 
+OBLIGEES_PER_PAGE = 25
 
 @require_http_methods([u'HEAD', u'GET'])
 def index(request):
     obligees = Obligee.objects.pending().order_by_name()
-    paginator = Paginator(obligees, 25)
+    paginator = Paginator(obligees, OBLIGEES_PER_PAGE)
 
     page = request.GET.get(u'page')
     try:

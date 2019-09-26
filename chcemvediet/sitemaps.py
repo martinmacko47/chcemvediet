@@ -1,22 +1,11 @@
-from django.contrib.sitemaps import Sitemap
-
 from poleno.pages.sitemaps import PagesSitemap
 
-from .apps.inforequests.sitemaps import InforequestSitemap
+from .apps.inforequests.sitemaps import InforequestsSitemap
+from .apps.obligees.sitemaps import ObligeesSitemap
 
-
-class HomepageSitemap(Sitemap):
-    priority = 1.0
-    changefreq = u'never'
-
-    def items(self):
-        return [u'homepage']
-
-    def location(self, item):
-        return u'/'
 
 sitemaps = {
-        u'homepage': HomepageSitemap,
         u'pages': PagesSitemap,
-        u'inforequests': InforequestSitemap,
-        }
+        u'inforequests': InforequestsSitemap,
+        u'obligees': ObligeesSitemap,
+}

@@ -7,8 +7,8 @@ from .pages import Page
 
 
 class PagesSitemap(Sitemap):
-    changefreq = u'never'
-    priority = 0.5
+    changefreq = u'weekly'
+    priority = 0.7
 
     def items(self):
         res = []
