@@ -14,12 +14,9 @@ class InforequestsSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        res = []
         inforequests = Inforequest.objects.published()
-        for lang, name in settings.LANGUAGES:
-            for inforequest in inforequests:
-                res.append((lang, inforequest))
-        return res
+        return [(lang, inforequest) for lang, name in settings.LANGUAGES
+                for inforequest in inforequests]
 
     def location(self, (lang, inforequest)):
         with translation(lang):
@@ -27,5 +24,5 @@ class InforequestsSitemap(Sitemap):
 
     def lastmod(self, (lang, inforequest)):
         return (Action.objects
-                .where_inforequest(inforequest)
+                .of_inforequest(inforequest)
                 .aggregate(most_recent=Max(u'created'))[u'most_recent'])

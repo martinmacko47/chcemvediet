@@ -11,9 +11,9 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.http import JsonResponse
 
+from .constants import OBLIGEES_PER_PAGE
 from .models import Obligee
 
-OBLIGEES_PER_PAGE = 25
 
 @require_http_methods([u'HEAD', u'GET'])
 def index(request):

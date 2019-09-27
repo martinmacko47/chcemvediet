@@ -2,12 +2,14 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.contrib.sitemaps import Sitemap
+from django.utils.http import urlencode
 
 from poleno.utils.urls import reverse
 from poleno.utils.translation import translation
 
+from .constants import OBLIGEES_PER_PAGE
 from .models import Obligee
-from .views import OBLIGEES_PER_PAGE
+
 
 class ObligeesSitemap(Sitemap):
     changefreq = u'weekly'
@@ -20,4 +22,4 @@ class ObligeesSitemap(Sitemap):
 
     def location(self, (lang, i)):
         with translation(lang):
-            return u"{}?page={}".format(reverse(u'obligees:index'), i)
+            return reverse(u'obligees:index') + u'?' + urlencode({u'page': i})

@@ -67,7 +67,7 @@ class ActionQuerySet(QuerySet):
         return self.filter(email__isnull=False)
     def by_smail(self):
         return self.filter(email__isnull=True)
-    def where_inforequest(self, inforequest):
+    def of_inforequest(self, inforequest):
         return self.filter(branch__inforequest=inforequest)
     def order_by_pk(self):
         return self.order_by(u'pk')
