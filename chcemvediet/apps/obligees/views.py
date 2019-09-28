@@ -11,13 +11,14 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.http import JsonResponse
 
+from .constants import OBLIGEES_PER_PAGE
 from .models import Obligee
 
 
 @require_http_methods([u'HEAD', u'GET'])
 def index(request):
     obligees = Obligee.objects.pending().order_by_name()
-    paginator = Paginator(obligees, 25)
+    paginator = Paginator(obligees, OBLIGEES_PER_PAGE)
 
     page = request.GET.get(u'page')
     try:

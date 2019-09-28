@@ -1,2 +1,4 @@
+Sitemap: https://www.chcemvediet.sk/sitemap.xml
+
 User-agent: *
 Allow:
