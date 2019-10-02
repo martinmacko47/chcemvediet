@@ -25,6 +25,7 @@ urlpatterns = patterns(u'',
 
 urlpatterns += i18n_patterns(u'',
     url(r'^$', views.homepage, name=u'homepage'),
+    url(r'^search/$', views.customsearch, name=u'customsearch'),
     url(lazy_format(r'^{0}/', _(u'main:urls:obligees')),     include(u'chcemvediet.apps.obligees.urls', namespace=u'obligees')),
     url(lazy_format(r'^{0}/', _(u'main:urls:inforequests')), include(u'chcemvediet.apps.inforequests.urls', namespace=u'inforequests')),
     url(lazy_format(r'^{0}/', _(u'main:urls:invitations')),  include(u'poleno.invitations.urls', namespace=u'invitations')),

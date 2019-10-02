@@ -1278,6 +1278,9 @@ msgstr "Overte vašu e-mailovú adresu"
 msgid "account:verified_email_required:heading"
 msgstr "Je potrebné overenie e-mailovej adresy"
 
+msgid "customsearch:search:title"
+msgstr "Hľadať"
+
 msgid "main:base:title"
 msgstr "Chcemvediet.sk"
 

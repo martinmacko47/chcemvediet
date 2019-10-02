@@ -1,0 +1,18 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% extends "main/base/single_column.html" %}
+{% load trans from i18n %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- None
+ %
+{% endcomment %}
+
+
+{% block title %}{% trans 'customsearch:search:title' %} | {{ block.super }}{% endblock %}
+
+{% block content %}
+  <script async src="https://cse.google.com/cse.js?cx=010601888809869439804:rk-fpmmkuio"></script>
+  <div class="gcse-searchresults-only"></div>
+{% endblock %}
