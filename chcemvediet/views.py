@@ -3,9 +3,7 @@
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.utils.http import urlencode
+from django.conf import settings
 
 from chcemvediet.apps.obligees.models import Obligee
 from chcemvediet.apps.inforequests.models import Inforequest
@@ -23,9 +21,12 @@ def homepage(request):
             u'inforequests': inforequests,
             })
 
-@require_http_methods([u'HEAD', u'GET', u'POST'])
-def customsearch(request):
-    if request.POST:
-        q = request.POST[u'q']
-        return HttpResponseRedirect(reverse(u'customsearch') + u'?' + urlencode({u'q': q}))
-    return render(request, u'customsearch/search.html')
+@require_http_methods([u'HEAD', u'GET'])
+def search(request):
+    search_api_key = settings.SEARCH_API_KEY
+    q = request.GET.get(u'q', u'')
+
+    return render(request, u'main/search/search.html', {
+        u'search_api_key': search_api_key,
+        u'q': q,
+    })

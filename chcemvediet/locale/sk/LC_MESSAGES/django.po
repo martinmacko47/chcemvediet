@@ -1278,9 +1278,6 @@ msgstr "Overte vašu e-mailovú adresu"
 msgid "account:verified_email_required:heading"
 msgstr "Je potrebné overenie e-mailovej adresy"
 
-msgid "customsearch:search:title"
-msgstr "Hľadať"
-
 msgid "main:base:title"
 msgstr "Chcemvediet.sk"
 
@@ -1370,6 +1367,9 @@ msgstr "Podaj infožiadosť"
 
 msgid "main:homepage:steps:wait"
 msgstr "Čakaj pripomienku"
+
+msgid "main:search:title"
+msgstr "Vyhľadávanie"
 
 msgid "main:ajax_fail:heading"
 msgstr "Niečo sa pokazilo"

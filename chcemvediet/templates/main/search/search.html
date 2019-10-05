@@ -1,0 +1,29 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% extends "main/base/full_width.html" %}
+{% load trans from i18n %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- search_api_key: string
+ %  -- q: string
+ %
+{% endcomment %}
+
+
+{% block title %}{% trans 'main:search:title' %} | {{ block.super }}{% endblock %}
+
+{% block content %}
+  <div class="chv-scheme-inv-blue">
+    <div class="container text-center">
+      {% include "main/snippets/search.html" with q=q search_text=False %}
+    </div>
+  </div>
+
+  {% if search_api_key %}
+    <div class="container chv-above-1 chv-bellow-1">
+      <script async src="https://cse.google.com/cse.js?cx={{ search_api_key }}"></script>
+      <div class="gcse-searchresults-only"></div>
+    </div>
+  {% endif %}
+{% endblock %}

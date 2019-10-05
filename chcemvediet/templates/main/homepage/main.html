@@ -15,7 +15,7 @@
 {% block content %}
   <div class="chv-scheme-inv-blue">
     <div class="container text-center">
-      {% include "main/homepage/search.html" %}
+      {% include "main/snippets/search.html" with q="" search_text=True %}
       {% include "main/homepage/steps.html" %}
     </div>
   </div>

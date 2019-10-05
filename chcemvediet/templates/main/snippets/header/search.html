@@ -12,8 +12,7 @@
 
 <div class="chv-navbar-search {{ pull }}">
   <div id="{{ collapse_id }}" class="chv-navbar-search-inner collapse">
-      <form method="post" action="{% url 'customsearch' %}">
-        {% csrf_token %}
+      <form action="{% url 'search' %}" method="get">
         <div class="input-group">
           <input class="form-control" type="text" name="q"
                  placeholder="{% trans 'main:header:search:placeholder' %}">

@@ -212,6 +212,7 @@ ASSETS = (
     u'obligees/js/obligee_widget.js',
     u'main/js/01.bootstrapfix.js',
     u'main/css/02.jqueryfix.css',
+    u'main/css/03.gcsefix.css',
     )
 
 # Django-allauth settings
