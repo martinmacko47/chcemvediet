@@ -3,7 +3,6 @@
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.conf import settings
 
 from chcemvediet.apps.obligees.models import Obligee
 from chcemvediet.apps.inforequests.models import Inforequest
@@ -23,10 +22,8 @@ def homepage(request):
 
 @require_http_methods([u'HEAD', u'GET'])
 def search(request):
-    search_api_key = settings.SEARCH_API_KEY
     q = request.GET.get(u'q', u'')
 
     return render(request, u'main/search/search.html', {
-        u'search_api_key': search_api_key,
         u'q': q,
     })

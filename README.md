@@ -212,7 +212,7 @@ and `{group}` are unix user and group names the server will run under.
 
     Where `{domain}` is your production domain or `127.0.0.1:8000` if in local development mode.
 
- 3. Run the configuration script `configure.py` and enter given 'Client ID for web application' and
+ 3. Run the configuration script `setup.py` and enter given 'Client ID for web application' and
     'Client secret'.
 
 
@@ -235,7 +235,7 @@ and `{group}` are unix user and group names the server will run under.
 ## 5. Mandrill transactional e-mail servis
 
 To use Mandrill, you need to register on their site http://mandrill.com/ and obtain a Mandrill API
-key. The configuration script `configure.py` will ask for this key.
+key. The configuration script `setup.py` will ask for this key.
 
 To let Mandrill process your inbound e-mails, you must configure your inbound e-mail addresses to
 reside on domains you control. The configuration script will ask you to input your admin e-mail,

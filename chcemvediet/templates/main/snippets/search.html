@@ -5,17 +5,16 @@
  %
  % Context:
  %  -- q: string
- %  -- search_text: boolean
  %
 {% endcomment %}
 
 
-<div class="chv-above-2 chv-bellow-1 chv-maxwidth-500 center-block">
-  <h1>{% trans 'main:homepage:search:heading' %}</h1>
+<div class="chv-above-2 chv-maxwidth-500 center-block">
+  <h1>{% trans 'main:snippets:search:heading' %}</h1>
   <form action="{% url 'search' %}" method="get">
     <div class="input-group">
       <input class="form-control" type="text" name="q" value="{{ q }}"
-             placeholder="{% trans 'main:homepage:search:placeholder' %}">
+             placeholder="{% trans 'main:snippets:search:placeholder' %}">
       <span class="input-group-btn">
         <button class="btn chv-btn-plain" type="submit">
           <i class="chv-icon icon-search chv-color-blue"></i>
@@ -23,7 +22,4 @@
       </span>
     </div>
   </form>
-  {% if search_text %}
-    {% include "main/homepage/texts/search_text.html" %}
-  {% endif %}
 </div>
