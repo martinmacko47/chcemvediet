@@ -1494,6 +1494,9 @@ msgstr "Prihlásiť sa"
 msgid "socialaccount:signup:submit"
 msgstr "Prihlásiť sa"
 
+msgid "main:urls:search"
+msgstr "vyhladavanie"
+
 msgid "main:urls:obligees"
 msgstr "institucie"
 
