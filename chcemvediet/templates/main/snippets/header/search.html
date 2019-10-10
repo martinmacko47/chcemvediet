@@ -14,7 +14,7 @@
   <div id="{{ collapse_id }}" class="chv-navbar-search-inner collapse">
       <form action="{% url 'search' %}" method="get">
         <div class="input-group">
-          <input class="form-control" type="text" name="q"
+          <input class="form-control" type="text" name="q" autocomplete="off"
                  placeholder="{% trans 'main:header:search:placeholder' %}">
           <span class="input-group-btn">
           <button class="btn" type="submit">
