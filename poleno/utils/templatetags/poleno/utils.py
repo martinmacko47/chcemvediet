@@ -345,6 +345,8 @@ def change_lang(context, lang=None):
     with translation(lang):
         url = reverse(view_name, kwargs=kwargs)
 
+    query = context[u'request'].GET.urlencode()
+    url = url + u'?' + query if query else url
     return format(url)
 
 @register.simple_tag
