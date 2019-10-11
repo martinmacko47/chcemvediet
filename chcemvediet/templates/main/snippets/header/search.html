@@ -12,10 +12,11 @@
 
 <div class="chv-navbar-search {{ pull }}">
   <div id="{{ collapse_id }}" class="chv-navbar-search-inner collapse">
-    <form class="pln-not-implemented" action=".">
-      <div class="input-group">
-        <input class="form-control" type="text" placeholder="{% trans 'main:header:search:placeholder' %}">
-        <span class="input-group-btn">
+      <form action="{% url 'search' %}" method="get">
+        <div class="input-group">
+          <input class="form-control" type="text" name="q" autocomplete="off"
+                 placeholder="{% trans 'main:header:search:placeholder' %}">
+          <span class="input-group-btn">
           <button class="btn" type="submit">
             <span class="hidden-xs"><i class="chv-icon icon-search"></i></span>
             <span class="visible-xs">{% trans 'main:header:search:button' %}</span>

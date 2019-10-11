@@ -1,0 +1,40 @@
+/** Google custom search fix **/
+
+/* div that contains result entries */
+.gsc-control-cse{
+    font-family: inherit !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    }
+
+/* result entry */
+.gsc-webResult, .gsc-result{
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    }
+
+/* result info container, content in result entry, divs showing by typo */
+.gsc-result-info, .gsc-thumbnail-inside, .gsc-url-top, .gsc-table-result, .gs-spelling,
+.gs-spelling-original{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    }
+
+/* divs with common content */
+.gsc-control-cse, .gsc-table-result{
+    font-size: inherit !important;
+    }
+
+/* find more */
+.gcsc-find-more-on-google{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    }
+
+/* no results */
+.gs-snippet{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    }

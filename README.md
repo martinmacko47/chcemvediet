@@ -41,7 +41,7 @@ to `"read|write"`. See the related [Imagemagick issue] why.
 [Imagemagick issue]: https://bugs.launchpad.net/ubuntu/+source/imagemagick/+bug/1796563
 
 
-#### 2.1.2. Libmagic Configuration
+#### 1.1.2. Libmagic Configuration
 
 Some word documents can sometimes fail to identify correctly. You can solve it by editing
 `/etc/magic` file with add rules for this documents. See the related [Libmagic issue] why.
@@ -212,14 +212,30 @@ and `{group}` are unix user and group names the server will run under.
 
     Where `{domain}` is your production domain or `127.0.0.1:8000` if in local development mode.
 
- 3. Run the configuration script `configure.py` and enter given 'Client ID for web application' and
+ 3. Run the configuration script `setup.py` and enter given 'Client ID for web application' and
     'Client secret'.
 
 
-## 4. Mandrill transactional e-mail servis
+## 4. Google custom search engine key
+
+ 1. Sign into [Control Panel](https://cse.google.com/create/new) using your Google Account.
+
+ 2. In the **Sites to search** section, add the `www.chcemvediet.sk` page. Set **Language** to
+    `Slovak`and click **Create**. 
+
+ 3. Go to the **Look and feel** section and click the **Layout** tab. Select and save the `Results
+    only` layout.
+
+ 4. Go back to **Setup** section. On the **Basics** tab, in the **Details** section, copy **Search
+    engine ID**.
+
+ 5. Run `setup.py` to configure your google custom search API key.
+
+
+## 5. Mandrill transactional e-mail servis
 
 To use Mandrill, you need to register on their site http://mandrill.com/ and obtain a Mandrill API
-key. The configuration script `configure.py` will ask for this key.
+key. The configuration script `setup.py` will ask for this key.
 
 To let Mandrill process your inbound e-mails, you must configure your inbound e-mail addresses to
 reside on domains you control. The configuration script will ask you to input your admin e-mail,
@@ -244,7 +260,7 @@ a webhook to trigger on the following events: `send`, `deferral`, `hard_bounce`,
 into the configuration script and restart the server.
 
 
-## 5. Dummy e-mail infrastructure
+## 6. Dummy e-mail infrastructure
 
 Using the command:
 
@@ -292,7 +308,7 @@ e-mail address whatsoever. Nothing will be delivered. Also note, that all e-mail
 memory only, so they will disappear when the infrastructure is restarted.
 
 
-## 6. Contributing
+## 7. Contributing
 
 If you want to contribute, please, create a new branch for your changes:
 
@@ -302,7 +318,7 @@ If you want to contribute, please, create a new branch for your changes:
 
 And then submit a 'Pull Request' on GitHub.
 
-### 6.1. Site Content and translations
+### 7.1. Site Content and translations
 
 All site text content is stored in templates. Templates are in `template` directories all over the
 project. Some templates are translated in place and have their translated versions such as

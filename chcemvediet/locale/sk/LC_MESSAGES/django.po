@@ -1350,12 +1350,6 @@ msgstr "vedeli-ste"
 msgid "main:homepage:didyouknow:heading"
 msgstr "Vedeli ste?"
 
-msgid "main:homepage:search:heading"
-msgstr "Čo chceš <b>vedieť</b>?"
-
-msgid "main:homepage:search:placeholder"
-msgstr "Hľadaj v už zodpovedaných infožiadostiach..."
-
 msgid "main:homepage:steps:signup"
 msgstr "Zaregistruj sa"
 
@@ -1367,6 +1361,15 @@ msgstr "Podaj infožiadosť"
 
 msgid "main:homepage:steps:wait"
 msgstr "Čakaj pripomienku"
+
+msgid "main:search:title"
+msgstr "Vyhľadávanie"
+
+msgid "main:snippets:search:heading"
+msgstr "Čo chceš <b>vedieť</b>?"
+
+msgid "main:snippets:search:placeholder"
+msgstr "Hľadaj v už zodpovedaných infožiadostiach..."
 
 msgid "main:ajax_fail:heading"
 msgstr "Niečo sa pokazilo"
@@ -1490,6 +1493,9 @@ msgstr "Prihlásiť sa"
 
 msgid "socialaccount:signup:submit"
 msgstr "Prihlásiť sa"
+
+msgid "main:urls:search"
+msgstr "vyhladavanie"
 
 msgid "main:urls:obligees"
 msgstr "institucie"

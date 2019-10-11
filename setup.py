@@ -431,6 +431,13 @@ def configure_mandrill(configure, settings):
         settings.setting(u'MANDRILL_API_KEY', mandrill_api_key)
         settings.setting(u'MANDRILL_WEBHOOK_KEYS', mandrill_webhook_keys.split())
 
+def configure_search(configure, settings):
+    print(INFO + textwrap.dedent(u"""
+            Google Custom Search is a platform we use to feature information about published
+            Inforequests, Obligees and other content in www.chcemvediet.sk searches.""") + RESET)
+    search_api_key = configure.input(u'search_api_key', u'Google Custom Search API key')
+    settings.setting(u'SEARCH_API_KEY', search_api_key)
+
 def load_fixtures(configure):
     res = []
     res.append(u'fixtures/sites_site.json')
@@ -596,6 +603,7 @@ def main():
             configure_database(configure, settings)
             configure_cache(configure, settings)
             configure_mandrill(configure, settings)
+            configure_search(configure, settings)
 
         # Settings module is configured, so we may use Django now.
         os.environ.setdefault(u'DJANGO_SETTINGS_MODULE', u'chcemvediet.settings')
