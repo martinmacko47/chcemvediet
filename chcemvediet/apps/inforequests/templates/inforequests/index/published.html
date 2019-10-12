@@ -1,0 +1,20 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load trans from i18n %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- published_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %
+{% endcomment %}
+
+
+{% if published_inforequests %}
+  <h2 id="{% trans 'inforequests:index:published:anchor' %}">
+    <i class="chv-icon chv-color-blue-ll icon-ok"></i>&nbsp;
+    {% trans 'inforequests:index:published:heading' %}
+  </h2>
+  {% with class="chv-table-blue" objects=published_inforequests %}
+    {% include "inforequests/mine/tables/inforequests.html" %}
+  {% endwith %}
+{% endif %}

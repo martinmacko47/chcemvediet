@@ -1,6 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 
+from .inforequest import inforequest_index
 from .inforequest import inforequest_mine
 from .inforequest import inforequest_create
 from .inforequest import inforequest_detail
