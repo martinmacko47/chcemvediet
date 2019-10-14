@@ -28,7 +28,7 @@ class DeleteDraftViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase
         response = self.client.post(reverse(u'inforequests:delete_draft', args=(draft.pk,)))
         self.assertFalse(InforequestDraft.objects.filter(pk=draft.pk).exists())
 
-    def test_post_is_redirected_to_inforequests_index(self):
+    def test_post_is_redirected_to_inforequests_mine(self):
         draft = self._create_inforequest_draft()
         self._login_user()
         response = self.client.post(reverse(u'inforequests:delete_draft', args=(draft.pk,)), follow=True)

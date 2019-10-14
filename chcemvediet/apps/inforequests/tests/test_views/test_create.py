@@ -203,7 +203,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         draft = InforequestDraft.objects.get(pk=draft.pk)
         self.assertEqual(draft.subject, [u'Old Subject'])
 
-    def test_post_with_draft_button_and_valid_data_redirects_to_inforequests_index(self):
+    def test_post_with_draft_button_and_valid_data_redirects_to_inforequests_mine(self):
         data = self._create_post_data(button=u'draft')
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)

@@ -7,7 +7,7 @@ from poleno.utils.test import ViewTestCaseMixin
 
 from .. import InforequestsTestCaseMixin
 
-class IndexViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
+class MineViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
     u"""
     Tests ``mine()`` view registered as "inforequests:mine".
     """
@@ -19,7 +19,7 @@ class IndexViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
     def test_anonymous_user_is_redirected(self):
         self.assert_anonymous_user_is_redirected(reverse(u'inforequests:mine'))
 
-    def test_authenticated_user_gets_inforequest_index(self):
+    def test_authenticated_user_gets_inforequest_mine(self):
         self._login_user()
         response = self.client.get(reverse(u'inforequests:mine'))
         self.assertEqual(response.status_code, 200)
