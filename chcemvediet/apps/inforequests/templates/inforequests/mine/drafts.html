@@ -10,11 +10,11 @@
 
 
 {% if drafts %}
-  <h2 id="{% trans 'inforequests:index:drafts:anchor' %}">
+  <h2 id="{% trans 'inforequests:mine:drafts:anchor' %}">
     <i class="chv-icon chv-color-green-l icon-doc-inv"></i>&nbsp;
-    {% trans 'inforequests:index:drafts:heading' %}
+    {% trans 'inforequests:mine:drafts:heading' %}
   </h2>
   {% with class="chv-table-green" objects=drafts %}
-    {% include "inforequests/index/tables/drafts.html" %}
+    {% include "inforequests/mine/tables/drafts.html" %}
   {% endwith %}
 {% endif %}

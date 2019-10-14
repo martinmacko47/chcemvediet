@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "inforequests/index/panels/base_top.html" %}
+{% extends "inforequests/mine/panels/base_top.html" %}
 {% load trans from i18n %}
 
 {% comment %}
@@ -12,5 +12,5 @@
 
 {% block color %}chv-color-blue-ll{% endblock %}
 {% block icon %}icon-at{% endblock %}
-{% block heading %}{% trans 'inforequests:index:email:heading' %}{% endblock %}
-{% block text %}{% include "inforequests/index/texts/email.html" %}{% endblock %}
+{% block heading %}{% trans 'inforequests:mine:email:heading' %}{% endblock %}
+{% block text %}{% include "inforequests/mine/texts/email.html" %}{% endblock %}

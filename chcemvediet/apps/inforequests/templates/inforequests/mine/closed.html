@@ -10,11 +10,11 @@
 
 
 {% if closed_inforequests %}
-  <h2 id="{% trans 'inforequests:index:closed:anchor' %}">
+  <h2 id="{% trans 'inforequests:mine:closed:anchor' %}">
     <i class="chv-icon chv-color-blue-ll icon-ok"></i>&nbsp;
-    {% trans 'inforequests:index:closed:heading' %}
+    {% trans 'inforequests:mine:closed:heading' %}
   </h2>
   {% with class="chv-table-blue" objects=closed_inforequests %}
-    {% include "inforequests/index/tables/inforequests.html" %}
+    {% include "inforequests/mine/tables/inforequests.html" %}
   {% endwith %}
 {% endif %}

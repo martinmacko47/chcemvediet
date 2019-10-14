@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "inforequests/index/panels/base_bottom.html" %}
+{% extends "inforequests/mine/panels/base_bottom.html" %}
 {% load trans from i18n %}
 
 {% comment %}
@@ -12,4 +12,4 @@
 
 {% block button-href %}{% url 'inforequests:create' %}{% endblock %}
 {% block button-icon %}icon-doc-inv{% endblock %}
-{% block botton-text %}{% trans 'inforequests:index:create:button' %}{% endblock %}
+{% block botton-text %}{% trans 'inforequests:mine:create:button' %}{% endblock %}

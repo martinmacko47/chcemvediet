@@ -32,7 +32,7 @@ class DeleteDraftViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase
         draft = self._create_inforequest_draft()
         self._login_user()
         response = self.client.post(reverse(u'inforequests:delete_draft', args=(draft.pk,)), follow=True)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_post_with_invalid_draft_returns_404_not_found(self):
         self._login_user()

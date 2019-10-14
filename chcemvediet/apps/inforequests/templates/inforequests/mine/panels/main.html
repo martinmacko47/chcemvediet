@@ -13,26 +13,26 @@
 {% with undecided_emails_count=user.profile.undecided_emails_count %}
   <div class="chv-eq-rows chv-above-1 chv-bellow-1">
     <div class="chv-eq-row chv-hidden chv-tablerow-sm">
-      {% include "inforequests/index/panels/create_top.html" %}
+      {% include "inforequests/mine/panels/create_top.html" %}
       {% if undecided_emails_count %}
-        {% include "inforequests/index/panels/email_top.html" %}
+        {% include "inforequests/mine/panels/email_top.html" %}
       {% elif inforequests %}
-        {% include "inforequests/index/panels/smail_top.html" %}
+        {% include "inforequests/mine/panels/smail_top.html" %}
       {% else %}
-        {% include "inforequests/index/panels/nomail_top.html" %}
+        {% include "inforequests/mine/panels/nomail_top.html" %}
       {% endif %}
-      {% include "inforequests/index/panels/archive_top.html" %}
+      {% include "inforequests/mine/panels/archive_top.html" %}
     </div>
     <div class="chv-eq-row">
-      {% include "inforequests/index/panels/create_bottom.html" %}
+      {% include "inforequests/mine/panels/create_bottom.html" %}
       {% if undecided_emails_count %}
-        {% include "inforequests/index/panels/email_bottom.html" %}
+        {% include "inforequests/mine/panels/email_bottom.html" %}
       {% elif inforequests %}
-        {% include "inforequests/index/panels/smail_bottom.html" %}
+        {% include "inforequests/mine/panels/smail_bottom.html" %}
       {% else %}
-        {% include "inforequests/index/panels/nomail_bottom.html" %}
+        {% include "inforequests/mine/panels/nomail_bottom.html" %}
       {% endif %}
-      {% include "inforequests/index/panels/archive_bottom.html" %}
+      {% include "inforequests/mine/panels/archive_bottom.html" %}
     </div>
   </div>
 {% endwith %}

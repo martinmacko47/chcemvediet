@@ -17,7 +17,7 @@ from chcemvediet.apps.inforequests.models import InforequestDraft, Inforequest, 
 
 @require_http_methods([u'HEAD', u'GET'])
 @login_required
-def inforequest_index(request):
+def inforequest_mine(request):
     inforequests = (Inforequest.objects
             .not_closed()
             .owned_by(request.user)
@@ -41,7 +41,7 @@ def inforequest_index(request):
                     Branch.objects.select_related(u'historicalobligee')))
             )
 
-    return render(request, u'inforequests/index/index.html', {
+    return render(request, u'inforequests/mine/mine.html', {
             u'inforequests': inforequests,
             u'drafts': drafts,
             u'closed_inforequests': closed_inforequests,
@@ -73,7 +73,7 @@ def inforequest_create(request, draft_pk=None):
             draft = InforequestDraft(applicant=request.user)
         form.save_to_draft(draft)
         draft.save()
-        return HttpResponseRedirect(reverse(u'inforequests:index'))
+        return HttpResponseRedirect(reverse(u'inforequests:mine'))
 
     if button == u'submit':
         form = InforequestForm(request.POST, attached_to=attached_to, user=request.user)
@@ -111,7 +111,7 @@ def inforequest_detail(request, inforequest_slug, inforequest_pk):
 def inforequest_delete_draft(request, draft_pk):
     draft = InforequestDraft.objects.owned_by(request.user).get_or_404(pk=draft_pk)
     draft.delete()
-    return HttpResponseRedirect(reverse(u'inforequests:index'))
+    return HttpResponseRedirect(reverse(u'inforequests:mine'))
 
 @require_http_methods([u'HEAD', u'GET'])
 @login_required
@@ -138,7 +138,7 @@ def obligee_action_dispatcher(request):
         return HttpResponseRedirect(
                 reverse(u'inforequests:obligee_action', kwargs=dict(inforequest=inforequests[0])))
     if len(inforequests) == 0:
-        return HttpResponseRedirect(reverse(u'inforequests:index'))
+        return HttpResponseRedirect(reverse(u'inforequests:mine'))
 
     return render(request, u'inforequests/obligee_action_dispatcher/dispatcher.html', {
             u'inforequests': inforequests,

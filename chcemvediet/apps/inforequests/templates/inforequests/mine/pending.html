@@ -10,13 +10,13 @@
 
 
 {% if inforequests %}
-  <h2 id="{% trans 'inforequests:index:pending:anchor' %}">
+  <h2 id="{% trans 'inforequests:mine:pending:anchor' %}">
     {% with class="chv-icon-lg" color="chv-color-red-l" %}
       {% include "main/snippets/icons/chv-diag.html" %}
     {% endwith %}
-    {% trans 'inforequests:index:pending:heading' %}
+    {% trans 'inforequests:mine:pending:heading' %}
   </h2>
   {% with class="chv-table-red" objects=inforequests %}
-    {% include "inforequests/index/tables/inforequests.html" %}
+    {% include "inforequests/mine/tables/inforequests.html" %}
   {% endwith %}
 {% endif %}

@@ -21,6 +21,7 @@ parts = {
     u'attachment_finalization_pk':r'(?P<attachment_finalization_pk>\d+)/',
     u'step_idx':                  r'(?P<step_idx>\d+)/',
     u'step_idx?':              r'(?:(?P<step_idx>\d+)/)?',
+    u'mine':                      lazy_concat(_(u'inforequests:urls:mine'), u'/'),
     u'create':                    lazy_concat(_(u'inforequests:urls:create'), u'/'),
     u'delete_draft':              lazy_concat(_(u'inforequests:urls:delete_draft'), u'/'),
     u'obligee_action':            lazy_concat(_(u'inforequests:urls:obligee_action'), u'/'),
@@ -33,7 +34,7 @@ parts = {
     }
 
 urlpatterns = patterns(u'',
-    url(lazy_format(r'^$'),                                                                             views.inforequest_index,                name=u'index'),
+    url(lazy_format(r'^{mine}$', **parts),                                                              views.inforequest_mine,                 name=u'mine'),
     url(lazy_format(r'^{create}{draft_pk?}$', **parts),                                                 views.inforequest_create,               name=u'create'),
     url(lazy_format(r'^{delete_draft}{draft_pk}$', **parts),                                            views.inforequest_delete_draft,         name=u'delete_draft'),
     url(lazy_format(r'^{obligee_action_dispatcher}$', **parts),                                         views.obligee_action_dispatcher,        name=u'obligee_action_dispatcher'),

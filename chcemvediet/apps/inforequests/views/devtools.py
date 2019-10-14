@@ -115,4 +115,4 @@ def devtools_delete(request, inforequest_pk):
     inforequest = Inforequest.objects.owned_by(request.user).get_or_404(pk=inforequest_pk)
     inforequest.delete()
 
-    return HttpResponseRedirect(reverse(u'inforequests:index'))
+    return HttpResponseRedirect(reverse(u'inforequests:mine'))
