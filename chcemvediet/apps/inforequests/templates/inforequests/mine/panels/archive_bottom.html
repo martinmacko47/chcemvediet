@@ -10,7 +10,6 @@
 {% endcomment %}
 
 
-{% block button-class %}pln-not-implemented{% endblock %}
-{% block button-href %}#{% endblock %}
+{% block button-href %}{% url 'inforequests:index' %}{% endblock %}
 {% block button-icon %}icon-search{% endblock %}
 {% block botton-text %}{% trans 'inforequests:mine:archive:button' %}{% endblock %}

@@ -1,0 +1,47 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% extends "main/base/single_column.html" %}
+{% load trans from i18n %}
+{% load range from poleno.utils %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- inforequest_page: django.core.paginator.Paginator(chcemvediet.apps.inforequests.models.Inforequest.objects)
+ %
+{% endcomment %}
+
+
+{% block title %}{% trans 'inforequests:index:title' %} | {{ block.super }}{% endblock %}
+
+{% block content %}
+  <h1>{% trans 'inforequests:index:heading' %}</h1>
+  {% include "inforequests/index/texts/index.html" %}
+  {% include "inforequests/index/published.html" with published_inforequests=inforequest_page.object_list %}
+  <nav class="text-center">
+    <ul class="pagination">
+      {% if inforequest_page.number > 1 %}
+        <li><a href="?page=1">&laquo;</a></li>
+      {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+      {% endif %}
+      {% for i in "-3"|range:"4" %}
+        {% if i == 0 %}
+          <li class="active"><span>{{ inforequest_page.number }}</span></li>
+        {% else %}
+          {% if inforequest_page.number|add:i > 0 %}
+            {% if inforequest_page.number|add:i <= inforequest_page.paginator.num_pages %}
+              <li>
+                <a href="?page={{ inforequest_page.number|add:i }}">{{ inforequest_page.number|add:i }}</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% if inforequest_page.number < inforequest_page.paginator.num_pages %}
+        <li><a href="?page={{ inforequest_page.paginator.num_pages }}">&raquo;</a></li>
+      {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endblock %}
