@@ -12,12 +12,12 @@
 {% endcomment %}
 
 
-{% block title %}{% trans 'inforequests:index:title' %} | {{ block.super }}{% endblock %}
+{% block title %}{% trans 'inforequests:mine:title' %} | {{ block.super }}{% endblock %}
 
 {% block content %}
-  <h1>{% trans 'inforequests:index:heading' %}</h1>
-  {% include "inforequests/index/panels/main.html" %}
-  {% include "inforequests/index/drafts.html" %}
-  {% include "inforequests/index/pending.html" %}
-  {% include "inforequests/index/closed.html" %}
+  <h1>{% trans 'inforequests:mine:heading' %}</h1>
+  {% include "inforequests/mine/panels/main.html" %}
+  {% include "inforequests/mine/drafts.html" %}
+  {% include "inforequests/mine/pending.html" %}
+  {% include "inforequests/mine/closed.html" %}
 {% endblock %}

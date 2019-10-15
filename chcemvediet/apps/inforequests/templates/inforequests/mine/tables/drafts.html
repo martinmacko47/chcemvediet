@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "inforequests/index/tables/base.html" %}
+{% extends "inforequests/mine/tables/base.html" %}
 {% load trans from i18n %}
 {% load url from poleno.utils %}
 
@@ -13,14 +13,14 @@
 
 
 {% block collapse-actions %}
-  {% include "inforequests/index/tables/drafts_delete.html" with draft=object %}
+  {% include "inforequests/mine/tables/drafts_delete.html" with draft=object %}
 {% endblock %}
 
 {% block collapse %}
   {% if object.subject.0 %}
     <b>{{ object.subject.0 }}</b>
   {% else %}
-    <span class="chv-color-gray-l">{% trans 'inforequests:index:drafts:empty_subject' %}</span>
+    <span class="chv-color-gray-l">{% trans 'inforequests:mine:drafts:empty_subject' %}</span>
   {% endif %}
 {% endblock %}
 
@@ -30,7 +30,7 @@
   {% if object.subject.0 %}
     <b>{{ object.subject.0 }}</b>
   {% else %}
-    <span class="chv-color-gray-l">{% trans 'inforequests:index:drafts:empty_subject' %}</span>
+    <span class="chv-color-gray-l">{% trans 'inforequests:mine:drafts:empty_subject' %}</span>
   {% endif %}
 {% endblock %}
 
@@ -38,7 +38,7 @@
   {% if object.obligee %}
     {{ object.obligee.name }}
   {% else %}
-    <span class="chv-color-gray-l">{% trans 'inforequests:index:drafts:empty_obligee' %}</span>
+    <span class="chv-color-gray-l">{% trans 'inforequests:mine:drafts:empty_obligee' %}</span>
   {% endif %}
 {% endblock %}
 
@@ -48,11 +48,11 @@
 
 {% block status %}
   <i class="chv-icon chv-icon-li icon-pencil"></i>
-  {% trans 'inforequests:index:status:draft' %}
+  {% trans 'inforequests:mine:status:draft' %}
 {% endblock %}
 
 {% block actions %}
   <div class="hidden-xs">
-    {% include "inforequests/index/tables/drafts_delete.html" with draft=object %}
+    {% include "inforequests/mine/tables/drafts_delete.html" with draft=object %}
   </div>
 {% endblock %}

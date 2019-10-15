@@ -830,79 +830,79 @@ msgstr "Reagovať na e-mail"
 msgid "inforequests:detail:response:smail:button"
 msgstr "Prišla mi pošta"
 
-msgid "inforequests:index:closed:anchor"
+msgid "inforequests:mine:closed:anchor"
 msgstr "uzavrete"
 
-msgid "inforequests:index:closed:heading"
+msgid "inforequests:mine:closed:heading"
 msgstr "Uzavreté"
 
-msgid "inforequests:index:drafts:anchor"
+msgid "inforequests:mine:drafts:anchor"
 msgstr "rozpisane"
 
-msgid "inforequests:index:drafts:heading"
+msgid "inforequests:mine:drafts:heading"
 msgstr "Rozpísané"
 
-msgid "inforequests:index:title"
+msgid "inforequests:mine:title"
 msgstr "Moje žiadosti"
 
-msgid "inforequests:index:heading"
+msgid "inforequests:mine:heading"
 msgstr "Moje žiadosti"
 
-msgid "inforequests:index:archive:button"
+msgid "inforequests:mine:archive:button"
 msgstr "Preskúmať"
 
-msgid "inforequests:index:archive:heading"
+msgid "inforequests:mine:archive:heading"
 msgstr "Archív všetkých žiadosti"
 
-msgid "inforequests:index:create:button"
+msgid "inforequests:mine:create:button"
 msgstr "Podať infožiadosť"
 
-msgid "inforequests:index:create:heading"
+msgid "inforequests:mine:create:heading"
 msgstr "Chcem vedieť"
 
-msgid "inforequests:index:email:button"
+msgid "inforequests:mine:email:button"
 msgstr "Reagovať"
 
-msgid "inforequests:index:email:heading"
+msgid "inforequests:mine:email:heading"
 msgstr "Prišla odpoveď emailom"
 
-msgid "inforequests:index:nomail:heading"
+msgid "inforequests:mine:nomail:heading"
 msgstr "Spracujeme aj odpoveď poštou"
 
-msgid "inforequests:index:smail:button"
+msgid "inforequests:mine:smail:button"
 msgstr "Nahrať odpoveď"
 
-msgid "inforequests:index:smail:heading"
+msgid "inforequests:mine:smail:heading"
 msgstr "Prišla odpoveď klasickou poštou"
 
-msgid "inforequests:index:pending:anchor"
+msgid "inforequests:mine:pending:anchor"
 msgstr "podane"
 
-msgid "inforequests:index:pending:heading"
+msgid "inforequests:mine:pending:heading"
 msgstr "Podané"
 
-msgid "inforequests:index:subject"
+msgid "inforequests:mine:subject"
 msgstr "Predmet žiadosti"
 
-msgid "inforequests:index:obligee"
+msgid "inforequests:mine:obligee"
 msgstr "Inštitúcia"
 
-msgid "inforequests:index:date"
+msgid "inforequests:mine:date"
 msgstr "Posledná aktivita"
 
-msgid "inforequests:index:status"
+msgid "inforequests:mine:status"
 msgstr "Aktivita"
 
-msgid "inforequests:index:drafts:empty_subject"
+msgid "inforequests:mine:drafts:empty_subject"
 msgstr "(bez predmetu)"
 
-msgid "inforequests:index:drafts:empty_obligee"
+msgid "inforequests:mine:drafts:empty_obligee"
 msgstr "(bez inštitúcie)"
 
-msgid "inforequests:index:status:draft"
+msgid "inforequests:mine:status:draft"
 msgstr "Rozpísané"
 
-msgid "inforequests:index:status:new_email"
+msgid "inforequests:mine:status:new_email"
 msgstr "Nový email"
 
 msgid "inforequests:modals:snooze:heading"
@@ -955,6 +955,9 @@ msgstr "Predmet žiadosti"
 
 msgid "inforequests:obligee_action_dispatcher:obligee"
 msgstr "Inštitúcia"
+
+msgid "inforequests:urls:mine"
+msgstr "moje"
 
 msgid "inforequests:urls:create"
 msgstr "nova-ziadost"

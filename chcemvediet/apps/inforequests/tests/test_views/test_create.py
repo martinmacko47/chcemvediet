@@ -203,11 +203,11 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         draft = InforequestDraft.objects.get(pk=draft.pk)
         self.assertEqual(draft.subject, [u'Old Subject'])
 
-    def test_post_with_draft_button_and_valid_data_redirects_to_inforequests_index(self):
+    def test_post_with_draft_button_and_valid_data_redirects_to_inforequests_mine(self):
         data = self._create_post_data(button=u'draft')
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_post_with_draft_button_and_valid_data_related_models_are_prefetched_before_render(self):
         data = self._create_post_data(button=u'draft')
@@ -391,7 +391,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', omit=[u'obligee'])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_obligee_field_with_invalid_obligee_name_is_invalid(self):
         data = self._create_post_data(button=u'draft', obligee=u'invalid')
@@ -409,7 +409,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', omit=[u'subject'])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_subject_field_max_length(self):
         data = self._create_post_data(button=u'draft', subject=[u'x'*256])
@@ -427,7 +427,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', omit=[u'content'])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_attachments_field_is_not_required_for_submit_button(self):
         data = self._create_post_data(button=u'submit', omit=[u'attachments'])
@@ -441,7 +441,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', omit=[u'attachments'])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_attachments_field_with_invalid_attachment_is_invalid(self):
         data = self._create_post_data(button=u'draft', attachments=u',47,')
@@ -473,7 +473,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         attachment = self._create_attachment()
         data = self._create_post_data(button=u'draft', attachments=u',%s,' % attachment.pk)
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_attachments_field_with_attachment_assigned_to_used_draft_is_valid(self):
         draft = self._create_inforequest_draft()
@@ -481,7 +481,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', attachments=u',%s,' % attachment.pk)
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
-        self.assertRedirects(response, reverse(u'inforequests:index'))
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_attachments_field_upload_and_download_url_funcs(self):
         draft = self._create_inforequest_draft(applicant=self.user1)
