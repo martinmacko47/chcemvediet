@@ -836,12 +836,6 @@ msgstr "Zverejnené infožiadosti"
 msgid "inforequests:index:heading"
 msgstr "Zoznam zverejnených infožiadostí"
 
-msgid "inforequests:index:published:anchor"
-msgstr "publikovane"
-
-msgid "inforequests:index:published:heading"
-msgstr "Publikované"
-
 msgid "inforequests:mine:closed:anchor"
 msgstr "uzavrete"
 

@@ -25,11 +25,7 @@
 </a>
 
 <a class="chv-navbar-item {{ request|active:'inforequests'|yes:"active" }}"
-   {% if user.is_authenticated %}
-     href="{% url 'inforequests:mine' %}">
-   {% else %}
-     href="{% url 'inforequests:index' %}">
-   {% endif %}
+   href="{% url user.is_authenticated|yesno:'inforequests:mine,inforequests:index' %}">
   <span class="chv-hover-bold" data-content="{% trans 'main:menu:inforequests' %}">
     {% trans 'main:menu:inforequests' %}
   </span>

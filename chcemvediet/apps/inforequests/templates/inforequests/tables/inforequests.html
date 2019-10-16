@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "inforequests/mine/tables/base.html" %}
+{% extends "inforequests/tables/base.html" %}
 {% load trans from i18n %}
 
 {% comment %}
@@ -26,7 +26,7 @@
 {% block obligee %}
   {{ object.main_branch.historicalobligee.name }}
   {% with branch=object.main_branch %}
-    {% include "inforequests/mine/tables/inforequests_advanced.html" %}
+    {% include "inforequests/tables/inforequests_advanced.html" %}
   {% endwith %}
 {% endblock %}
 
