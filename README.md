@@ -20,6 +20,8 @@ You need the following packages installed:
  * python (ver. 2.7.x)
  * python-virtualenv
  * libmagic (ver. 5.25+)
+ * libxml2-dev
+ * libxslt-dev
 
 The following packages are also recommended, but you can configure `setup.py` to use mocks
 instead of them:
