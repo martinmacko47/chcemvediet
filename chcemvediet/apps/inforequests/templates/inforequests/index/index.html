@@ -16,5 +16,9 @@
   <h1>{% trans 'inforequests:index:heading' %}</h1>
   {% include "inforequests/index/texts/index.html" %}
   {% include "inforequests/index/published.html" with published_inforequests=inforequest_page.object_list %}
-  {% include "main/snippets/paging.html" with page=inforequest_page %}
+  {% if inforequest_page %}
+    {% include "main/snippets/paging.html" with page=inforequest_page %}
+  {% else %}
+    {% include "inforequests/index/texts/noresults_alert.html" %}
+  {% endif %}
 {% endblock %}
