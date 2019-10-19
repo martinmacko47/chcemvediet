@@ -1,7 +1,6 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% extends "main/base/single_column.html" %}
 {% load trans from i18n %}
-{% load range from poleno.utils %}
 
 {% comment %}
  %
@@ -34,31 +33,5 @@
       {% endfor %}
     </tbody>
   </table>
-  <nav class="text-center">
-    <ul class="pagination">
-      {% if obligee_page.number > 1 %}
-        <li><a href="?page=1">&laquo;</a></li>
-      {% else %}
-        <li class="disabled"><span>&laquo;</span></li>
-      {% endif %}
-      {% for i in "-3"|range:"4" %}
-        {% if i == 0 %}
-          <li class="active"><span>{{ obligee_page.number }}</span></li>
-        {% else %}
-          {% if obligee_page.number|add:i > 0 %}
-            {% if obligee_page.number|add:i <= obligee_page.paginator.num_pages %}
-              <li>
-                <a href="?page={{ obligee_page.number|add:i }}">{{ obligee_page.number|add:i }}</a>
-              </li>
-            {% endif %}
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-      {% if obligee_page.number < obligee_page.paginator.num_pages %}
-        <li><a href="?page={{ obligee_page.paginator.num_pages }}">&raquo;</a></li>
-      {% else %}
-        <li class="disabled"><span>&raquo;</span></li>
-      {% endif %}
-    </ul>
-  </nav>
+  {% include "main/snippets/paging.html" with page=obligee_page %}
 {% endblock %}

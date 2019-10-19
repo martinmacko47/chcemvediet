@@ -1,0 +1,15 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+
+{% comment %}
+ %
+ % Context:
+ %  -- published_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %
+{% endcomment %}
+
+
+{% if published_inforequests %}
+  {% with class="chv-table-blue" objects=published_inforequests %}
+    {% include "inforequests/tables/inforequests.html" %}
+  {% endwith %}
+{% endif %}

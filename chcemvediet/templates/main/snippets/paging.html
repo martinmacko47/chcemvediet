@@ -1,0 +1,38 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load range from poleno.utils %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- page: django.core.paginator.Paginator
+ %
+{% endcomment %}
+
+
+<nav class="text-center">
+  <ul class="pagination">
+    {% if page.number > 1 %}
+      <li><a href="?page=1">&laquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in "-3"|range:"4" %}
+      {% if i == 0 %}
+        <li class="active"><span>{{ page.number }}</span></li>
+      {% else %}
+        {% if page.number|add:i > 0 %}
+          {% if page.number|add:i <= page.paginator.num_pages %}
+            <li>
+              <a href="?page={{ page.number|add:i }}">{{ page.number|add:i }}</a>
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% if page.number < page.paginator.num_pages %}
+      <li><a href="?page={{ page.paginator.num_pages }}">&raquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>

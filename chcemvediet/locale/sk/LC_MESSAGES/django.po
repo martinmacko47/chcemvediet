@@ -830,6 +830,12 @@ msgstr "Reagovať na e-mail"
 msgid "inforequests:detail:response:smail:button"
 msgstr "Prišla mi pošta"
 
+msgid "inforequests:index:title"
+msgstr "Zverejnené infožiadosti"
+
+msgid "inforequests:index:heading"
+msgstr "Zoznam zverejnených infožiadostí"
+
 msgid "inforequests:mine:closed:anchor"
 msgstr "uzavrete"
 

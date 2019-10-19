@@ -1,6 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.core.exceptions import SuspiciousOperation
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponseRedirect, Http404
@@ -13,7 +14,29 @@ from poleno.utils.views import login_required
 from poleno.utils.forms import clean_button
 from chcemvediet.apps.inforequests.forms import InforequestForm
 from chcemvediet.apps.inforequests.models import InforequestDraft, Inforequest, Branch
+from chcemvediet.apps.inforequests.constants import INFOREQUESTS_PER_PAGE
 
+
+@require_http_methods([u'HEAD', u'GET'])
+def inforequest_index(request):
+    published_inforequests = (Inforequest.objects
+            .published()
+            .order_by_submission_date()
+            .reverse()
+            )
+    paginator = Paginator(published_inforequests, INFOREQUESTS_PER_PAGE)
+
+    page = request.GET.get(u'page')
+    try:
+        inforequest_page = paginator.page(page)
+    except PageNotAnInteger:
+        inforequest_page = paginator.page(1)
+    except EmptyPage:
+        inforequest_page = paginator.page(paginator.num_pages)
+
+    return render(request, u'inforequests/index/index.html', {
+            u'inforequest_page': inforequest_page,
+            })
 
 @require_http_methods([u'HEAD', u'GET'])
 @login_required

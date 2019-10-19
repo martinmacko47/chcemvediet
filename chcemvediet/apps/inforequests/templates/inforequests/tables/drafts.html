@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "inforequests/mine/tables/base.html" %}
+{% extends "inforequests/tables/base.html" %}
 {% load trans from i18n %}
 {% load url from poleno.utils %}
 
@@ -13,7 +13,7 @@
 
 
 {% block collapse-actions %}
-  {% include "inforequests/mine/tables/drafts_delete.html" with draft=object %}
+  {% include "inforequests/tables/drafts_delete.html" with draft=object %}
 {% endblock %}
 
 {% block collapse %}
@@ -53,6 +53,6 @@
 
 {% block actions %}
   <div class="hidden-xs">
-    {% include "inforequests/mine/tables/drafts_delete.html" with draft=object %}
+    {% include "inforequests/tables/drafts_delete.html" with draft=object %}
   </div>
 {% endblock %}
