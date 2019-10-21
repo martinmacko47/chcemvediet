@@ -17,9 +17,9 @@ class InforequestsSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        inforequests = Inforequest.objects.published()
+        published_inforequests = Inforequest.objects.published()
         return [(lang, inforequest) for lang, name in settings.LANGUAGES
-                for inforequest in inforequests]
+                for inforequest in published_inforequests]
 
     def location(self, (lang, inforequest)):
         with translation(lang):
@@ -30,7 +30,7 @@ class InforequestsSitemap(Sitemap):
                 .of_inforequest(inforequest)
                 .aggregate(most_recent=Max(u'created'))[u'most_recent'])
 
-class PublishedInforequestsSitemap(Sitemap):
+class InforequestsPagingSitemap(Sitemap):
     changefreq = u'weekly'
     priority = 0.3
 
