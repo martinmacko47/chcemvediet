@@ -4,11 +4,17 @@ XML_CONTENT_TYPE = u'application/xml'
 
 LIBREOFFICE_CONTENT_TYPES = (
     u'application/CDFV2-corrupt',
+    u'application/CDFV2-unknown',
     u'application/msword',
     u'application/vnd.ms-excel',
+    u'application/vnd.ms-powerpoint',
     u'application/vnd.ms-office',
     u'application/vnd.oasis.opendocument.spreadsheet',
+    u'application/vnd.oasis.opendocument.spreadsheet-template',
     u'application/vnd.oasis.opendocument.text',
+    u'application/vnd.oasis.opendocument.text-template',
+    u'application/vnd.oasis.opendocument.presentation',
+    u'application/vnd.oasis.opendocument.presentation-template',
     u'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     u'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     u'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
