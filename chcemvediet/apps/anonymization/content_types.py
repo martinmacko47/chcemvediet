@@ -28,4 +28,9 @@ IMAGEMAGICK_CONTENT_TYPES = (
     u'image/jpeg',
     u'image/png',
     u'image/tiff',
+    u'image/x-ms-bmp',
+    u'image/x-portable-pixmap',
+    u'image/x-portable-greymap',
+    u'image/x-portable-bitmap',
+    u'image/webp',
 )
