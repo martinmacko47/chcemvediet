@@ -20,6 +20,7 @@ You need the following packages installed:
  * python (ver. 2.7.x)
  * python-virtualenv
  * libmagic (ver. 5.25+)
+ * webp
  * libxml2-dev
  * libxslt-dev
 
@@ -134,6 +135,7 @@ You need the following packages installed
  * libreoffice
  * imagemagick
  * libmagic (ver. 5.25+)
+ * webp
  * [abbyyocr11]
 
  [abbyyocr11]: https://www.ocr4linux.com/en:download:start
