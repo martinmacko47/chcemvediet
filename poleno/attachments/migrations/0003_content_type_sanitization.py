@@ -8,7 +8,10 @@ from django.db import models, migrations
 def forward(apps, schema_editor):
     Attachment = apps.get_model(u'attachments', u'Attachment')
     for attachment in Attachment.objects.all():
-        content_type = magic.from_buffer(attachment.file.read(), mime=True)
+        try:
+            content_type = magic.from_buffer(attachment.file.read(), mime=True)
+        finally:
+            attachment.file.close()
         if attachment.content_type != content_type:
             attachment.content_type = content_type
             attachment.save()
