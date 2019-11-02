@@ -13,6 +13,7 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 LIBSASS_OUTPUT_STYLE = u'compressed'
 INVITATIONS_INVITATION_ONLY = False
+AUTOPUBLISH_INFOREQUESTS = False
 
 # English on production server is disabled for now.
 LANGUAGES = (
