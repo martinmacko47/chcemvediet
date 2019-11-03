@@ -1,6 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 import traceback
+from datetime import timedelta
 
 from django.db import transaction
 from django.conf import settings
@@ -8,7 +9,7 @@ from django.conf import settings
 from poleno.cron import cron_job, cron_logger
 from poleno.workdays import workdays
 from poleno.utils.translation import translation
-from poleno.utils.date import local_date, local_today
+from poleno.utils.date import local_date, local_today, utc_now
 from poleno.utils.misc import nop
 
 from .constants import DAYS_TO_CLOSE_INFOREQUEST, DAYS_TO_PUBLISH_INFOREQUEST
@@ -181,7 +182,8 @@ def close_inforequests():
                         action.deadline.snooze_calendar_days_behind < DAYS_TO_CLOSE_INFOREQUEST):
                     break
             else:
-                # Every branch that has a deadline have been missed for at least 100 WD.
+                # Every branch that has a deadline have been missed for at least
+                # DAYS_TO_CLOSE_INFOREQUEST WD.
                 filtered.append(inforequest)
         except Exception:
             msg = u'Checking if inforequest should be closed failed: {}\n{}'
@@ -217,11 +219,14 @@ def publish_inforequests():
         try:
             for branch in inforequest.branches:
                 action = branch.last_action
-                if (action.deadline and
-                        action.deadline.snooze_calendar_days_behind < DAYS_TO_PUBLISH_INFOREQUEST):
+                days_to_publish = DAYS_TO_CLOSE_INFOREQUEST + DAYS_TO_PUBLISH_INFOREQUEST
+                if action.deadline is None:
+                    if action.created > utc_now() - timedelta(days=DAYS_TO_PUBLISH_INFOREQUEST):
+                        break
+                elif action.deadline.snooze_calendar_days_behind < days_to_publish:
                     break
             else:
-                # Every inforequest that has been closed for at least 60 WD.
+                # Every inforequest that has been closed for at least DAYS_TO_PUBLISH_INFOREQUEST WD
                 filtered.append(inforequest)
         except Exception:
             msg = u'Checking if inforequest should be published failed: {}\n{}'
