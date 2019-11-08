@@ -183,7 +183,7 @@ def close_inforequests():
                     break
             else:
                 # Every branch that has a deadline have been missed for at least
-                # DAYS_TO_CLOSE_INFOREQUEST WD.
+                # DAYS_TO_CLOSE_INFOREQUEST CD.
                 filtered.append(inforequest)
         except Exception:
             msg = u'Checking if inforequest should be closed failed: {}\n{}'
@@ -220,13 +220,14 @@ def publish_inforequests():
             for branch in inforequest.branches:
                 action = branch.last_action
                 days_to_publish = DAYS_TO_CLOSE_INFOREQUEST + DAYS_TO_PUBLISH_INFOREQUEST
-                if action.deadline is None:
-                    if action.created > utc_now() - timedelta(days=DAYS_TO_PUBLISH_INFOREQUEST):
-                        break
-                elif action.deadline.snooze_calendar_days_behind < days_to_publish:
+                days_behind_closed = (local_today() - local_date(action.created)).days
+                if (action.deadline
+                        and action.deadline.snooze_calendar_days_behind < days_to_publish):
+                    break
+                elif days_behind_closed < DAYS_TO_PUBLISH_INFOREQUEST:
                     break
             else:
-                # Every inforequest that has been closed for at least DAYS_TO_PUBLISH_INFOREQUEST WD
+                # Every inforequest that has been closed for at least DAYS_TO_PUBLISH_INFOREQUEST CD
                 filtered.append(inforequest)
         except Exception:
             msg = u'Checking if inforequest should be published failed: {}\n{}'
