@@ -2,6 +2,10 @@
 
 ![](assets/inforequests.svg)
 
+### Inforequest Flow
+
+![](assets/inforequest-flow.svg)
+
 ## `InforequestDraft`
 
 Relations:
@@ -465,6 +469,23 @@ action is added just before the branch is closed while there a missed obligee su
 
 _Properties that apply_:
 * `effective_date`: the date the branch was closed.
+
+## Wizards
+
+### Obligee Action Wizard
+
+![](assets/obligee-action-wizard.svg)
+
+Overview of wizard results:
+
+![](assets/obligee-action-wizard-table.svg)
+
+Black tick: The wizard correctly categorizes the new action.
+
+Green H: The new action is invalid in such case and the wizard ends with a help request.
+
+Red action type: The new action is invalid in such case, but the wizard ends with a categorization
+as a wrong action type. Such cases are very rare, however, so we don't care about them.
 
 ## Events
 
