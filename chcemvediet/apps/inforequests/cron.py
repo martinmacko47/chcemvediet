@@ -11,6 +11,7 @@ from poleno.utils.translation import translation
 from poleno.utils.date import local_date, local_today
 from poleno.utils.misc import nop
 
+from .constants import DAYS_TO_CLOSE_INFOREQUEST, DAYS_TO_PUBLISH_INFOREQUEST
 from .models import Inforequest, Branch, Action
 
 
@@ -176,10 +177,12 @@ def close_inforequests():
         try:
             for branch in inforequest.branches:
                 action = branch.last_action
-                if action.deadline and action.deadline.snooze_calendar_days_behind < 100:
-                    break
+                if action.deadline:
+                    if action.deadline.snooze_calendar_days_behind < DAYS_TO_CLOSE_INFOREQUEST:
+                        break
             else:
-                # Every branch that has a deadline have been missed for at least 100 WD.
+                # Every branch that has a deadline have been missed for at least
+                # DAYS_TO_CLOSE_INFOREQUEST calendar days.
                 filtered.append(inforequest)
         except Exception:
             msg = u'Checking if inforequest should be closed failed: {}\n{}'
@@ -196,6 +199,54 @@ def close_inforequests():
                 cron_logger.info(u'Closed inforequest: {}'.format(inforequest))
         except Exception:
             msg = u'Closing inforequest failed: {}\n{}'
+            trace = unicode(traceback.format_exc(), u'utf-8')
+            cron_logger.error(msg.format(inforequest, trace))
+
+@cron_job(run_at_times=settings.CRON_IMPORTANT_MAINTENANCE_TIMES)
+def publish_inforequests():
+    if not settings.AUTOPUBLISH_INFOREQUESTS:
+        cron_logger.info(u'Automatically publishing inforequests is disabled.')
+        return
+
+    inforequests = (Inforequest.objects
+            .closed()
+            .not_published()
+            )
+
+    filtered = []
+    for inforequest in inforequests:
+        try:
+            for branch in inforequest.branches:
+                action = branch.last_action
+                if action.deadline:
+                    days_to_publish = DAYS_TO_CLOSE_INFOREQUEST + DAYS_TO_PUBLISH_INFOREQUEST
+                    if action.deadline.snooze_calendar_days_behind < days_to_publish:
+                        break
+                else:
+                    days_since_last_action = (local_today() - local_date(action.created)).days
+                    if days_since_last_action < DAYS_TO_PUBLISH_INFOREQUEST:
+                        break
+            else:
+                # We publish the inforequest after it was closed for at least
+                # DAYS_TO_PUBLISH_INFOREQUEST calendar days. The inforequest was closed when all its
+                # branches with deadlines had been missed for at least DAYS_TO_CLOSE_INFOREQUEST
+                # calendar days. Therefore we publish it when all its branches with deadlines are
+                # missed for at least DAYS_TO_CLOSE_INFOREQUEST plus DAYS_TO_PUBLISH_INFOREQUEST
+                # calendar days, and last actions of all its branches without deadlines were added
+                # at least before DAYS_TO_PUBLISH_INFOREQUEST calendar days.
+                filtered.append(inforequest)
+        except Exception:
+            msg = u'Checking if inforequest should be published failed: {}\n{}'
+            trace = unicode(traceback.format_exc(), u'utf-8')
+            cron_logger.error(msg.format(inforequest, trace))
+
+    for inforequest in filtered:
+        try:
+            inforequest.published = True
+            inforequest.save(update_fields=[u'published'])
+            cron_logger.info(u'Published inforequest: {}'.format(inforequest))
+        except Exception:
+            msg = u'Publishing inforequest failed: {}\n{}'
             trace = unicode(traceback.format_exc(), u'utf-8')
             cron_logger.error(msg.format(inforequest, trace))
 

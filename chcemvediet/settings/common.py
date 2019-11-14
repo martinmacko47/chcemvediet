@@ -128,6 +128,7 @@ CRON_CLASSES = (
     u'chcemvediet.apps.inforequests.cron.obligee_deadline_reminder',
     u'chcemvediet.apps.inforequests.cron.applicant_deadline_reminder',
     u'chcemvediet.apps.inforequests.cron.close_inforequests',
+    u'chcemvediet.apps.inforequests.cron.publish_inforequests',
     u'chcemvediet.apps.inforequests.cron.add_expirations',
     u'chcemvediet.apps.anonymization.cron.anonymization',
     u'chcemvediet.cron.clear_expired_sessions',
@@ -225,5 +226,8 @@ ACCOUNT_SIGNUP_FORM_CLASS = u'chcemvediet.apps.accounts.forms.SignupForm'
 SOCIALACCOUNT_EMAIL_VERIFICATION = u'none'
 SOCIALACCOUNT_AUTO_SIGNUP = False
 LOGIN_REDIRECT_URL = u'inforequests:mine'
+
+# Chcemvediet settings
 INVITATIONS_INVITATION_ONLY = False
 INVITATIONS_USERS_CAN_INVITE = True
+AUTOPUBLISH_INFOREQUESTS = True
