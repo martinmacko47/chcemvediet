@@ -34,7 +34,7 @@
     <g id="jump">
       <path d="M -30,-20 20,-20 40,0 20,20 -30,20 Z" fill="none" stroke="black" stroke-width="1pt" />
     </g>
-    <g id="result">
+    <g id="action">
       <path d="M -100,-10 -90,-20 90,-20 100,-10 100,10 90,20 -90,20 -100,10 Z" fill="none" stroke="black" stroke-width="1pt" />
     </g>
   </defs>
@@ -95,7 +95,7 @@
   </g>
 
   <g transform="translate(1400 400)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Clarif. Request</text>
     <path class="arrow" d="M 100,0 h 100 v 100" />
   </g>
@@ -122,7 +122,7 @@
   </g>
 
   <g transform="translate(1400 500)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Confirmation</text>
     <path class="arrow" d="M 100,0 h 100 v 300" />
   </g>
@@ -179,7 +179,7 @@
   </g>
 
   <g transform="translate(1400 800)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Affirmation</text>
     <path class="arrow" d="M 100,0 h 100 v 200" />
   </g>
@@ -211,7 +211,7 @@
   </g>
 
   <g transform="translate(1400 1000)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Remandment</text>
     <path class="arrow" d="M 100,0 h 100 v 300" />
   </g>
@@ -254,7 +254,7 @@
   </g>
 
   <g transform="translate(1400 1300)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Reversion</text>
     <path class="arrow" d="M 100,0 h 100 v 300" />
   </g>
@@ -274,7 +274,7 @@
   </g>
 
   <g transform="translate(1400 1400)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Help</text>
   </g>
 
@@ -342,7 +342,7 @@
   </g>
 
   <g transform="translate(1400 1600)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Refusal</text>
     <path class="arrow" d="M 100,0 h 100 v 200" />
   </g>
@@ -377,7 +377,7 @@
   </g>
 
   <g transform="translate(1400 1800)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Advancement</text>
     <path class="arrow" d="M 100,0 h 100 v 200" />
   </g>
@@ -412,7 +412,7 @@
   </g>
 
   <g transform="translate(1400 2000)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Extension</text>
     <path class="arrow" d="M 100,0 h 100 v 300" />
   </g>
@@ -453,7 +453,7 @@
   </g>
 
   <g transform="translate(1400 2300)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Disclosure</text>
     <path class="arrow" d="M 100,0 h 100 v 80" />
   </g>
@@ -482,12 +482,12 @@
   </g>
 
   <g transform="translate(500 2400)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Help</text>
   </g>
 
   <g transform="translate(500 2500)">
-    <use href="#result" />
+    <use href="#action" />
     <text class="caption">Skip</text>
   </g>
 
@@ -517,8 +517,8 @@
       </text>
     </g>
     <g transform="translate(350 95)">
-      <use href="#result" />
-      <text class="caption">Result</text>
+      <use href="#action" />
+      <text class="caption">Result action</text>
     </g>
     <g transform="translate(350 169)">
       <use href="#jump" />
