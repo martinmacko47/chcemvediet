@@ -1,0 +1,319 @@
+<svg version="1.1" viewBox="0 0 900 830" xmlns="http://www.w3.org/2000/svg">
+  <style>
+      text {
+        font-family: sans-serif;
+        font-size: 12pt;
+      }
+      .head {
+        text-anchor: start;
+        dominant-baseline: central;
+      }
+      .cell {
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+      .help {
+        fill: green;
+      }
+      .err {
+        fill: red;
+      }
+      .grid {
+        fill: none;
+        stroke: black;
+        stroke-width: 1pt;
+      }
+  </style>
+
+  <path class="grid" d="M 100,100 h 700" />
+  <path class="grid" d="M 100,250 h 700" />
+  <path class="grid" d="M 100,280 h 700" />
+  <path class="grid" d="M 100,310 h 700" />
+  <path class="grid" d="M 100,340 h 700" />
+  <path class="grid" d="M 100,370 h 700" />
+  <path class="grid" d="M 100,400 h 700" />
+  <path class="grid" d="M 100,430 h 700" />
+  <path class="grid" d="M 100,460 h 700" />
+  <path class="grid" d="M 100,490 h 700" />
+  <path class="grid" d="M 100,520 h 700" />
+  <path class="grid" d="M 100,550 h 700" />
+  <path class="grid" d="M 100,580 h 700" />
+  <path class="grid" d="M 100,610 h 700" />
+  <path class="grid" d="M 100,640 h 700" />
+  <path class="grid" d="M 100,670 h 700" />
+  <path class="grid" d="M 100,700 h 700" />
+  <path class="grid" d="M 100,730 h 700" />
+
+  <path class="grid" d="M 100,100 v 630" />
+  <path class="grid" d="M 250,100 v 630" />
+  <path class="grid" d="M 300,100 v 630" />
+  <path class="grid" d="M 350,100 v 630" />
+  <path class="grid" d="M 400,100 v 630" />
+  <path class="grid" d="M 450,100 v 630" />
+  <path class="grid" d="M 500,100 v 630" />
+  <path class="grid" d="M 550,100 v 630" />
+  <path class="grid" d="M 600,100 v 630" />
+  <path class="grid" d="M 650,100 v 630" />
+  <path class="grid" d="M 700,100 v 630" />
+  <path class="grid" d="M 750,100 v 630" />
+  <path class="grid" d="M 800,100 v 630" />
+
+  <path class="grid" d="M 100,100 l 150,150" />
+  <text class="head" x="105" y="235">Previous Action</text>
+  <text class="head" x="130" y="235" transform="rotate(-90) translate(-350 0)">New Action</text>
+
+  <g transform="rotate(-90) translate(-250 250)">
+    <text class="head" x="5" y="25">Confirmation</text>
+    <text class="head" x="5" y="75">Clarif. Req.</text>
+    <text class="head" x="5" y="125">Advancement</text>
+    <text class="head" x="5" y="175">Extension</text>
+    <text class="head" x="5" y="225">Full Disclosure</text>
+    <text class="head" x="5" y="275">Non-full Discl.</text>
+    <text class="head" x="5" y="325">Refusal</text>
+    <text class="head" x="5" y="375">Remandment</text>
+    <text class="head" x="5" y="425">Affirmation</text>
+    <text class="head" x="5" y="475">Reversion</text>
+    <text class="head" x="5" y="525">Off-topic</text>
+  </g>
+
+  <g transform="translate(100 265)">
+    <text class="head" x="5">Request</text>
+    <text class="cell" x="175">✓</text>
+    <text class="cell" x="225">✓</text>
+    <text class="cell" x="275">✓</text>
+    <text class="cell" x="325">✓</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell" x="475">✓</text>
+    <text class="cell err" x="525">Ref.</text>
+    <text class="cell err" x="575">Ref.</text>
+    <text class="cell err" x="625">Ref.</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 295)">
+    <text class="head" x="5">Adv. Request</text>
+    <text class="cell" x="175">✓</text>
+    <text class="cell" x="225">✓</text>
+    <text class="cell" x="275">✓</text>
+    <text class="cell" x="325">✓</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell" x="475">✓</text>
+    <text class="cell err" x="525">Ref.</text>
+    <text class="cell err" x="575">Ref.</text>
+    <text class="cell err" x="625">Ref.</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 325)">
+    <text class="head" x="5">Confirmation</text>
+    <text class="cell" x="175">✓</text>
+    <text class="cell" x="225">✓</text>
+    <text class="cell" x="275">✓</text>
+    <text class="cell" x="325">✓</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell" x="475">✓</text>
+    <text class="cell err" x="525">Ref.</text>
+    <text class="cell err" x="575">Ref.</text>
+    <text class="cell err" x="625">Ref.</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 355)">
+    <text class="head" x="5">Clarif. Req.</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell" x="225">✓</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 385)">
+    <text class="head" x="5">Clarif. Resp.</text>
+    <text class="cell err" x="175">Disc.</text>
+    <text class="cell" x="225">✓</text>
+    <text class="cell" x="275">✓</text>
+    <text class="cell" x="325">✓</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell" x="475">✓</text>
+    <text class="cell err" x="525">Ref.</text>
+    <text class="cell err" x="575">Ref.</text>
+    <text class="cell err" x="625">Ref.</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 415)">
+    <text class="head" x="5">Advancement</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell help" x="225">H</text>
+    <text class="cell" x="275">✓</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 445)">
+    <text class="head" x="5">Extension</text>
+    <text class="cell err" x="175">Disc.</text>
+    <text class="cell err" x="225">Disc.</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell" x="325">✓</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell" x="475">✓</text>
+    <text class="cell err" x="525">Ref.</text>
+    <text class="cell err" x="575">Ref.</text>
+    <text class="cell err" x="625">Ref.</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 475)">
+    <text class="head" x="5">Full Disclosure</text>
+    <text class="cell err" x="175">Disc.</text>
+    <text class="cell err" x="225">Disc.</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 505)">
+    <text class="head" x="5">Non-full Discl.</text>
+    <text class="cell err" x="175">Disc.</text>
+    <text class="cell err" x="225">Disc.</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 535)">
+    <text class="head" x="5">Refusal</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell help" x="225">H</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell" x="475">✓</text>
+    <text class="cell err" x="525">Ref.</text>
+    <text class="cell err" x="575">Ref.</text>
+    <text class="cell err" x="625">Ref.</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 565)">
+    <text class="head" x="5">Expiration</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell help" x="225">H</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 595)">
+    <text class="head" x="5">Appeal</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell help" x="225">H</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell" x="525">✓</text>
+    <text class="cell" x="575">✓</text>
+    <text class="cell" x="625">✓</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 625)">
+    <text class="head" x="5">Remandment</text>
+    <text class="cell err" x="175">Disc.</text>
+    <text class="cell err" x="225">Disc.</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell" x="325">✓</text>
+    <text class="cell" x="375">✓</text>
+    <text class="cell" x="425">✓</text>
+    <text class="cell" x="475">✓</text>
+    <text class="cell" x="525">✓</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 655)">
+    <text class="head" x="5">Affirmation</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell help" x="225">H</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell" x="575">✓</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 685)">
+    <text class="head" x="5">Reversion</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell help" x="225">H</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell" x="625">✓</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 715)">
+    <text class="head" x="5">Appeal Expiration</text>
+    <text class="cell help" x="175">H</text>
+    <text class="cell help" x="225">H</text>
+    <text class="cell help" x="275">H</text>
+    <text class="cell help" x="325">H</text>
+    <text class="cell help" x="375">H</text>
+    <text class="cell help" x="425">H</text>
+    <text class="cell help" x="475">H</text>
+    <text class="cell help" x="525">H</text>
+    <text class="cell help" x="575">H</text>
+    <text class="cell help" x="625">H</text>
+    <text class="cell help" x="675">H</text>
+  </g>
+
+</svg>

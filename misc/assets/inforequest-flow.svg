@@ -1,0 +1,343 @@
+<svg version="1.1" viewBox="0 0 1270 1365" xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <style>
+      text, foreignObject {
+        font-family: sans-serif;
+      }
+      .title {
+        font-weight: bold;
+        font-size: 16pt;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+      .label {
+        font-size: 10pt;
+        dominant-baseline: hanging;
+      }
+      .action {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+      }
+      .caption {
+        font-weight: bold;
+        font-size: 12pt;
+      }
+      .note {
+        font-size: 10pt;
+      }
+      .legend {
+        font-size: 10pt;
+        padding: 5pt;
+      }
+      .arrow {
+        fill: none;
+        stroke: black;
+        stroke-width: 1pt;
+        marker-end: url(#arrow);
+      }
+  </style>
+  <defs>
+    <marker id="start" orient="auto" markerWidth="4" markerHeight="4" refX="2" refY="2">
+      <circle cx="2" cy="2" r="2" />
+    </marker>
+    <marker id="arrow" orient="auto" markerWidth="8" markerHeight="6" refX="8" refY="3">
+      <path d='M 0,0 V 6 L 8,3 Z' />
+    </marker>
+    <g id="action">
+      <path d="M -100,-15 -85,-30 85,-30 100,-15 100,15 85,30 -85,30 -100,15 Z" fill="none" stroke="black" stroke-width="1pt" />
+    </g>
+    <g id="end">
+      <ellipse cx="0" cy="0" rx="20" ry="20" fill="none" stroke="black" stroke-width="1pt" />
+      <text text-anchor="middle" dominant-baseline="middle">⊥</text>
+    </g>
+  </defs>
+
+  <path d="M 350,100 v 1125" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="2pt" />
+  <path d="M 750,100 v 1125" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="2pt" />
+
+  <g transform="translate(200 120)">
+    <text class="title">Applicant</text>
+  </g>
+
+  <g transform="translate(550 120)">
+    <text class="title">Obligee</text>
+  </g>
+
+  <g transform="translate(950 120)">
+    <text class="title">Advanced Obligee</text>
+  </g>
+
+  <g transform="translate(200 220)">
+    <path class="arrow" d="M 0,-70 v 40" marker-start="url(#start)" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Request</xhtml:div>
+        <xhtml:div class="note">obligee: 8 WD + SZ</xhtml:div>
+        <xhtml:div class="note">after: DD or SD + 1 WD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 100,0 h 380 l 20,20" />
+  </g>
+
+  <g transform="translate(950 220)">
+    <path class="arrow" d="M 0,-70 v 40" marker-start="url(#start)" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Adv. Request</xhtml:div>
+        <xhtml:div class="note">obligee: 8 WD + SZ</xhtml:div>
+        <xhtml:div class="note">after: DD or LD + 4 WD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M -100,0 h -130 l -20,20" />
+  </g>
+
+  <g transform="translate(550 320)">
+    <path class="arrow" d="M 150,0 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Confirmation</xhtml:div>
+        <xhtml:div class="note">obligee: PA DL + PA SZ</xhtml:div>
+        <xhtml:div class="note">after: PA after</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 0,-30 v -20 h 130 l 20,20" />
+  </g>
+
+  <g transform="translate(550 470)">
+    <path class="arrow" d="M 150,0 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Clarif. Req.</xhtml:div>
+        <xhtml:div class="note">applicant: 7 CD no SZ</xhtml:div>
+        <xhtml:div class="note">after: DD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M -100,0 h -50 v -50 h 150 v 20" />
+    <path class="arrow" d="M -100,0 h -250 v -45" />
+    <g transform="translate(-330 5)">
+      <text class="label">
+        <tspan>at most 3 CD</tspan>
+        <tspan x="0" dy="1.2em">after DL</tspan>
+      </text>
+    </g>
+  </g>
+
+  <g transform="translate(200 395)">
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Clarif. Resp.</xhtml:div>
+        <xhtml:div class="note">obligee: 8 WD + SZ</xhtml:div>
+        <xhtml:div class="note">after: DD or SD + 1 WD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 100,0 h 380 l 20,20" />
+  </g>
+
+  <g transform="translate(550 570)">
+    <path class="arrow" d="M 150,0 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Advancement</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M -100,0 h -50 v -50 h 150 v 20" />
+    <path class="arrow" d="M -100,0 h -250 v 570" />
+    <g transform="translate(-330 5)">
+      <text class="label">
+        <tspan>at most 7 CD</tspan>
+        <tspan x="0" dy="1.2em">after DD</tspan>
+      </text>
+    </g>
+  </g>
+
+  <g transform="translate(550 670)">
+    <path class="arrow" d="M 150,0 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Extension</xhtml:div>
+        <xhtml:div class="note">obligee: PA DL + EX + PA SZ</xhtml:div>
+        <xhtml:div class="note">after: PA after</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 0,-30 v -20 h 130 l 20,20" />
+  </g>
+
+  <g transform="translate(550 770)">
+    <path class="arrow" d="M 150,0 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Full Disclosure</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M -100,0 h -50 v -50 h 150 v 20" />
+    <path class="arrow" d="M -100,0 h -155" />
+  </g>
+
+  <g transform="translate(275 770)">
+    <use href="#end" />
+  </g>
+
+  <g transform="translate(550 870)">
+    <path class="arrow" d="M 150,0 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Non-full Discl.</xhtml:div>
+        <xhtml:div class="note">applicant: 15 CD no SZ</xhtml:div>
+        <xhtml:div class="note">after: DD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M -100,0 h -50 v -50 h 150 v 20" />
+    <path class="arrow" d="M -100,0 h -230 l -20,20" />
+    <g transform="translate(-330 5)">
+      <text class="label">
+        <tspan>at most 47 CD</tspan>
+        <tspan x="0" dy="1.2em">after DL</tspan>
+      </text>
+    </g>
+  </g>
+
+  <g transform="translate(550 970)">
+    <path class="arrow" d="M 150,0 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Refusal</xhtml:div>
+        <xhtml:div class="note">applicant: 15 CD no SZ</xhtml:div>
+        <xhtml:div class="note">after: DD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M -100,0 h -50 v -50 h 150 v 20" />
+    <path class="arrow" d="M -100,0 h -230 l -20,20" />
+    <g transform="translate(-330 5)">
+      <text class="label">
+        <tspan>at most 7 CD</tspan>
+        <tspan x="0" dy="1.2em">after DL</tspan>
+      </text>
+    </g>
+  </g>
+
+  <g transform="translate(550 1070)">
+    <path class="arrow" d="M 150,-830 v 830 h -50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Expiration</xhtml:div>
+        <xhtml:div class="note">applicant: 15 CD no SZ</xhtml:div>
+        <xhtml:div class="note">after: LD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M -100,0 h -230 l -20,20" />
+    <g transform="translate(-330 5)">
+      <text class="label">
+        <tspan>at most 47 CD</tspan>
+        <tspan x="0" dy="1.2em">after DL</tspan>
+      </text>
+    </g>
+  </g>
+
+  <g transform="translate(200 1170)">
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Appeal</xhtml:div>
+        <xhtml:div class="note">obligee: 15 CD + SZ</xhtml:div>
+        <xhtml:div class="note">after: DD or SD + 6 WD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 100,0 h 500 v -500 h 50" />
+  </g>
+
+  <g transform="translate(950 570)">
+    <text class="title">Obligee Superior</text>
+  </g>
+
+  <g transform="translate(950 670)">
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Remandment</xhtml:div>
+        <xhtml:div class="note">obligee: 8 WD + SZ</xhtml:div>
+        <xhtml:div class="note">after: LD + 4 WD</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 100,0 h 50 v -50 h -380 l -20,20" />
+    <path class="arrow" d="M 100,0 h 50 v -50 h -150 v 20" />
+  </g>
+
+  <g transform="translate(950 770)">
+    <path class="arrow" d="M -150,0 h 50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Affirmation</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 100,0 h 100 v 280" />
+    <path class="arrow" d="M 100,0 h 50 v -50 h -150 v 20" />
+  </g>
+
+  <g transform="translate(950 870)">
+    <path class="arrow" d="M -150,0 h 50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Reversion</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 100,0 h 80 l 20,20" />
+    <path class="arrow" d="M 100,0 h 50 v -50 h -150 v 20" />
+  </g>
+
+  <g transform="translate(950 970)">
+    <path class="arrow" d="M -150,0 h 50" />
+    <use href="#action" />
+    <foreignObject x="-100" y="-30" width="200" height="60">
+      <xhtml:div class="action">
+        <xhtml:div class="caption">Appeal Expiration</xhtml:div>
+      </xhtml:div>
+    </foreignObject>
+    <path class="arrow" d="M 100,0 h 80 l 20,20" />
+  </g>
+
+  <g transform="translate(1150 1070)">
+    <use href="#end" />
+  </g>
+
+  <g transform="translate(830 1120)">
+    <rect x="0" y="0" width="340" height="145" fill="none" stroke="black" stroke-width="1pt" stroke-dasharray="2pt" />
+    <foreignObject x="0" y="0" width="145" height="100">
+      <xhtml:div class="legend">
+        WD - Working Days<xhtml:br/>
+        CD - Calendar Days<xhtml:br/>
+        SD - Sent Date<xhtml:br/>
+        DD - Delivered Date<xhtml:br/>
+        LD - Legal Date<xhtml:br/>
+      </xhtml:div>
+    </foreignObject>
+    <foreignObject x="145" y="0" width="195" height="100">
+      <xhtml:div class="legend">
+        EX - Extension (max 15 WD)<xhtml:br/>
+        SZ - Snooze (max 8 CD)<xhtml:br/>
+        DL - Deadline<xhtml:br/>
+        PA - Previous Action<xhtml:br/>
+      </xhtml:div>
+    </foreignObject>
+    <foreignObject x="0" y="100" width="345" height="45">
+      <xhtml:div class="legend">
+        Deadlines that apply to the applicant or to the obligee after actions are below action names.
+      </xhtml:div>
+    </foreignObject>
+  </g>
+
+</svg>
