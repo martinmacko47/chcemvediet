@@ -28,7 +28,7 @@ class InforequestQuerySet(QuerySet):
         return self.filter(published=True)
     def not_published(self):
         return self.filter(published=False)
-    def never_published(self):
+    def published_unknown(self):
         return self.filter(published=None)
     def with_undecided_email(self):
         return self.filter(inforequestemail__type=InforequestEmail.TYPES.UNDECIDED).distinct()
@@ -117,10 +117,11 @@ class Inforequest(FormatMixin, models.Model):
             help_text=squeeze(u"""
                 True if the inforequest is closed and the applicant may not act on it any more.
                 """))
-    published = models.NullBooleanField(default=False,
+
+    published = models.NullBooleanField(
             help_text=squeeze(u"""
-                NULL if the inforequest will never be published automatically. False if the
-                inforequest will be published automatically. True if the inforequest is published
+                NULL if the inforequest will be published automatically. False if the
+                inforequest will never be published automatically. True if the inforequest is published
                 and everybody can see it. Non-published inforequests can be seen only by the user
                 who created them.
             """))
