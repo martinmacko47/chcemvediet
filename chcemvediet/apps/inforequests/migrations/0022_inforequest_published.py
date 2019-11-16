@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='inforequest',
             name='published',
-            field=models.BooleanField(default=False, help_text='True if the inforequest is published and everybody can see it. Non-published inforequests can be seen only by the user who created them.'),
+            field=models.NullBooleanField(help_text='NULL if the inforequest will be published automatically. False if the inforequest will never be published automatically. True if the inforequest is published and everybody can see it. Non-published inforequests can be seen only by the user who created them.'),
             preserve_default=True,
         ),
     ]

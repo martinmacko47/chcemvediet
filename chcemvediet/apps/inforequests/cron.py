@@ -210,7 +210,7 @@ def publish_inforequests():
 
     inforequests = (Inforequest.objects
             .closed()
-            .not_published()
+            .published_unknown()
             )
 
     filtered = []
