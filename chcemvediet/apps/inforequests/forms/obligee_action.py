@@ -20,7 +20,7 @@ from chcemvediet.apps.obligees.forms import MultipleObligeeWidget, MultipleOblig
 from chcemvediet.apps.inforequests.models import Action, InforequestEmail
 from chcemvediet.apps.inforequests.forms import BranchField, RefusalReasonField
 
-
+#todo: zmenit poradie class (CanAddDecision <-> CanAddAppealDecision)
 class ObligeeActionStep(Step):
     template = u'inforequests/obligee_action/wizard.html'
     form_template = u'main/forms/form_horizontal.html'
@@ -249,6 +249,39 @@ class DisclosureLevelFork(ObligeeActionStep):
 
         return res
 
+class CanAddReversion(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddReversion, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_reversion:
+            res.next = DisclosureLevelFork
+        else:
+            res.next = NotCategorized
+
+        return res
+
+class CanAddRemandment(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddRemandment, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_remandment:
+            res.globals[u'result'] = u'action'
+            res.globals[u'action'] = Action.TYPES.REMANDMENT
+            res.next = Categorized
+        else:
+            res.next = NotCategorized
+
+        return res
+
+
 class WasItReturned(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:WasItReturned:label')
     text_template = u'inforequests/obligee_action/texts/was_returned.html'
@@ -270,13 +303,28 @@ class WasItReturned(ObligeeActionStep):
         res = super(WasItReturned, self).post_transition()
 
         if not self.is_valid():
-            res.next = DisclosureLevelFork
+            res.next = CanAddReversion
         elif self.cleaned_data[u'was_returned']:
+            res.next = CanAddRemandment
+        else:
+            res.next = CanAddReversion
+
+        return res
+
+class CanAddAffirmation(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddAffirmation, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_affirmation:
             res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.REMANDMENT
+            res.globals[u'action'] = Action.TYPES.AFFIRMATION
             res.next = Categorized
         else:
-            res.next = DisclosureLevelFork
+            res.next = NotCategorized
 
         return res
 
@@ -303,9 +351,7 @@ class WasItAccepted(ObligeeActionStep):
         if not self.is_valid():
             res.next = WasItReturned
         elif self.cleaned_data[u'was_accepted'] == u'none':
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.AFFIRMATION
-            res.next = Categorized
+            res.next = CanAddAffirmation
         else:
             res.next = WasItReturned
 
@@ -355,28 +401,30 @@ class IsItAppealDecision(ObligeeActionStep):
         res = super(IsItAppealDecision, self).post_transition()
 
         if not self.is_valid():
+            #todo: check this
             res.next = ContainsAppealInfo
         elif self.cleaned_data[u'is_decision']:
             res.next = ContainsAppealInfo
         else:
-            res.next = NotCategorized
+            res.next = CanAddDecision
 
         return res
 
-class CanAddAppealDecision(ObligeeActionStep):
+class CanAddRemandmentAffirmationReversion(ObligeeActionStep):
 
     def pre_transition(self):
-        res = super(CanAddAppealDecision, self).pre_transition()
+        res = super(CanAddRemandmentAffirmationReversion, self).pre_transition()
         branch = self.wizard.values.get(u'branch', None)
 
         if self.wizard.email:
-            res.next = NotCategorized
+            res.next = CanAddDecision
         elif not branch:
             res.next = IsItAppealDecision
         elif branch.can_add_remandment:
+            #todo: check this
             res.next = IsItAppealDecision
         else:
-            res.next = NotCategorized
+            res.next = CanAddDecision
 
         return res
 
@@ -695,7 +743,7 @@ class CanAddDecision(ObligeeActionStep):
         elif branch.can_add_refusal: # equivalent to ``can_add_disclosure``
             res.next = IsOnTopic
         else:
-            res.next = CanAddAppealDecision
+            res.next = CanAddRemandmentAffirmationReversion
 
         return res
 
@@ -720,13 +768,13 @@ class IsItConfirmation(ObligeeActionStep):
         res = super(IsItConfirmation, self).post_transition()
 
         if not self.is_valid():
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationReversion
         elif self.cleaned_data[u'is_confirmation']:
             res.globals[u'result'] = u'action'
             res.globals[u'action'] = Action.TYPES.CONFIRMATION
             res.next = Categorized
         else:
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationReversion
 
         return res
 
@@ -737,11 +785,11 @@ class CanAddConfirmation(ObligeeActionStep):
         branch = self.wizard.values.get(u'branch', None)
 
         if not branch:
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationReversion
         elif branch.can_add_confirmation:
             res.next = IsItConfirmation
         else:
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationReversion
 
         return res
 
