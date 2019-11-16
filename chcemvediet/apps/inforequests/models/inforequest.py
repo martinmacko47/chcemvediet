@@ -120,10 +120,10 @@ class Inforequest(FormatMixin, models.Model):
 
     published = models.NullBooleanField(
             help_text=squeeze(u"""
-                NULL if the inforequest will be published automatically. False if the
-                inforequest will never be published automatically. True if the inforequest is published
-                and everybody can see it. Non-published inforequests can be seen only by the user
-                who created them.
+                NULL if the inforequest will be published automatically. False if the inforequest
+                will never be published automatically. True if the inforequest is published and
+                everybody can see it. Non-published inforequests can be seen only by the user who
+                created them.
             """))
 
     # May be NULL; Used by ``cron.undecided_email_reminder``
