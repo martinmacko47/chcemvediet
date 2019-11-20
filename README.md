@@ -179,6 +179,7 @@ Make sure `mod_wsgi` Apache module is installed and enabled and add the followin
 your virtualhost configuration:
 
 	ServerName {domain}
+	ServerAlias www.{domain}
 
 	...
 
