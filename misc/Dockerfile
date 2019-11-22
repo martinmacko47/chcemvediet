@@ -39,10 +39,10 @@ RUN \
 # Setup mysql
 RUN \
   /etc/init.d/mysql start && \
-  echo \
-    "create database chcemvediet;\n" \
-    "alter database chcemvediet character set utf8 collate utf8_general_ci;\n" \
-    "grant all privileges on chcemvediet.* to chcemvediet@localhost identified by 'nbusr123';\n" \
+  printf "%s\n" \
+    "create database chcemvediet;" \
+    "alter database chcemvediet character set utf8 collate utf8_general_ci;" \
+    "grant all privileges on chcemvediet.* to chcemvediet@localhost identified by 'nbusr123';" \
     | mysql && \
   :
 
@@ -50,38 +50,38 @@ RUN \
 RUN \
   a2enmod ssl && \
   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /root/chcemvediet.key -out /root/chcemvediet.crt -subj '/' && \
-  echo \
-    "<VirtualHost *:80>\n" \
-    "  ServerName chcemvediet.local\n" \
-    "  ServerAlias www.chcemvediet.local\n" \
-    "  Redirect permanent / https://www.chcemvediet.local/\n" \
-    "</VirtualHost>\n" \
-    "\n" \
-    "<VirtualHost *:443>\n" \
-    "  ServerName chcemvediet.local\n" \
-    "  ServerAlias www.chcemvediet.local\n" \
-    "  \n" \
-    "  SSLEngine on\n" \
-    "  SSLCertificateFile /root/chcemvediet.crt\n" \
-    "  SSLCertificateKeyFile /root/chcemvediet.key\n" \
-    "  \n" \
-    "  Alias /robots.txt /home/chcemvediet/chcemvediet/static/robots.txt\n" \
-    "  Alias /favicon.ico /home/chcemvediet/chcemvediet/static/favicon.ico\n" \
-    "  Alias /static/ /home/chcemvediet/chcemvediet/static/\n" \
-    "  <Directory /home/chcemvediet/chcemvediet/static>\n" \
-    "    Require all granted\n" \
-    "    Options -Indexes\n" \
-    "  </Directory>\n" \
-    "  \n" \
-    "  WSGIScriptAlias / /home/chcemvediet/chcemvediet/chcemvediet/wsgi.py\n" \
-    "  WSGIDaemonProcess chcemvediet user=chcemvediet group=chcemvediet python-path=/home/chcemvediet/chcemvediet:/home/chcemvediet/chcemvediet/env/lib/python2.7/site-packages\n" \
-    "  WSGIProcessGroup chcemvediet\n" \
-    "  <Directory /home/chcemvediet/chcemvediet/chcemvediet>\n" \
-    "    <Files wsgi.py>\n" \
-    "      Require all granted\n" \
-    "    </Files>\n" \
-    "  </Directory>\n" \
-    "</VirtualHost>\n" \
+  printf "%s\n" \
+    "<VirtualHost *:80>" \
+    "  ServerName chcemvediet.local" \
+    "  ServerAlias www.chcemvediet.local" \
+    "  Redirect permanent / https://www.chcemvediet.local/" \
+    "</VirtualHost>" \
+    "" \
+    "<VirtualHost *:443>" \
+    "  ServerName chcemvediet.local" \
+    "  ServerAlias www.chcemvediet.local" \
+    "" \
+    "  SSLEngine on" \
+    "  SSLCertificateFile /root/chcemvediet.crt" \
+    "  SSLCertificateKeyFile /root/chcemvediet.key" \
+    "" \
+    "  Alias /robots.txt /home/chcemvediet/chcemvediet/static/robots.txt" \
+    "  Alias /favicon.ico /home/chcemvediet/chcemvediet/static/favicon.ico" \
+    "  Alias /static/ /home/chcemvediet/chcemvediet/static/" \
+    "  <Directory /home/chcemvediet/chcemvediet/static>" \
+    "    Require all granted" \
+    "    Options -Indexes" \
+    "  </Directory>" \
+    "" \
+    "  WSGIScriptAlias / /home/chcemvediet/chcemvediet/chcemvediet/wsgi.py" \
+    "  WSGIDaemonProcess chcemvediet user=chcemvediet group=chcemvediet python-path=/home/chcemvediet/chcemvediet:/home/chcemvediet/chcemvediet/env/lib/python2.7/site-packages" \
+    "  WSGIProcessGroup chcemvediet" \
+    "  <Directory /home/chcemvediet/chcemvediet/chcemvediet>" \
+    "    <Files wsgi.py>" \
+    "      Require all granted" \
+    "    </Files>" \
+    "  </Directory>" \
+    "</VirtualHost>" \
     > /etc/apache2/sites-available/001-chcemvediet.conf && \
   ln -s ../sites-available/001-chcemvediet.conf /etc/apache2/sites-enabled/001-chcemvediet.conf && \
   :
@@ -101,64 +101,63 @@ RUN \
 RUN \
   /etc/init.d/mysql start && \
   cd /home/chcemvediet/chcemvediet && \
-  echo \
+  printf "%s\n" \
     # Server mode: Production mode with no email infrastructure.
-    "6\n" \
+    "6" \
     # Mock libreoffice?
-    "n\n" \
+    "n" \
     # Mock imagemagic?
-    "n\n" \
+    "n" \
     # Mock abbyyocr11?
-    "y\n" \
+    "y" \
     # Install requirements for unittesting?
-    "n\n" \
+    "n" \
     # Server domain
-    "www.chcemvediet.local\n" \
+    "www.chcemvediet.local" \
     # Admin e-mail (default)
-    "\n" \
+    "" \
     # Support e-mail (default)
-    "\n" \
+    "" \
     # Inforequest unique e-mail (default)
-    "\n" \
+    "" \
     # Default from e-mail (default)
-    "\n" \
+    "" \
     # Database name
-    "chcemvediet\n" \
+    "chcemvediet" \
     # Database user name
-    "chcemvediet\n" \
+    "chcemvediet" \
     # Database user password
-    "nbusr123\n" \
+    "nbusr123" \
     # Unique cache key prefix (default)
-    "\n" \
+    "" \
     # Google Custom Search API key (default)
-    "\n" \
+    "" \
     # Load datasheets / Neighbourhood dummy was omitted / Delete it?
-    "y\n" \
+    "y" \
     # Load datasheets / Municipality dummy was omitted / Delete it?
-    "y\n" \
+    "y" \
     # Load datasheets / District dummy was omitted / Delete it?
-    "y\n" \
+    "y" \
     # Load datasheets / Region dummy was omitted / Delete it?
-    "y\n" \
+    "y" \
     # Admin password
-    "nbusr123\n" \
+    "nbusr123" \
     # Facebook OAuth Client ID (default)
-    "\n" \
+    "" \
     # Facebook OAuth Secret (default)
-    "\n" \
+    "" \
     # Google OAuth Client ID (default)
-    "\n" \
+    "" \
     # Google OAuth Secret (default)
-    "\n" \
+    "" \
     # Twitter OAuth Client ID (default)
-    "\n" \
+    "" \
     # Twitter OAuth Secret (default)
-    "\n" \
+    "" \
     # LinkedIn OAuth Client ID (default)
-    "\n" \
+    "" \
     # LinkedIn OAuth Secret (default)
-    "\n" \
-    | sed 's/^ //' \
+    "" \
     | su chcemvediet -c "PYTHONUNBUFFERED=1 python setup.py" && \
   su chcemvediet -c "env/bin/python manage.py collectstatic --noinput" && \
   :
