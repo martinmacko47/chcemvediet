@@ -20,7 +20,7 @@ RUN \
     libapache2-mod-wsgi \
     libreoffice \
     imagemagick \
-    libmagic-dev \
+    libmagic1 \
     webp \
     && \
   :

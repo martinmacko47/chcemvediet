@@ -19,7 +19,7 @@ You need the following packages installed:
 
  * python (ver. 2.7.x)
  * python-virtualenv
- * libmagic-dev (ver. 5.25+)
+ * libmagic (ver. 5.25+, package `libmagic1`)
  * webp
  * libxml2-dev
  * libxslt-dev
@@ -134,7 +134,7 @@ You need the following packages installed
  * libapache2-mod-wsgi
  * libreoffice
  * imagemagick
- * libmagic-dev (ver. 5.25+)
+ * libmagic (ver. 5.25+, package `libmagic1`)
  * webp
  * [abbyyocr11]
 
