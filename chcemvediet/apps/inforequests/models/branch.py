@@ -209,6 +209,7 @@ class Branch(FormatMixin, models.Model):
     def can_add_confirmation(self):
         return self.last_action.type in [
                 Action.TYPES.REQUEST,
+                Action.TYPES.CONFIRMATION,
                 Action.TYPES.ADVANCED_REQUEST,
                 ]
 
@@ -219,6 +220,7 @@ class Branch(FormatMixin, models.Model):
                 Action.TYPES.CONFIRMATION,
                 Action.TYPES.CLARIFICATION_RESPONSE,
                 Action.TYPES.REMANDMENT,
+                Action.TYPES.EXTENSION,
                 Action.TYPES.ADVANCED_REQUEST,
                 ]
 
@@ -228,6 +230,7 @@ class Branch(FormatMixin, models.Model):
                 Action.TYPES.REQUEST,
                 Action.TYPES.CLARIFICATION_RESPONSE,
                 Action.TYPES.CONFIRMATION,
+                Action.TYPES.ADVANCEMENT,
                 Action.TYPES.ADVANCED_REQUEST,
                 ]
 
@@ -249,6 +252,7 @@ class Branch(FormatMixin, models.Model):
                 Action.TYPES.CONFIRMATION,
                 Action.TYPES.EXTENSION,
                 Action.TYPES.REMANDMENT,
+                Action.TYPES.DISCLOSURE,
                 Action.TYPES.ADVANCED_REQUEST,
                 ]
 
@@ -260,20 +264,39 @@ class Branch(FormatMixin, models.Model):
                 Action.TYPES.CONFIRMATION,
                 Action.TYPES.EXTENSION,
                 Action.TYPES.REMANDMENT,
+                Action.TYPES.REFUSAL,
                 Action.TYPES.ADVANCED_REQUEST,
                 ]
 
     @cached_property
+    def can_add_disclosure_refusal_advancement_extension(self):
+        return (self.can_add_disclosure or self.can_add_refusal or self.can_add_advancement
+                or self.can_add_extension)
+
+    @cached_property
     def can_add_affirmation(self):
-        return self.last_action.type == Action.TYPES.APPEAL
+        return self.last_action.type in [
+            Action.TYPES.APPEAL,
+            Action.TYPES.AFFIRMATION,
+            ]
 
     @cached_property
     def can_add_reversion(self):
-        return self.last_action.type == Action.TYPES.APPEAL
+        return self.last_action.type in [
+            Action.TYPES.APPEAL,
+            Action.TYPES.REVERSION,
+            ]
 
     @cached_property
     def can_add_remandment(self):
-        return self.last_action.type == Action.TYPES.APPEAL
+        return self.last_action.type in [
+            Action.TYPES.APPEAL,
+            Action.TYPES.REMANDMENT,
+            ]
+
+    @cached_property
+    def can_add_remandment_affirmation_reversion(self):
+        return self.can_add_remandment or self.can_add_affirmation or self.can_add_reversion
 
     @cached_property
     def can_add_applicant_action(self):

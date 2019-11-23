@@ -202,10 +202,10 @@ class DisclosureReasons(ObligeeActionStep):
 
         return res
 
-class DisclosureLevelFork2(ObligeeActionStep):
+class DisclosureLevelFork(ObligeeActionStep):
 
     def pre_transition(self):
-        res = super(DisclosureLevelFork2, self).pre_transition()
+        res = super(DisclosureLevelFork, self).pre_transition()
         disclosure_level = self.wizard.values.get(u'disclosure_level', None)
 
         if disclosure_level == Action.DISCLOSURE_LEVELS.FULL:
@@ -226,7 +226,7 @@ class CanAddDisclosure(ObligeeActionStep):
         if not branch:
             res.next = NotCategorized
         elif branch.can_add_disclosure:
-            res.next = DisclosureLevelFork2
+            res.next = DisclosureLevelFork
         else:
             res.next = NotCategorized
 
@@ -534,7 +534,7 @@ class CanAddDisclosureRefusalAdvancementExtension(ObligeeActionStep):
 
         if not branch:
             res.next = IsOnTopic
-        elif branch.can_add_refusal: # equivalent to ``can_add_disclosure``
+        elif branch.can_add_disclosure_refusal_advancement_extension:
             res.next = IsOnTopic
         else:
             res.next = NotCategorized
@@ -591,10 +591,10 @@ class ReversionReasons(ObligeeActionStep):
 
         return res
 
-class DisclosureLevelFork(ObligeeActionStep):
+class AppealDisclosureLevelFork(ObligeeActionStep):
 
     def pre_transition(self):
-        res = super(DisclosureLevelFork, self).pre_transition()
+        res = super(AppealDisclosureLevelFork, self).pre_transition()
         disclosure_level = self.wizard.values.get(u'disclosure_level', None)
 
         if disclosure_level == Action.DISCLOSURE_LEVELS.FULL:
@@ -619,7 +619,7 @@ class CanAddReversion(ObligeeActionStep):
         if not branch:
             res.next = NotCategorized
         elif branch.can_add_reversion:
-            res.next = DisclosureLevelFork
+            res.next = AppealDisclosureLevelFork
         else:
             res.next = NotCategorized
 
@@ -641,7 +641,6 @@ class CanAddRemandment(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
-
 
 class WasItReturned(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:WasItReturned:label')
@@ -762,8 +761,11 @@ class IsItAppealDecision(ObligeeActionStep):
         res = super(IsItAppealDecision, self).post_transition()
 
         if not self.is_valid():
-            #todo: check this
-            res.next = ContainsAppealInfo
+            branch = self.wizard.values.get(u'branch', None)
+            if branch.can_add_disclosure_refusal_advancement_extension:
+                res.next = CanAddDisclosureRefusalAdvancementExtension
+            else:
+                res.next = ContainsAppealInfo
         elif self.cleaned_data[u'is_decision']:
             res.next = ContainsAppealInfo
         else:
@@ -780,9 +782,8 @@ class CanAddRemandmentAffirmationReversion(ObligeeActionStep):
         if self.wizard.email:
             res.next = CanAddDisclosureRefusalAdvancementExtension
         elif not branch:
-            res.next = IsItAppealDecision
-        elif branch.can_add_remandment:
-            #todo: check this
+            res.next = CanAddDisclosureRefusalAdvancementExtension
+        elif branch.can_add_remandment_affirmation_reversion:
             res.next = IsItAppealDecision
         else:
             res.next = CanAddDisclosureRefusalAdvancementExtension
