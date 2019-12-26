@@ -85,9 +85,9 @@
     <text class="cell" x="375">✓</text>
     <text class="cell" x="425">✓</text>
     <text class="cell" x="475">✓</text>
-    <text class="cell err" x="525">Ref.</text>
-    <text class="cell err" x="575">Ref.</text>
-    <text class="cell err" x="625">Ref.</text>
+    <text class="cell" x="525">—</text>
+    <text class="cell" x="575">—</text>
+    <text class="cell" x="625">—</text>
     <text class="cell help" x="675">H</text>
   </g>
 
@@ -100,9 +100,9 @@
     <text class="cell" x="375">✓</text>
     <text class="cell" x="425">✓</text>
     <text class="cell" x="475">✓</text>
-    <text class="cell err" x="525">Ref.</text>
-    <text class="cell err" x="575">Ref.</text>
-    <text class="cell err" x="625">Ref.</text>
+    <text class="cell" x="525">—</text>
+    <text class="cell" x="575">—</text>
+    <text class="cell" x="625">—</text>
     <text class="cell help" x="675">H</text>
   </g>
 
@@ -115,9 +115,9 @@
     <text class="cell" x="375">✓</text>
     <text class="cell" x="425">✓</text>
     <text class="cell" x="475">✓</text>
-    <text class="cell err" x="525">Ref.</text>
-    <text class="cell err" x="575">Ref.</text>
-    <text class="cell err" x="625">Ref.</text>
+    <text class="cell" x="525">—</text>
+    <text class="cell" x="575">—</text>
+    <text class="cell" x="625">—</text>
     <text class="cell help" x="675">H</text>
   </g>
 
@@ -130,9 +130,9 @@
     <text class="cell help" x="375">H</text>
     <text class="cell help" x="425">H</text>
     <text class="cell help" x="475">H</text>
-    <text class="cell help" x="525">H</text>
-    <text class="cell help" x="575">H</text>
-    <text class="cell help" x="625">H</text>
+    <text class="cell" x="525">—</text>
+    <text class="cell" x="575">—</text>
+    <text class="cell" x="625">—</text>
     <text class="cell help" x="675">H</text>
   </g>
 
@@ -145,9 +145,9 @@
     <text class="cell" x="375">✓</text>
     <text class="cell" x="425">✓</text>
     <text class="cell" x="475">✓</text>
-    <text class="cell err" x="525">Ref.</text>
-    <text class="cell err" x="575">Ref.</text>
-    <text class="cell err" x="625">Ref.</text>
+    <text class="cell" x="525">—</text>
+    <text class="cell" x="575">—</text>
+    <text class="cell" x="625">—</text>
     <text class="cell help" x="675">H</text>
   </g>
 
@@ -160,9 +160,9 @@
     <text class="cell help" x="375">H</text>
     <text class="cell help" x="425">H</text>
     <text class="cell help" x="475">H</text>
-    <text class="cell help" x="525">H</text>
-    <text class="cell help" x="575">H</text>
-    <text class="cell help" x="625">H</text>
+    <text class="cell" x="525">—</text>
+    <text class="cell" x="575">—</text>
+    <text class="cell" x="625">—</text>
     <text class="cell help" x="675">H</text>
   </g>
 
