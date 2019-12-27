@@ -20,6 +20,7 @@ from chcemvediet.apps.obligees.forms import MultipleObligeeWidget, MultipleOblig
 from chcemvediet.apps.inforequests.models import Action, InforequestEmail
 from chcemvediet.apps.inforequests.forms import BranchField, RefusalReasonField
 
+
 class ObligeeActionStep(Step):
     template = u'inforequests/obligee_action/wizard.html'
     form_template = u'main/forms/form_horizontal.html'
@@ -526,15 +527,15 @@ class IsOnTopic(ObligeeActionStep):
 
         return res
 
-class CanAddDisclosureRefusalAdvancementExtension(ObligeeActionStep):
+class CanAddDisclosureRefusalAdvancementOrExtension(ObligeeActionStep):
 
     def pre_transition(self):
-        res = super(CanAddDisclosureRefusalAdvancementExtension, self).pre_transition()
+        res = super(CanAddDisclosureRefusalAdvancementOrExtension, self).pre_transition()
         branch = self.wizard.values.get(u'branch', None)
 
         if not branch:
             res.next = IsOnTopic
-        elif branch.can_add_disclosure_refusal_advancement_extension:
+        elif branch.can_add_disclosure_refusal_advancement_or_extension:
             res.next = IsOnTopic
         else:
             res.next = NotCategorized
@@ -761,34 +762,32 @@ class IsItAppealDecision(ObligeeActionStep):
         res = super(IsItAppealDecision, self).post_transition()
 
         if not self.is_valid():
-            branch = self.wizard.values.get(u'branch', None)
-            if branch.can_add_disclosure_refusal_advancement_extension:
-                res.next = CanAddDisclosureRefusalAdvancementExtension
-            else:
-                res.next = ContainsAppealInfo
+            res.next = ContainsAppealInfo
         elif self.cleaned_data[u'is_decision']:
             res.next = ContainsAppealInfo
         else:
-            res.next = CanAddDisclosureRefusalAdvancementExtension
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
 
         return res
 
-class CanAddRemandmentAffirmationReversion(ObligeeActionStep):
+class CanAddRemandmentAffirmationOrReversion(ObligeeActionStep):
 
     def pre_transition(self):
-        res = super(CanAddRemandmentAffirmationReversion, self).pre_transition()
+        res = super(CanAddRemandmentAffirmationOrReversion, self).pre_transition()
         branch = self.wizard.values.get(u'branch', None)
 
         if self.wizard.email:
-            res.next = CanAddDisclosureRefusalAdvancementExtension
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
         elif not branch:
-            res.next = CanAddDisclosureRefusalAdvancementExtension
-        elif branch.can_add_remandment_affirmation_reversion:
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
+        elif branch.can_add_remandment_affirmation_or_reversion:
             res.next = IsItAppealDecision
         else:
-            res.next = CanAddDisclosureRefusalAdvancementExtension
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
 
         return res
+
+# Confirmation and Clarification Request
 
 class IsItConfirmation(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItConfirmation:label')
@@ -811,13 +810,13 @@ class IsItConfirmation(ObligeeActionStep):
         res = super(IsItConfirmation, self).post_transition()
 
         if not self.is_valid():
-            res.next = CanAddRemandmentAffirmationReversion
+            res.next = CanAddRemandmentAffirmationOrReversion
         elif self.cleaned_data[u'is_confirmation']:
             res.globals[u'result'] = u'action'
             res.globals[u'action'] = Action.TYPES.CONFIRMATION
             res.next = Categorized
         else:
-            res.next = CanAddRemandmentAffirmationReversion
+            res.next = CanAddRemandmentAffirmationOrReversion
 
         return res
 
@@ -828,11 +827,11 @@ class CanAddConfirmation(ObligeeActionStep):
         branch = self.wizard.values.get(u'branch', None)
 
         if not branch:
-            res.next = CanAddRemandmentAffirmationReversion
+            res.next = CanAddRemandmentAffirmationOrReversion
         elif branch.can_add_confirmation:
             res.next = IsItConfirmation
         else:
-            res.next = CanAddRemandmentAffirmationReversion
+            res.next = CanAddRemandmentAffirmationOrReversion
 
         return res
 

@@ -269,7 +269,7 @@ class Branch(FormatMixin, models.Model):
                 ]
 
     @cached_property
-    def can_add_disclosure_refusal_advancement_extension(self):
+    def can_add_disclosure_refusal_advancement_or_extension(self):
         return (self.can_add_disclosure or self.can_add_refusal or self.can_add_advancement
                 or self.can_add_extension)
 
@@ -295,7 +295,7 @@ class Branch(FormatMixin, models.Model):
             ]
 
     @cached_property
-    def can_add_remandment_affirmation_reversion(self):
+    def can_add_remandment_affirmation_or_reversion(self):
         return self.can_add_remandment or self.can_add_affirmation or self.can_add_reversion
 
     @cached_property
