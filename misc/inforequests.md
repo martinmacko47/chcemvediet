@@ -480,13 +480,6 @@ Overview of wizard results:
 
 ![](assets/obligee-action-wizard-table.svg)
 
-_Legend_:
-* Tick: The wizard correctly categorizes the new action.
-* Dash: The new action is impossible in such cases, so we don't care what wizard does about them.
-* Green H: The new action is invalid in such case and the wizard ends with a help request.
-* Red action type: The new action is invalid in such case, but the wizard ends with a categorization
-  as a wrong action type. Such cases are very rare, however, so we don't care about them.
-
 ## Events
 
 ### Received E-mail

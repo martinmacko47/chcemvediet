@@ -1,6 +1,6 @@
-<svg version="1.1" viewBox="0 0 900 830" xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" viewBox="0 0 900 940" xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <style>
-      text {
+      text, foreignObject {
         font-family: sans-serif;
         font-size: 12pt;
       }
@@ -14,14 +14,20 @@
       }
       .help {
         fill: green;
+        color: green;
       }
       .err {
         fill: red;
+        color: red;
       }
       .grid {
         fill: none;
         stroke: black;
         stroke-width: 1pt;
+      }
+      .legend {
+        font-size: 10pt;
+        padding: 5pt;
       }
   </style>
 
@@ -314,6 +320,26 @@
     <text class="cell help" x="575">H</text>
     <text class="cell help" x="625">H</text>
     <text class="cell help" x="675">H</text>
+  </g>
+
+  <g transform="translate(100 740)">
+    <foreignObject x="0" y="0" width="700" height="100">
+      <xhtml:div class="legend">
+        <xhtml:span>✓</xhtml:span>:
+          The wizard correctly categorizes the new action.
+          <xhtml:br/>
+        <xhtml:span class="help">H</xhtml:span>:
+          The new action is invalid in such case and the wizard ends with a help request.
+          <xhtml:br/>
+        <xhtml:span class="err">Ref.</xhtml:span>/<xhtml:span class="err">Disc.</xhtml:span>:
+          The new action is invalid in such case, but the wizard ends with a categorization as the
+          given wrong action type. Such cases are very rare, however, so we don't care about them.
+          <xhtml:br/>
+        <xhtml:span>—</xhtml:span>:
+          The new action is impossible in such case, so we don't care what wizard does for it.
+          <xhtml:br/>
+      </xhtml:div>
+    </foreignObject>
   </g>
 
 </svg>
