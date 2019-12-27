@@ -27,63 +27,6 @@ class ObligeeActionStep(Step):
 
 # Epilogue
 
-class NotCategorized(ObligeeActionStep):
-    label = _(u'inforequests:obligee_action:NotCategorized:label')
-    text_template = u'inforequests/obligee_action/texts/not_categorized.html'
-    global_fields = [u'help_request']
-    post_step_class = Bottom
-
-    def add_fields(self):
-        super(NotCategorized, self).add_fields()
-
-        self.fields[u'wants_help'] = forms.TypedChoiceField(
-                label=u' ',
-                coerce=int,
-                choices=(
-                    (1, _(u'inforequests:obligee_action:NotCategorized:help')),
-                    (0, _(u'inforequests:obligee_action:NotCategorized:unrelated')),
-                    ),
-                widget=forms.RadioSelect(attrs={
-                    u'class': u'pln-toggle-changed',
-                    u'data-container': u'form',
-                    u'data-hide-target-1': u'.form-group:has(.chv-visible-if-wants-help)',
-                    u'data-disable-target-1': u'.chv-visible-if-wants-help',
-                    }),
-                )
-
-        self.fields[u'help_request'] = forms.CharField(
-                label=_(u'inforequests:obligee_action:NotCategorized:help_request:label'),
-                required=False,
-                widget=forms.Textarea(attrs={
-                    u'placeholder':
-                        _(u'inforequests:obligee_action:NotCategorized:help_request:placeholder'),
-                    u'class': u'pln-autosize chv-visible-if-wants-help',
-                    u'cols': u'', u'rows': u'',
-                    }),
-                )
-
-    def clean(self):
-        cleaned_data = super(NotCategorized, self).clean()
-
-        wants_help = cleaned_data.get(u'wants_help', None)
-        help_request = cleaned_data.get(u'help_request', None)
-        if wants_help and not help_request:
-            msg = self.fields[u'help_request'].error_messages[u'required']
-            if u'help_request' in cleaned_data:
-                self.add_error(u'help_request', msg)
-
-        return cleaned_data
-
-    def post_transition(self):
-        res = super(NotCategorized, self).post_transition()
-
-        if self.is_valid() and self.cleaned_data[u'wants_help']:
-            res.globals[u'result'] = u'help'
-        else:
-            res.globals[u'result'] = u'unrelated'
-
-        return res
-
 class Categorized(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:Categorized:label')
     text_template = u'inforequests/obligee_action/texts/categorized.html'
@@ -180,203 +123,60 @@ class Categorized(ObligeeActionStep):
 
         return cleaned_data
 
-# Post Appeal
-
-class InvalidReversion(ObligeeActionStep):
-    label = _(u'inforequests:obligee_action:InvalidReversion:label')
-    text_template = u'inforequests/obligee_action/texts/invalid_reversion.html'
+class NotCategorized(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:NotCategorized:label')
+    text_template = u'inforequests/obligee_action/texts/not_categorized.html'
     global_fields = [u'help_request']
     post_step_class = Bottom
 
     def add_fields(self):
-        super(InvalidReversion, self).add_fields()
+        super(NotCategorized, self).add_fields()
+
+        self.fields[u'wants_help'] = forms.TypedChoiceField(
+                label=u' ',
+                coerce=int,
+                choices=(
+                    (1, _(u'inforequests:obligee_action:NotCategorized:help')),
+                    (0, _(u'inforequests:obligee_action:NotCategorized:unrelated')),
+                    ),
+                widget=forms.RadioSelect(attrs={
+                    u'class': u'pln-toggle-changed',
+                    u'data-container': u'form',
+                    u'data-hide-target-1': u'.form-group:has(.chv-visible-if-wants-help)',
+                    u'data-disable-target-1': u'.chv-visible-if-wants-help',
+                    }),
+                )
 
         self.fields[u'help_request'] = forms.CharField(
-                label=_(u'inforequests:obligee_action:InvalidReversion:help_request:label'),
+                label=_(u'inforequests:obligee_action:NotCategorized:help_request:label'),
+                required=False,
                 widget=forms.Textarea(attrs={
                     u'placeholder':
-                        _(u'inforequests:obligee_action:InvalidReversion:help_request:placeholder'),
-                    u'class': u'pln-autosize',
+                        _(u'inforequests:obligee_action:NotCategorized:help_request:placeholder'),
+                    u'class': u'pln-autosize chv-visible-if-wants-help',
                     u'cols': u'', u'rows': u'',
                     }),
                 )
 
-    def post_transition(self):
-        res = super(InvalidReversion, self).post_transition()
+    def clean(self):
+        cleaned_data = super(NotCategorized, self).clean()
 
-        res.globals[u'result'] = u'help'
+        wants_help = cleaned_data.get(u'wants_help', None)
+        help_request = cleaned_data.get(u'help_request', None)
+        if wants_help and not help_request:
+            msg = self.fields[u'help_request'].error_messages[u'required']
+            if u'help_request' in cleaned_data:
+                self.add_error(u'help_request', msg)
 
-        return res
-
-class ReversionReasons(ObligeeActionStep):
-    label = _(u'inforequests:obligee_action:ReversionReasons:label')
-    text_template = u'inforequests/obligee_action/texts/reversion_reasons.html'
-    global_fields = [u'refusal_reason']
-
-    def add_fields(self):
-        super(ReversionReasons, self).add_fields()
-        branch = self.wizard.values[u'branch']
-        self.fields[u'refusal_reason'] = RefusalReasonField(
-                section_3=(branch.obligee.type == Obligee.TYPES.SECTION_3),
-                choices=Action.APPEAL_REFUSAL_REASONS._choices,
-                )
+        return cleaned_data
 
     def post_transition(self):
-        res = super(ReversionReasons, self).post_transition()
+        res = super(NotCategorized, self).post_transition()
 
-        res.globals[u'result'] = u'action'
-        res.globals[u'action'] = Action.TYPES.REVERSION
-        res.next = Categorized
-
-        return res
-
-class DisclosureLevelFork(ObligeeActionStep):
-
-    def pre_transition(self):
-        res = super(DisclosureLevelFork, self).pre_transition()
-        disclosure_level = self.wizard.values.get(u'disclosure_level', None)
-
-        if disclosure_level == Action.DISCLOSURE_LEVELS.FULL:
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.REVERSION
-            res.next = Categorized
-        elif disclosure_level == Action.DISCLOSURE_LEVELS.PARTIAL:
-            res.next = ReversionReasons
-        elif disclosure_level == Action.DISCLOSURE_LEVELS.NONE:
-            res.next = InvalidReversion
+        if self.is_valid() and self.cleaned_data[u'wants_help']:
+            res.globals[u'result'] = u'help'
         else:
-            res.next = ReversionReasons
-
-        return res
-
-class WasItReturned(ObligeeActionStep):
-    label = _(u'inforequests:obligee_action:WasItReturned:label')
-    text_template = u'inforequests/obligee_action/texts/was_returned.html'
-
-    def add_fields(self):
-        super(WasItReturned, self).add_fields()
-
-        self.fields[u'was_returned'] = forms.TypedChoiceField(
-                label=u' ',
-                coerce=int,
-                choices=(
-                    (1, _(u'inforequests:obligee_action:WasItReturned:yes')),
-                    (0, _(u'inforequests:obligee_action:WasItReturned:no')),
-                    ),
-                widget=forms.RadioSelect(),
-            )
-
-    def post_transition(self):
-        res = super(WasItReturned, self).post_transition()
-
-        if not self.is_valid():
-            res.next = DisclosureLevelFork
-        elif self.cleaned_data[u'was_returned']:
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.REMANDMENT
-            res.next = Categorized
-        else:
-            res.next = DisclosureLevelFork
-
-        return res
-
-class WasItAccepted(ObligeeActionStep):
-    label = _(u'inforequests:obligee_action:WasItAccepted:label')
-    text_template = u'inforequests/obligee_action/texts/was_accepted.html'
-
-    def add_fields(self):
-        super(WasItAccepted, self).add_fields()
-
-        self.fields[u'was_accepted'] = forms.ChoiceField(
-                label=u' ',
-                choices=(
-                    (u'all', _(u'inforequests:obligee_action:WasItAccepted:all')),
-                    (u'some', _(u'inforequests:obligee_action:WasItAccepted:some')),
-                    (u'none', _(u'inforequests:obligee_action:WasItAccepted:none')),
-                    ),
-                widget=forms.RadioSelect(),
-                )
-
-    def post_transition(self):
-        res = super(WasItAccepted, self).post_transition()
-
-        if not self.is_valid():
-            res.next = WasItReturned
-        elif self.cleaned_data[u'was_accepted'] == u'none':
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.AFFIRMATION
-            res.next = Categorized
-        else:
-            res.next = WasItReturned
-
-        return res
-
-class ContainsAppealInfo(ObligeeActionStep):
-    label = _(u'inforequests:obligee_action:ContainsAppealInfo:label')
-    text_template = u'inforequests/obligee_action/texts/contains_appeal_info.html'
-    global_fields = [u'disclosure_level']
-    post_step_class = WasItAccepted
-
-    def add_fields(self):
-        super(ContainsAppealInfo, self).add_fields()
-
-        self.fields[u'disclosure_level'] = forms.TypedChoiceField(
-                label=u' ',
-                coerce=int,
-                choices=(
-                    (Action.DISCLOSURE_LEVELS.FULL,
-                        _(u'inforequests:obligee_action:ContainsAppealInfo:full')),
-                    (Action.DISCLOSURE_LEVELS.PARTIAL,
-                        _(u'inforequests:obligee_action:ContainsAppealInfo:partial')),
-                    (Action.DISCLOSURE_LEVELS.NONE,
-                        _(u'inforequests:obligee_action:ContainsAppealInfo:none')),
-                    ),
-                widget=forms.RadioSelect(),
-                )
-
-class IsItAppealDecision(ObligeeActionStep):
-    label = _(u'inforequests:obligee_action:IsItAppealDecision:label')
-    text_template = u'inforequests/obligee_action/texts/is_appeal_decision.html'
-
-    def add_fields(self):
-        super(IsItAppealDecision, self).add_fields()
-
-        self.fields[u'is_decision'] = forms.TypedChoiceField(
-                label=u' ',
-                coerce=int,
-                choices=(
-                    (1, _(u'inforequests:obligee_action:IsItAppealDecision:yes')),
-                    (0, _(u'inforequests:obligee_action:IsItAppealDecision:no')),
-                    ),
-                widget=forms.RadioSelect(),
-                )
-
-    def post_transition(self):
-        res = super(IsItAppealDecision, self).post_transition()
-
-        if not self.is_valid():
-            res.next = ContainsAppealInfo
-        elif self.cleaned_data[u'is_decision']:
-            res.next = ContainsAppealInfo
-        else:
-            res.next = NotCategorized
-
-        return res
-
-class CanAddAppealDecision(ObligeeActionStep):
-
-    def pre_transition(self):
-        res = super(CanAddAppealDecision, self).pre_transition()
-        branch = self.wizard.values.get(u'branch', None)
-
-        if self.wizard.email:
-            res.next = NotCategorized
-        elif not branch:
-            res.next = IsItAppealDecision
-        elif branch.can_add_remandment:
-            res.next = IsItAppealDecision
-        else:
-            res.next = NotCategorized
+            res.globals[u'result'] = u'unrelated'
 
         return res
 
@@ -400,6 +200,53 @@ class DisclosureReasons(ObligeeActionStep):
         res.globals[u'result'] = u'action'
         res.globals[u'action'] = Action.TYPES.DISCLOSURE
         res.next = Categorized
+
+        return res
+
+class DisclosureLevelFork(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(DisclosureLevelFork, self).pre_transition()
+        disclosure_level = self.wizard.values.get(u'disclosure_level', None)
+
+        if disclosure_level == Action.DISCLOSURE_LEVELS.FULL:
+            res.globals[u'result'] = u'action'
+            res.globals[u'action'] = Action.TYPES.DISCLOSURE
+            res.next = Categorized
+        else:
+            res.next = DisclosureReasons
+
+        return res
+
+class CanAddDisclosure(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddDisclosure, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_disclosure:
+            res.next = DisclosureLevelFork
+        else:
+            res.next = NotCategorized
+
+        return res
+
+class CanAddExtension(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddExtension, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_extension:
+            res.globals[u'result'] = u'action'
+            res.globals[u'action'] = Action.TYPES.EXTENSION
+            res.next = Categorized
+        else:
+            res.next = NotCategorized
 
         return res
 
@@ -456,28 +303,28 @@ class IsItExtension(ObligeeActionStep):
         res = super(IsItExtension, self).post_transition()
 
         if not self.is_valid():
-            res.next = DisclosureReasons
+            res.next = CanAddDisclosure
         elif self.cleaned_data[u'is_extension']:
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.EXTENSION
-            res.next = Categorized
+            res.next = CanAddExtension
         else:
-            res.next = DisclosureReasons
+            res.next = CanAddDisclosure
 
         return res
 
-class CanAddExtension(ObligeeActionStep):
+class CanAddAdvancement(ObligeeActionStep):
 
     def pre_transition(self):
-        res = super(CanAddExtension, self).pre_transition()
+        res = super(CanAddAdvancement, self).pre_transition()
         branch = self.wizard.values.get(u'branch', None)
 
         if not branch:
-            res.next = DisclosureReasons
-        elif branch.can_add_extension:
-            res.next = IsItExtension
+            res.next = NotCategorized
+        elif branch.can_add_advancement:
+            res.globals[u'result'] = u'action'
+            res.globals[u'action'] = Action.TYPES.ADVANCEMENT
+            res.next = Categorized
         else:
-            res.next = DisclosureReasons
+            res.next = NotCategorized
 
         return res
 
@@ -544,28 +391,11 @@ class IsItAdvancement(ObligeeActionStep):
         res = super(IsItAdvancement, self).post_transition()
 
         if not self.is_valid():
-            res.next = CanAddExtension
+            res.next = IsItExtension
         elif self.cleaned_data[u'is_advancement']:
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.ADVANCEMENT
-            res.next = Categorized
+            res.next = CanAddAdvancement
         else:
-            res.next = CanAddExtension
-
-        return res
-
-class CanAddAdvancement(ObligeeActionStep):
-
-    def pre_transition(self):
-        res = super(CanAddAdvancement, self).pre_transition()
-        branch = self.wizard.values.get(u'branch', None)
-
-        if not branch:
-            res.next = CanAddExtension
-        elif branch.can_add_advancement:
-            res.next = IsItAdvancement
-        else:
-            res.next = CanAddExtension
+            res.next = IsItExtension
 
         return res
 
@@ -590,6 +420,21 @@ class RefusalReasons(ObligeeActionStep):
 
         return res
 
+class CanAddRefusal(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddRefusal, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_refusal:
+            res.next = RefusalReasons
+        else:
+            res.next = NotCategorized
+
+        return res
+
 class IsItDecision(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItDecision:label')
     text_template = u'inforequests/obligee_action/texts/is_decision.html'
@@ -611,11 +456,11 @@ class IsItDecision(ObligeeActionStep):
         res = super(IsItDecision, self).post_transition()
 
         if not self.is_valid():
-            res.next = CanAddAdvancement
+            res.next = IsItAdvancement
         elif self.cleaned_data[u'is_decision']:
-            res.next = RefusalReasons
+            res.next = CanAddRefusal
         else:
-            res.next = CanAddAdvancement
+            res.next = IsItAdvancement
 
         return res
 
@@ -647,9 +492,7 @@ class ContainsInfo(ObligeeActionStep):
         if not self.is_valid():
             res.next = IsItDecision
         elif self.cleaned_data[u'disclosure_level'] == Action.DISCLOSURE_LEVELS.FULL:
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.DISCLOSURE
-            res.next = Categorized
+            res.next = CanAddDisclosure
         else:
             res.next = IsItDecision
 
@@ -684,20 +527,267 @@ class IsOnTopic(ObligeeActionStep):
 
         return res
 
-class CanAddDecision(ObligeeActionStep):
+class CanAddDisclosureRefusalAdvancementOrExtension(ObligeeActionStep):
 
     def pre_transition(self):
-        res = super(CanAddDecision, self).pre_transition()
+        res = super(CanAddDisclosureRefusalAdvancementOrExtension, self).pre_transition()
         branch = self.wizard.values.get(u'branch', None)
 
         if not branch:
             res.next = IsOnTopic
-        elif branch.can_add_refusal: # equivalent to ``can_add_disclosure``
+        elif branch.can_add_disclosure_refusal_advancement_or_extension:
             res.next = IsOnTopic
         else:
-            res.next = CanAddAppealDecision
+            res.next = NotCategorized
 
         return res
+
+# Post Appeal
+
+class InvalidReversion(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:InvalidReversion:label')
+    text_template = u'inforequests/obligee_action/texts/invalid_reversion.html'
+    global_fields = [u'help_request']
+    post_step_class = Bottom
+
+    def add_fields(self):
+        super(InvalidReversion, self).add_fields()
+
+        self.fields[u'help_request'] = forms.CharField(
+                label=_(u'inforequests:obligee_action:InvalidReversion:help_request:label'),
+                widget=forms.Textarea(attrs={
+                    u'placeholder':
+                        _(u'inforequests:obligee_action:InvalidReversion:help_request:placeholder'),
+                    u'class': u'pln-autosize',
+                    u'cols': u'', u'rows': u'',
+                    }),
+                )
+
+    def post_transition(self):
+        res = super(InvalidReversion, self).post_transition()
+
+        res.globals[u'result'] = u'help'
+
+        return res
+
+class ReversionReasons(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:ReversionReasons:label')
+    text_template = u'inforequests/obligee_action/texts/reversion_reasons.html'
+    global_fields = [u'refusal_reason']
+
+    def add_fields(self):
+        super(ReversionReasons, self).add_fields()
+        branch = self.wizard.values[u'branch']
+        self.fields[u'refusal_reason'] = RefusalReasonField(
+                section_3=(branch.obligee.type == Obligee.TYPES.SECTION_3),
+                choices=Action.APPEAL_REFUSAL_REASONS._choices,
+                )
+
+    def post_transition(self):
+        res = super(ReversionReasons, self).post_transition()
+
+        res.globals[u'result'] = u'action'
+        res.globals[u'action'] = Action.TYPES.REVERSION
+        res.next = Categorized
+
+        return res
+
+class AppealDisclosureLevelFork(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(AppealDisclosureLevelFork, self).pre_transition()
+        disclosure_level = self.wizard.values.get(u'disclosure_level', None)
+
+        if disclosure_level == Action.DISCLOSURE_LEVELS.FULL:
+            res.globals[u'result'] = u'action'
+            res.globals[u'action'] = Action.TYPES.REVERSION
+            res.next = Categorized
+        elif disclosure_level == Action.DISCLOSURE_LEVELS.PARTIAL:
+            res.next = ReversionReasons
+        elif disclosure_level == Action.DISCLOSURE_LEVELS.NONE:
+            res.next = InvalidReversion
+        else:
+            res.next = ReversionReasons
+
+        return res
+
+class CanAddReversion(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddReversion, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_reversion:
+            res.next = AppealDisclosureLevelFork
+        else:
+            res.next = NotCategorized
+
+        return res
+
+class CanAddRemandment(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddRemandment, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_remandment:
+            res.globals[u'result'] = u'action'
+            res.globals[u'action'] = Action.TYPES.REMANDMENT
+            res.next = Categorized
+        else:
+            res.next = NotCategorized
+
+        return res
+
+class WasItReturned(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:WasItReturned:label')
+    text_template = u'inforequests/obligee_action/texts/was_returned.html'
+
+    def add_fields(self):
+        super(WasItReturned, self).add_fields()
+
+        self.fields[u'was_returned'] = forms.TypedChoiceField(
+                label=u' ',
+                coerce=int,
+                choices=(
+                    (1, _(u'inforequests:obligee_action:WasItReturned:yes')),
+                    (0, _(u'inforequests:obligee_action:WasItReturned:no')),
+                    ),
+                widget=forms.RadioSelect(),
+            )
+
+    def post_transition(self):
+        res = super(WasItReturned, self).post_transition()
+
+        if not self.is_valid():
+            res.next = CanAddReversion
+        elif self.cleaned_data[u'was_returned']:
+            res.next = CanAddRemandment
+        else:
+            res.next = CanAddReversion
+
+        return res
+
+class CanAddAffirmation(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddAffirmation, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if not branch:
+            res.next = NotCategorized
+        elif branch.can_add_affirmation:
+            res.globals[u'result'] = u'action'
+            res.globals[u'action'] = Action.TYPES.AFFIRMATION
+            res.next = Categorized
+        else:
+            res.next = NotCategorized
+
+        return res
+
+class WasItAccepted(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:WasItAccepted:label')
+    text_template = u'inforequests/obligee_action/texts/was_accepted.html'
+
+    def add_fields(self):
+        super(WasItAccepted, self).add_fields()
+
+        self.fields[u'was_accepted'] = forms.ChoiceField(
+                label=u' ',
+                choices=(
+                    (u'all', _(u'inforequests:obligee_action:WasItAccepted:all')),
+                    (u'some', _(u'inforequests:obligee_action:WasItAccepted:some')),
+                    (u'none', _(u'inforequests:obligee_action:WasItAccepted:none')),
+                    ),
+                widget=forms.RadioSelect(),
+                )
+
+    def post_transition(self):
+        res = super(WasItAccepted, self).post_transition()
+
+        if not self.is_valid():
+            res.next = WasItReturned
+        elif self.cleaned_data[u'was_accepted'] == u'none':
+            res.next = CanAddAffirmation
+        else:
+            res.next = WasItReturned
+
+        return res
+
+class ContainsAppealInfo(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:ContainsAppealInfo:label')
+    text_template = u'inforequests/obligee_action/texts/contains_appeal_info.html'
+    global_fields = [u'disclosure_level']
+    post_step_class = WasItAccepted
+
+    def add_fields(self):
+        super(ContainsAppealInfo, self).add_fields()
+
+        self.fields[u'disclosure_level'] = forms.TypedChoiceField(
+                label=u' ',
+                coerce=int,
+                choices=(
+                    (Action.DISCLOSURE_LEVELS.FULL,
+                        _(u'inforequests:obligee_action:ContainsAppealInfo:full')),
+                    (Action.DISCLOSURE_LEVELS.PARTIAL,
+                        _(u'inforequests:obligee_action:ContainsAppealInfo:partial')),
+                    (Action.DISCLOSURE_LEVELS.NONE,
+                        _(u'inforequests:obligee_action:ContainsAppealInfo:none')),
+                    ),
+                widget=forms.RadioSelect(),
+                )
+
+class IsItAppealDecision(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:IsItAppealDecision:label')
+    text_template = u'inforequests/obligee_action/texts/is_appeal_decision.html'
+
+    def add_fields(self):
+        super(IsItAppealDecision, self).add_fields()
+
+        self.fields[u'is_decision'] = forms.TypedChoiceField(
+                label=u' ',
+                coerce=int,
+                choices=(
+                    (1, _(u'inforequests:obligee_action:IsItAppealDecision:yes')),
+                    (0, _(u'inforequests:obligee_action:IsItAppealDecision:no')),
+                    ),
+                widget=forms.RadioSelect(),
+                )
+
+    def post_transition(self):
+        res = super(IsItAppealDecision, self).post_transition()
+
+        if not self.is_valid():
+            res.next = ContainsAppealInfo
+        elif self.cleaned_data[u'is_decision']:
+            res.next = ContainsAppealInfo
+        else:
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
+
+        return res
+
+class CanAddRemandmentAffirmationOrReversion(ObligeeActionStep):
+
+    def pre_transition(self):
+        res = super(CanAddRemandmentAffirmationOrReversion, self).pre_transition()
+        branch = self.wizard.values.get(u'branch', None)
+
+        if self.wizard.email:
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
+        elif not branch:
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
+        elif branch.can_add_remandment_affirmation_or_reversion:
+            res.next = IsItAppealDecision
+        else:
+            res.next = CanAddDisclosureRefusalAdvancementOrExtension
+
+        return res
+
+# Confirmation and Clarification Request
 
 class IsItConfirmation(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItConfirmation:label')
@@ -720,13 +810,13 @@ class IsItConfirmation(ObligeeActionStep):
         res = super(IsItConfirmation, self).post_transition()
 
         if not self.is_valid():
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationOrReversion
         elif self.cleaned_data[u'is_confirmation']:
             res.globals[u'result'] = u'action'
             res.globals[u'action'] = Action.TYPES.CONFIRMATION
             res.next = Categorized
         else:
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationOrReversion
 
         return res
 
@@ -737,11 +827,11 @@ class CanAddConfirmation(ObligeeActionStep):
         branch = self.wizard.values.get(u'branch', None)
 
         if not branch:
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationOrReversion
         elif branch.can_add_confirmation:
             res.next = IsItConfirmation
         else:
-            res.next = CanAddDecision
+            res.next = CanAddRemandmentAffirmationOrReversion
 
         return res
 
