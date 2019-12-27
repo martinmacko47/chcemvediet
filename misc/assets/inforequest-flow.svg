@@ -179,7 +179,8 @@
         <xhtml:div class="caption">Full Disclosure</xhtml:div>
       </xhtml:div>
     </foreignObject>
-    <path class="arrow" d="M -100,0 h -50 v -50 h 150 v 20" />
+    <path class="arrow" d="M -100,0 h -50 v 30 l 20,20" />
+    <path class="arrow" d="M 0,50 v -20" />
     <path class="arrow" d="M -100,0 h -155" />
   </g>
 
@@ -197,7 +198,8 @@
         <xhtml:div class="note">after: DD</xhtml:div>
       </xhtml:div>
     </foreignObject>
-    <path class="arrow" d="M -100,0 h -50 v -50 h 150 v 20" />
+    <path class="arrow" d="M -100,0 h -50 v -30 l 20,-20" />
+    <path class="arrow" d="M -130,-50 h 130 v 20" />
     <path class="arrow" d="M -100,0 h -230 l -20,20" />
     <g transform="translate(-330 5)">
       <text class="label">
