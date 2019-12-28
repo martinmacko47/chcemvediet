@@ -414,13 +414,13 @@ msgid "inforequests:obligee_action:ContainsAppealInfo:none"
 msgstr "Nie, inštitúcia mi neposlala žiadne z informácií, o ktoré som žiadal."
 
 msgid "inforequests:obligee_action:IsItAppealDecision:label"
-msgstr "Rozhodnutie"
+msgstr "Rozhodnutie o odvolaní"
 
 msgid "inforequests:obligee_action:IsItAppealDecision:yes"
-msgstr "Áno, obsahuje to dokument s nadpisom rozhodnutie."
+msgstr "Áno, je to rozhodnutie o mojom odvolaní."
 
 msgid "inforequests:obligee_action:IsItAppealDecision:no"
-msgstr "Nie, neobsahuje to dokument s nadpisom rozhodnutie."
+msgstr "Nie, nie je to rozhodnutie o mojom odvolaní."
 
 msgid "inforequests:obligee_action:DisclosureReasons:label"
 msgstr "Dôvody"
