@@ -19,7 +19,7 @@ You need the following packages installed:
 
  * python (ver. 2.7.x)
  * python-virtualenv
- * libmagic (ver. 5.25+)
+ * libmagic (ver. 5.25+, package `libmagic1`)
  * webp
  * libxml2-dev
  * libxslt-dev
@@ -134,24 +134,34 @@ You need the following packages installed
  * libapache2-mod-wsgi
  * libreoffice
  * imagemagick
- * libmagic (ver. 5.25+)
+ * libmagic (ver. 5.25+, package `libmagic1`)
  * webp
  * [abbyyocr11]
 
  [abbyyocr11]: https://www.ocr4linux.com/en:download:start
 
 
-#### 2.1.1. ImageMagick Configuration
+#### 2.1.1. MySQL Configuration
+
+Make sure your database has configured UTF-8 charset with correct collation:
+
+	mysql> alter database {database} character set utf8 collate utf8_general_ci;
+
+Where `{database}` is your database name. You must alter database charset before creating any
+tables, otherwise they will keep the old charset.
+
+
+#### 2.1.2. ImageMagick Configuration
 
 In the Imagemagick `policy.xml` file change the `rights` of `PDF` format type from `"none"`
 to `"read|write"`. See the related [Imagemagick issue] why.
 
-    <policy domain="coder" rights="read|write" pattern="PDF" />
+	<policy domain="coder" rights="read|write" pattern="PDF" />
 
 [Imagemagick issue]: https://bugs.launchpad.net/ubuntu/+source/imagemagick/+bug/1796563
 
 
-#### 2.1.2. Libmagic Configuration
+#### 2.1.3. Libmagic Configuration
 
 Some word documents can sometimes fail to identify correctly. You can solve it by editing
 `/etc/magic` file with add rules for this documents. See the related [Libmagic issue] why.
@@ -166,6 +176,7 @@ To prepare your server environment, run the following commands:
 	$ git clone https://github.com/martinmacko47/chcemvediet.git
 	$ cd chcemvediet
 	$ python setup.py
+	$ env/bin/python manage.py collectstatic --noinput
 
 In the configuration script select one of the online development server modes or the production
 server mode. Online development server modes have enabled some debug options that can be usefull
@@ -183,19 +194,60 @@ your virtualhost configuration:
 
 	...
 
+	Alias /robots.txt {path}/chcemvediet/static/robots.txt
+	Alias /favicon.ico {path}/chcemvediet/static/favicon.ico
+	Alias /static/ {path}/chcemvediet/static/
+	<Directory {path}/chcemvediet/static>
+	  Require all granted
+	  Options -Indexes
+	</Directory>
+
 	WSGIScriptAlias / {path}/chcemvediet/chcemvediet/wsgi.py
 	WSGIDaemonProcess {domain} user={user} group={group} python-path={path}/chcemvediet:{path}/chcemvediet/env/lib/python2.7/site-packages
 	WSGIProcessGroup {domain}
-
 	<Directory {path}/chcemvediet/chcemvediet>
 	  <Files wsgi.py>
-	    Order allow,deny
-	    Allow from all
+	    Require all granted
 	  </Files>
 	</Directory>
 
 Where `{path}` is an absolute path to the repository, `{domain}` is your web domain and `{user}`
 and `{group}` are unix user and group names the server will run under.
+
+
+### 2.4. Cron Configuration
+
+Configure cron to run app cron tasks every minute. The app handles itself how often the tasks are
+run and protects them from concurrent excecution in case some task takes longer then one minute to
+complete. Add the following rule to your contab:
+
+	* * * * * {user} cd {path}/chcemvediet && env/bin/python manage.py runcrons
+
+Where `{path}` is an absolute path to the repository and `{user}` is the unix user name the server
+will run under.
+
+
+### 2.5. Reference dockerfile for testing
+
+You can try to build production environment in Docker using this [Dockerfile]. However, don't use
+it on production. It is here just for reference, how to build the environment. It comes with
+disabled mail infrastructure, mocked OCR and self-signed ssl certificate on localhost domain.
+
+Setup testing localhost domain in your `/etc/hosts`:
+
+	127.0.0.1  chcemvediet.local
+	127.0.0.1  www.chcemvediet.local
+
+Copy [Dockerfile] into an empty directory and run the docker image as follows:
+
+	$ docker build -t chcemvediet .
+	$ docker run -it -p 80:80 -p 443:443 --name=chcemvediet chcemvediet
+
+You can see the testing app built with production environment on URL https://www.chcemvediet.local/
+on localhost. Note that it uses self-signed ssl certificate, so you must add an exception for it in
+your browser.
+
+[Dockerfile]: misc/Dockerfile
 
 
 ## 3. Social accounts application keys
