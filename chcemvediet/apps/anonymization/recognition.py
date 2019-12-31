@@ -55,14 +55,16 @@ def recognize_using_ocr(attachment_normalization):
                     successful=True,
                     file=ContentFile(file_odt.read()),
                     content_type=content_types.ODT_CONTENT_TYPE,
-                    debug=u'STDOUT:\n{}\nSTDERR:\n{}'.format(p.stdout, p.stderr)
+                    debug=u'STDOUT:\n{}\nSTDERR:\n{}'.format(unicode(p.stdout, u'utf-8'),
+                                                             unicode(p.stderr, u'utf-8'),
+                                                             )
                 )
             cron_logger.info(u'Recognized attachment_normalization using OCR: {}'.format(
                 attachment_normalization))
     except Exception as e:
         trace = unicode(traceback.format_exc(), u'utf-8')
-        stdout = p.stdout if p else getattr(e, u'stdout', u'')
-        stderr = p.stderr if p else getattr(e, u'stderr', u'')
+        stdout = unicode(p.stdout if p else getattr(e, u'stdout', ''), u'utf-8')
+        stderr = unicode(p.stderr if p else getattr(e, u'stderr', ''), u'utf-8')
         AttachmentRecognition.objects.create(
             attachment=attachment_normalization.attachment,
             successful=False,
