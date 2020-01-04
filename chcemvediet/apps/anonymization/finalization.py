@@ -56,14 +56,16 @@ def finalize_using_libreoffice(attachment_anonymization):
                     successful=True,
                     file=ContentFile(file_pdf.read()),
                     content_type=content_types.PDF_CONTENT_TYPE,
-                    debug=u'STDOUT:\n{}\nSTDERR:\n{}'.format(p.stdout, p.stderr)
+                    debug=u'STDOUT:\n{}\nSTDERR:\n{}'.format(unicode(p.stdout, u'utf-8'),
+                                                             unicode(p.stderr, u'utf-8'),
+                                                             )
                 )
             cron_logger.info(u'Finalized attachment using libreoffice: {}'.format(
                 attachment_anonymization))
     except Exception as e:
         trace = unicode(traceback.format_exc(), u'utf-8')
-        stdout = p.stdout if p else getattr(e, u'stdout', u'')
-        stderr = p.stderr if p else getattr(e, u'stderr', u'')
+        stdout = unicode(p.stdout if p else getattr(e, u'stdout', ''), u'utf-8')
+        stderr = unicode(p.stderr if p else getattr(e, u'stderr', ''), u'utf-8')
         AttachmentFinalization.objects.create(
             attachment=attachment_anonymization.attachment,
             successful=False,
