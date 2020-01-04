@@ -1306,7 +1306,7 @@ msgid "main:homepage:bigstats:obligees"
 msgstr "Inštitúcií <br>v databáze"
 
 msgid "main:homepage:bigstats:beta"
-msgstr "Portál chcemvediet.sk funguje v testovacej prevádzke"
+msgstr "Na vývoji portálu chcemvediet.sk priebežne pracujeme. Posielanie žiadostí, notifikácie a expertný právny systém fungujú. "
 
 msgid "main:homepage:didyouknow:twitter"
 msgstr "Tweet"
