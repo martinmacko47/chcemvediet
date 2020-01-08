@@ -1,0 +1,17 @@
+{% comment %}
+ %
+ % Context:
+ %  -- action: chcemvediet.apps.inforequests.models.Action
+ %
+{% endcomment %}
+
+
+{% if action.deadline.is_deadline_missed %}
+  <span class="chv-color-red">
+    Lehota uplynula {{ action.deadline.deadline_date|date:"j. E Y" }}.
+  </span>
+{% else %}
+  <span class="chv-color-green">
+    Lehota uplynie {{ action.deadline.deadline_date|date:"j. E Y" }}.
+  </span>
+{% endif %}

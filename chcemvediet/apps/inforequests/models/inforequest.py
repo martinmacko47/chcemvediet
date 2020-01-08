@@ -358,6 +358,35 @@ class Inforequest(FormatMixin, models.Model):
             return self.undecided_emails_set.order_by_processed().last()
 
     @cached_property
+    def last_action(self):
+        u"""
+        Cached last action across all branches from all action assigned to the inforequest.
+        """
+        return Action.objects.of_inforequest(inforequest=self).latest(u'created')
+
+    @cached_property
+    def has_full_disclosure(self):
+        u"""
+        Cached flag if the inforequest has any full-disclosure action.
+        """
+        actions = Action.objects.of_inforequest(inforequest=self).disclosures()
+        for action in actions:
+            if action.disclosure_level == action.DISCLOSURE_LEVELS.FULL:
+                return True
+        return False
+
+    @cached_property
+    def has_partial_disclosure(self):
+        u"""
+        Cached flag if the inforequest has any partial-disclosure action.
+        """
+        actions = Action.objects.of_inforequest(inforequest=self).disclosures()
+        for action in actions:
+            if action.disclosure_level == action.DISCLOSURE_LEVELS.PARTIAL:
+                return True
+        return False
+
+    @cached_property
     def can_add_request(self):
         return self.can_add_action(Action.TYPES.REQUEST)
 
