@@ -360,31 +360,18 @@ class Inforequest(FormatMixin, models.Model):
     @cached_property
     def last_action(self):
         u"""
-        Cached last action across all branches from all action assigned to the inforequest.
+        Cached last action across all branches from all actions assigned to the inforequest.
         """
-        return Action.objects.of_inforequest(inforequest=self).latest(u'created')
+        return Action.objects.of_inforequest(inforequest=self).order_by_created().last()
 
     @cached_property
-    def has_full_disclosure(self):
+    def disclosure_level(self):
         u"""
-        Cached flag if the inforequest has any full-disclosure action.
+        Cached maximum disclosure level to the inforequest. Returns None if the inforequest hasn't
+        got any disclosure action.
         """
-        actions = Action.objects.of_inforequest(inforequest=self).disclosures()
-        for action in actions:
-            if action.disclosure_level == action.DISCLOSURE_LEVELS.FULL:
-                return True
-        return False
-
-    @cached_property
-    def has_partial_disclosure(self):
-        u"""
-        Cached flag if the inforequest has any partial-disclosure action.
-        """
-        actions = Action.objects.of_inforequest(inforequest=self).disclosures()
-        for action in actions:
-            if action.disclosure_level == action.DISCLOSURE_LEVELS.PARTIAL:
-                return True
-        return False
+        actions = Action.objects.of_inforequest(inforequest=self)
+        return max([action.disclosure_level for action in actions])
 
     @cached_property
     def can_add_request(self):

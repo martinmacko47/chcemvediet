@@ -25,8 +25,15 @@
   na podanie odvolania
 {% endif %}
 &mdash;
-{% include "inforequests/detail/texts/deadline_date.html" %}
-
+{% if action.deadline.is_deadline_missed %}
+  <span class="chv-color-red">
+    Lehota uplynula {{ action.deadline.deadline_date|date:"j. E Y" }}.
+  </span>
+{% else %}
+  <span class="chv-color-green">
+    Lehota uplynie {{ action.deadline.deadline_date|date:"j. E Y" }}.
+  </span>
+{% endif %}
 {% if action.deadline.is_deadline_missed and action.deadline.is_snoozed %}
   {% if action.deadline.is_snooze_missed %}
     <br>

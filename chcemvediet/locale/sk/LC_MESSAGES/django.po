@@ -842,12 +842,6 @@ msgstr "uzavrete"
 msgid "inforequests:mine:closed:heading"
 msgstr "Uzavreté"
 
-msgid "inforequests:mine:closed:action:disclosure_level:PARTIAL"
-msgstr "Čiastočne zodpovedaná"
-
-msgid "inforequests:mine:closed:action:disclosure_level:FULL"
-msgstr "Plne zodpovedaná"
-
 msgid "inforequests:mine:drafts:anchor"
 msgstr "rozpisane"
 
@@ -910,6 +904,12 @@ msgstr "(bez predmetu)"
 
 msgid "inforequests:mine:drafts:empty_obligee"
 msgstr "(bez inštitúcie)"
+
+msgid "inforequests:mine:status:disclosure_level:PARTIAL"
+msgstr "Čiastočne zodpovedaná"
+
+msgid "inforequests:mine:status:disclosure_level:FULL"
+msgstr "Plne zodpovedaná"
 
 msgid "inforequests:mine:status:draft"
 msgstr "Rozpísané"

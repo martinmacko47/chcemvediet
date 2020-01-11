@@ -1,0 +1,21 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load plural from poleno.utils %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- object: chcemvediet.apps.inforequests.models.Inforequest
+ %
+{% endcomment %}
+
+
+{% if object.last_action.deadline.is_obligee_deadline %}
+  Lehota inštitúcii
+{% else %}
+  Lehota vám
+{% endif %}
+{% if object.last_action.deadline.is_deadline_missed %}
+  uplynula pred {% plural object.last_action.deadline.calendar_days_behind "1:{n} dňom" "{n} dňami" %}
+{% else %}
+  uplynie o {% plural object.last_action.deadline.calendar_days_remaining "1:{n} deň" "2~4:{n} dni" "{n} dní" %}
+{% endif %}

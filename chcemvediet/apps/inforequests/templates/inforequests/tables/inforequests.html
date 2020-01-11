@@ -44,10 +44,10 @@
   {% if object.closed %}
     <i class="chv-icon chv-icon-li icon-ok"></i>
     {{ object.last_action.get_extended_type_display }}
-    {% if object.has_full_disclosure %}
-      <p><em>{% trans 'inforequests:mine:closed:action:disclosure_level:FULL' %}</em></p>
-    {% elif object.has_partial_disclosure %}
-      <p><em>{% trans 'inforequests:mine:closed:action:disclosure_level:PARTIAL' %}</em></p>
+    {% if object.disclosure_level == ACTION_DISCLOSURE_LEVELS.FULL %}
+      <p><em>{% trans 'inforequests:mine:status:disclosure_level:FULL' %}</em></p>
+    {% elif object.disclosure_level == ACTION_DISCLOSURE_LEVELS.PARTIAL %}
+      <p><em>{% trans 'inforequests:mine:status:disclosure_level:PARTIAL' %}</em></p>
     {% endif %}
   {% elif object.has_undecided_emails %}
     <i class="chv-icon chv-icon-li icon-mail"></i>
@@ -56,7 +56,7 @@
     <i class="chv-icon chv-icon-li icon-ok"></i>
     {{ object.last_action.get_extended_type_display }}
     {% if object.last_action.deadline %}
-      <p><em>{% include "inforequests/detail/texts/deadline_date.html" with action=object.last_action %}</em></p>
+      <p><em>{% include "inforequests/tables/texts/deadline.html" %}</em></p>
     {% endif %}
   {% endif %}
 {% endblock %}
