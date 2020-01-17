@@ -23,20 +23,20 @@
   {% endif %}
   {% if action.deadline.is_in_calendar_days %}
     Pôvodná lehota bola
-    {% plural action.deadline.value "1:{n} kalendárny deň" "2~4:{n} kalendárne dni" "{n} kalendárnych dni" %}
+    {% plural action.deadline.value "1:{n} kalendárny deň" "2~4:{n} kalendárne dni" "{n} kalendárnych dní" %}
     od {{ action.deadline.base_date }}.
   {% else %}
     Pôvodná lehota bola
-    {% plural action.deadline.value "1:{n} pracovný deň" "2~4:{n} pracovné dni" "{n} pracovných dni" %}
+    {% plural action.deadline.value "1:{n} pracovný deň" "2~4:{n} pracovné dni" "{n} pracovných dní" %}
     od {{ action.deadline.base_date }}.
   {% endif %}
   {% if action.deadline.is_snoozed %}
     Túto lehotu ste už o
-    {% plural action.deadline.snooze_in_calendar_days "1:{n} kalendárny deň" "2~4:{n} kalendárne dni" "{n} kalendárnych dni" %}
+    {% plural action.deadline.snooze_in_calendar_days "1:{n} kalendárny deň" "2~4:{n} kalendárne dni" "{n} kalendárnych dní" %}
     predĺžili.
   {% endif %}
   Do dnes
-  {% plural action.deadline.calendar_days_passed "1:uplynul {n} kalendárny deň" "2~4:uplynuli {n} kalendárne dni" "uplynulo {n} kalendárnych dni" %}.
+  {% plural action.deadline.calendar_days_passed "1:uplynul {n} kalendárny deň" "2~4:uplynuli {n} kalendárne dni" "uplynulo {n} kalendárnych dní" %}.
 {% endfilter %}
 
 {% filter squeeze %}
