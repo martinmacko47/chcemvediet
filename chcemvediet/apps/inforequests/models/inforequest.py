@@ -1,7 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.db import models, IntegrityError, transaction, connection
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Max
 from django.conf import settings
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -356,6 +356,23 @@ class Inforequest(FormatMixin, models.Model):
                 return None
         else:
             return self.undecided_emails_set.order_by_processed().last()
+
+    @cached_property
+    def last_action(self):
+        u"""
+        Cached last action across all branches from all actions assigned to the inforequest.
+        """
+        return Action.objects.of_inforequest(inforequest=self).order_by_created().last()
+
+    @cached_property
+    def disclosure_level(self):
+        u"""
+        Cached maximum disclosure level to the inforequest. Returns None if the inforequest hasn't
+        got any disclosure action.
+        """
+        return (Action.objects.of_inforequest(inforequest=self)
+                .aggregate(Max(u'disclosure_level'))[u'disclosure_level__max']
+                )
 
     @cached_property
     def can_add_request(self):

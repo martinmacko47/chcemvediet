@@ -31,15 +31,32 @@
 {% endblock %}
 
 {% block date %}
-  FIXME
+  {% if object.closed %}
+    {{ object.last_action.legal_date|date:"j. n. Y" }}
+  {% elif object.has_undecided_emails %}
+    {{ object.newest_undecided_email.processed|date:"j. n. Y" }}
+  {% else %}
+    {{ object.last_action.legal_date|date:"j. n. Y" }}
+  {% endif %}
 {% endblock %}
 
 {% block status %}
-  {% if object.has_undecided_emails %}
+  {% if object.closed %}
+    <i class="chv-icon chv-icon-li icon-ok"></i>
+    {{ object.last_action.get_extended_type_display }}
+    {% if object.disclosure_level == ACTION_DISCLOSURE_LEVELS.FULL %}
+      <br><em>{% trans 'inforequests:mine:status:disclosure_level:FULL' %}</em>
+    {% elif object.disclosure_level == ACTION_DISCLOSURE_LEVELS.PARTIAL %}
+      <br><em>{% trans 'inforequests:mine:status:disclosure_level:PARTIAL' %}</em>
+    {% endif %}
+  {% elif object.has_undecided_emails %}
     <i class="chv-icon chv-icon-li icon-mail"></i>
     {% trans 'inforequests:mine:status:new_email' %}
   {% else %}
-    <i class="chv-icon chv-icon-li icon-help"></i>
-    FIXME
+    <i class="chv-icon chv-icon-li icon-ok"></i>
+    {{ object.last_action.get_extended_type_display }}
+    {% if object.last_action.deadline %}
+      <br><em>{% include "inforequests/tables/texts/deadline.html" %}</em>
+    {% endif %}
   {% endif %}
 {% endblock %}
