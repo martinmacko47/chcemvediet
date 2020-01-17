@@ -1,7 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.db import models, IntegrityError, transaction, connection
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Max
 from django.conf import settings
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -370,8 +370,8 @@ class Inforequest(FormatMixin, models.Model):
         Cached maximum disclosure level to the inforequest. Returns None if the inforequest hasn't
         got any disclosure action.
         """
-        actions = Action.objects.of_inforequest(inforequest=self)
-        return max([action.disclosure_level for action in actions])
+        return Action.objects.of_inforequest(inforequest=self).aggregate(
+                Max(u'disclosure_level'))[u'disclosure_level__max']
 
     @cached_property
     def can_add_request(self):

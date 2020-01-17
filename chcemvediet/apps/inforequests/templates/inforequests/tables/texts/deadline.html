@@ -17,5 +17,5 @@
 {% if object.last_action.deadline.is_deadline_missed %}
   uplynula pred {% plural object.last_action.deadline.calendar_days_behind "1:{n} dňom" "{n} dňami" %}
 {% else %}
-  uplynie o {% plural object.last_action.deadline.calendar_days_remaining "1:{n} deň" "2~4:{n} dni" "{n} dní" %}
+  uplynie {% plural object.last_action.deadline.calendar_days_remaining "0:dnes " "1:o {n} deň" "2~4:o {n} dni" "o {n} dní" %}
 {% endif %}
