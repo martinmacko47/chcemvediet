@@ -25,7 +25,7 @@
     {% plural action.deadline.calendar_days_behind "1:{n} kalendárnym dňom" "{n} kalendárnymi dňami" %}.
   {% else %}
     uplynie o
-    {% plural action.deadline.calendar_days_remaining "1:{n} kalendárny deň" "2~4:{n} kalendárne dni" "{n} kalendárnych dni" %}.
+    {% plural action.deadline.calendar_days_remaining "1:{n} kalendárny deň" "2~4:{n} kalendárne dni" "{n} kalendárnych dní" %}.
   {% endif %}
   {% if action.branch.can_add_clarification_response  %}
     Žiadosť by ste mali inštitúcii doplniť čo najskôr ako je to možné.
