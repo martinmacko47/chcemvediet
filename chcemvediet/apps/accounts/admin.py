@@ -27,6 +27,7 @@ class ProfileAdmin(admin.ModelAdmin):
                 short_description=u'Undecided E-mails',
                 admin_order_field=u'undecided_emails_count',
                 ),
+            u'anonymized_inforequest',
             ]
     list_filter = [
             simple_list_filter_factory(u'Undecided E-mail', u'undecided', [

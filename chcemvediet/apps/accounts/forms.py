@@ -61,3 +61,14 @@ class SignupForm(forms.Form):
         user.profile.city = self.cleaned_data[u'city']
         user.profile.zip = self.cleaned_data[u'zip']
         user.profile.save()
+
+class SettingsForm(forms.Form):
+
+    anonymized_inforequest = forms.BooleanField(
+        label=_(u'accounts:SettingsForm:anonymized_inforequest:label'),
+        required=False,
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.base_fields[u'anonymized_inforequest'].initial = user.profile.anonymized_inforequest
+        super(SettingsForm, self).__init__(*args, **kwargs)
