@@ -3,19 +3,28 @@
 {% load trans from i18n %}
 {% load url from poleno.utils %}
 
+{% comment %}
+ %
+ % Context:
+ %  -- form: chcemvediet.apps.accounts.forms.SettingsForm
+ %
+{% endcomment %}
+
+
 {% block title %}{% trans 'accounts:settings:title' %} | {{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1>{% trans "accounts:settings:heading" %}</h1>
-    {% include "accounts/texts/settings_text.html" %}
-
-    <form class="form-horizontal" method="POST" action="{% url 'accounts:settings' %}">
-        {% csrf_token %}
-        {% include "main/forms/form_horizontal.html" %}
-         <div class="col-sm-offset-3 col-sm-9">
-          <button type="submit" class="btn btn-primary">
-              {% trans "accounts:settings:save" %}
-          </button>
-         </div>
-    </form>
+  <h1>{% trans "accounts:settings:heading" %}</h1>
+  {% include "accounts/texts/settings_text.html" %}
+  <form class="form-horizontal" method="POST" action="{% url 'accounts:settings' %}">
+    {% csrf_token %}
+    {% include "main/forms/form_horizontal.html" %}
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-9">
+        <button type="submit" class="btn btn-primary">
+          {% trans "accounts:settings:save" %}
+        </button>
+      </div>
+    </div>
+  </form>
 {% endblock %}

@@ -10,5 +10,5 @@ from . import views
 
 urlpatterns = patterns(u'',
     url(r'^profile/$', views.profile, name=u'profile'),
-    url(lazy_format(r'^{0}/',  _(u'accounts:urls:settings')), views.settings, name=u'settings'),
+    url(lazy_format(r'^{0}/$',  _(u'accounts:urls:settings')), views.settings, name=u'settings'),
 )

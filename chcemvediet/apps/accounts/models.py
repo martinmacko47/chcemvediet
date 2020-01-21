@@ -25,8 +25,9 @@ class Profile(FormatMixin, models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     zip = models.CharField(max_length=10)
-    anonymized_inforequest = models.BooleanField(default=True,
-            help_text=squeeze(u"""
+
+    anonymize_inforequests = models.BooleanField(default=True,
+                help_text=squeeze(u"""
                 If true, published inforequests will be shown anonymized, otherwise in their
                 original version.
                 """))

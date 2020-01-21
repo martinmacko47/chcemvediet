@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='profile',
-            name='anonymized_inforequest',
+            name='anonymize_inforequests',
             field=models.BooleanField(default=True, help_text='If true, published inforequests will be shown anonymized, otherwise in their original version.'),
             preserve_default=True,
         ),

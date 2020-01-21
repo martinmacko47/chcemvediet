@@ -50,8 +50,8 @@ msgstr "PSČ"
 msgid "accounts:SignupForm:agreement:label"
 msgstr "Súhlasím s podmienkami používania."
 
-msgid "accounts:SettingsForm:anonymized_inforequest:label"
-msgstr "Anonymizovanie zverejnených infožiadostí"
+msgid "accounts:SettingsForm:anonymize_inforequests:label"
+msgstr "Zverejnené infožiadosti zverejniť anonymizovane"
 
 msgid "accounts:profile:title"
 msgstr "Profil užívateľa"
