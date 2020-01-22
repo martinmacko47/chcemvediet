@@ -53,36 +53,40 @@ TRANSLATE_TABLE = {
     u'ž': u'(?:z|ž)',
 }
 
-def generate_word_pattern(words):
+def generate_word_pattern(words, substring):
     u"""
     Generates list of patterns, that matches slovak accent insensitive lowercase word. Each word is
-    captured in group.
+    captured in group. If ``substring`` is True, pattern will match word too as a substring.
     """
     patterns = []
+    template = u'({})' if substring else u'(\\b{}\\b)'
     for word in words:
         if len(word) < WORD_SIZE_MIN:
             continue
         p = u''.join([TRANSLATE_TABLE[c] if c in TRANSLATE_TABLE else re.escape(c) for c in word.lower()])
-        patterns.append(u'(\\b{}\\b)'.format(p))
+        patterns.append(template.format(p))
     return patterns
 
-def generate_numeric_pattern(numbers):
+def generate_numeric_pattern(numbers, substring):
     u"""
     Generates list of patterns, that matches number, where digits can be splited with ' ' or '-'.
-    Each number is captured in group.
+    Each number is captured in group. If ``substring`` is True, pattern will match number too as a
+    substring.
     """
     patterns = []
+    template = u'({})' if substring else u'(\\b{}\\b)'
     for number in numbers:
         number = re.sub(u'[ -]', u'', number)
         if len(number) < NUMBER_SIZE_MIN:
             continue
         p = u'[ -]?'.join([re.escape(c) for c in number])
-        patterns.append(u'(\\b{}\\b)'.format(p))
+        patterns.append(template.format(p))
     return patterns
 
-def generate_user_pattern(inforequest):
+def generate_user_pattern(inforequest, substring=False):
     u"""
     Generates pattern object, that matches user personal information from inforequest.
+    If ``substring`` is True, pattern will match words too as a substring.
     """
     user = inforequest.applicant
     names = user.first_name.split() + user.last_name.split() + inforequest.applicant_name.split()
@@ -90,10 +94,10 @@ def generate_user_pattern(inforequest):
     cities = [user.profile.city, inforequest.applicant_city]
     zips = [user.profile.zip, inforequest.applicant_zip]
     patterns = (
-        generate_word_pattern(set(names)) +
-        generate_word_pattern(set(streets)) +
-        generate_word_pattern(set(cities)) +
-        generate_numeric_pattern(set(zips))
+        generate_word_pattern(set(names), substring) +
+        generate_word_pattern(set(streets), substring) +
+        generate_word_pattern(set(cities), substring) +
+        generate_numeric_pattern(set(zips), substring)
     )
     return re.compile(u'|'.join(patterns), re.IGNORECASE | re.UNICODE)
 

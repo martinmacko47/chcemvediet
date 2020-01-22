@@ -1,6 +1,6 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load url from poleno.utils %}
-{% load anonymized from chcemvediet.anonymization %}
+{% load anonymize anonymized from chcemvediet.anonymization %}
 
 {% comment %}
  %
@@ -24,12 +24,12 @@
       {% for attachment_finalization in attachment.attachmentfinalization_set.all %}
         <div class="pln-attachment">
           <a href="{% url 'inforequests:download_attachment_finalization' attachment_finalization=attachment_finalization %}">
-            {{ attachment_finalization.name }}
+            {% anonymize inforequest attachment_finalization.name substring=True %}
           </a>
         </div>
       {% empty %}
         <div class="pln-attachment">
-          {{ attachment.name }}
+          {% anonymize inforequest attachment.name substring=True %}
         </div>
       {% endfor %}
     {% endif %}
