@@ -22,6 +22,7 @@ class ProfileAdmin(admin.ModelAdmin):
             u'street',
             u'city',
             u'zip',
+            u'anonymize_inforequests',
             decorate(
                 lambda o: o.undecided_emails_count,
                 short_description=u'Undecided E-mails',
@@ -29,6 +30,7 @@ class ProfileAdmin(admin.ModelAdmin):
                 ),
             ]
     list_filter = [
+            u'anonymize_inforequests',
             simple_list_filter_factory(u'Undecided E-mail', u'undecided', [
                 (u'1', u'With', lambda qs: qs.filter(undecided_emails_count__gt=0)),
                 (u'0', u'Without', lambda qs: qs.filter(undecided_emails_count=0)),
