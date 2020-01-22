@@ -71,6 +71,7 @@ class SettingsForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
+        kwargs[u'initial'] = {u'anonymize_inforequests': user.profile.anonymize_inforequests}
         super(SettingsForm, self).__init__(*args, **kwargs)
 
     def save(self):

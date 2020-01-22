@@ -26,8 +26,5 @@ def settings(request):
             form.save()
             return HttpResponseRedirect(reverse(u'accounts:settings'))
     else:
-        form = SettingsForm(
-                request.user,
-                initial={u'anonymize_inforequests': request.user.profile.anonymize_inforequests}
-                )
+        form = SettingsForm(request.user)
     return render(request, u'accounts/settings.html', {u'form': form})
