@@ -27,7 +27,7 @@ You need the following packages installed:
 The following packages are also recommended, but you can configure `setup.py` to use mocks
 instead of them:
 
- * libreoffice
+ * libreoffice (ver. 6.3.4+)
  * imagemagick
  * [abbyyocr11]
 
@@ -132,7 +132,7 @@ You need the following packages installed
  * python-dev
  * libmysqlclient-dev
  * libapache2-mod-wsgi
- * libreoffice
+ * libreoffice (ver. 6.3.4+, on Ubuntu, you might want to use `sudo add-apt-repository ppa:libreoffice/ppa`)
  * imagemagick
  * libmagic (ver. 5.25+, package `libmagic1`)
  * webp
