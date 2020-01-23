@@ -56,7 +56,7 @@ TRANSLATE_TABLE = {
 def generate_word_pattern(words, match_subwords):
     u"""
     Generates list of patterns, that matches slovak accent insensitive lowercase word. Each word is
-    captured in group. If ``match_subwords`` is True, pattern will match word too as a substring.
+    captured in group. If ``match_subwords`` is True, pattern will match too subword.
     """
     patterns = []
     template = u'({})' if match_subwords else u'(\\b{}\\b)'
@@ -77,8 +77,7 @@ def generate_word_pattern(words, match_subwords):
 def generate_numeric_pattern(numbers, match_subwords):
     u"""
     Generates list of patterns, that matches number, where digits can be splited with ' ' or '-'.
-    Each number is captured in group. If ``match_subwords`` is True, pattern will match number too
-    as a substring.
+    Each number is captured in group. If ``match_subwords`` is True, pattern will match too subword.
     """
     patterns = []
     template = u'({})' if match_subwords else u'(\\b{}\\b)'
