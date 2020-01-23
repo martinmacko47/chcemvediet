@@ -24,12 +24,12 @@
       {% for attachment_finalization in attachment.attachmentfinalization_set.all %}
         <div class="pln-attachment">
           <a href="{% url 'inforequests:download_attachment_finalization' attachment_finalization=attachment_finalization %}">
-            {% anonymize inforequest attachment_finalization.name substring=True %}
+            {% anonymize inforequest attachment_finalization.name match_subwords=True %}
           </a>
         </div>
       {% empty %}
         <div class="pln-attachment">
-          {% anonymize inforequest attachment.name substring=True %}
+          {% anonymize inforequest attachment.name match_subwords=True %}
         </div>
       {% endfor %}
     {% endif %}
