@@ -53,6 +53,18 @@ msgstr "Súhlasím s podmienkami používania."
 msgid "accounts:SettingsForm:anonymize_inforequests:label"
 msgstr "Zverejnené infožiadosti zverejniť anonymizovane"
 
+msgid "accounts:SettingsForm:custom_anonymization:help_text"
+msgstr "Meno, priezvisko a adresa používateľa sa anonymizujú automaticky."
+
+msgid "accounts:SettingsForm:custom_anonymization:label"
+msgstr "Pridanie položiek pre anonymizáciu"
+
+msgid "accounts:SettingsForm:custom_anonymized_strings:help_text"
+msgstr "Veľkosť písmen a diakritika sa ignoruje. Slová zadané v jednom riadku musia ísť za sebou, a interpunkcia medzi nimi sa neignoruje. Všetky slová zadané v jednom riadku sa anonymizujú ako celok. Slová zadané v samostatných riadkoch sa anonymizujú samostatne."
+
+msgid "accounts:SettingsForm:custom_anonymized_strings:label"
+msgstr "Anonymizované položky"
+
 msgid "accounts:profile:title"
 msgstr "Profil užívateľa"
 

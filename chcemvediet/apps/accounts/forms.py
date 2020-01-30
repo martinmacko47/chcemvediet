@@ -3,6 +3,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+from chcemvediet.apps.anonymization.anonymization import WORD_SIZE_MIN
 
 class SignupForm(forms.Form):
     first_name = forms.CharField(
@@ -65,9 +66,31 @@ class SignupForm(forms.Form):
 class SettingsForm(forms.Form):
 
     anonymize_inforequests = forms.BooleanField(
-        label=_(u'accounts:SettingsForm:anonymize_inforequests:label'),
-        required=False,
-    )
+            label=_(u'accounts:SettingsForm:anonymize_inforequests:label'),
+            required=False,
+            )
+
+    custom_anonymization = forms.BooleanField(
+            label=_(u'accounts:SettingsForm:custom_anonymization:label'),
+            required=False,
+            help_text=_(u'accounts:SettingsForm:custom_anonymization:help_text'),
+            widget=forms.CheckboxInput(attrs={
+                u'class': u'pln-toggle-changed',
+                u'data-container': u'form',
+                u'data-hide-target-true': u'.form-group:has(.visible-if-true)',
+            }),
+            )
+
+    custom_anonymized_strings = forms.CharField(
+            label=_(u'accounts:SettingsForm:custom_anonymized_strings:label'),
+            required=False,
+            help_text=_(u'accounts:SettingsForm:custom_anonymized_strings:help_text'),
+            widget=forms.Textarea(attrs={
+                u'placeholder': u'halali',
+                u'class': u'pln-autosize visible-if-true',
+                u'cols': u'', u'rows': u'',
+                }),
+            )
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -77,3 +100,12 @@ class SettingsForm(forms.Form):
     def save(self):
         self.user.profile.anonymize_inforequests = self.cleaned_data[u'anonymize_inforequests']
         self.user.profile.save(update_fields=[u'anonymize_inforequests'])
+
+    def clean_custom_anonymized_strings(self):
+        custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings'].split(u'\n')
+        sentences = []
+        for sentence in custom_anonymized_strings:
+            sentence = sentence.strip()
+            if len(sentence) >= WORD_SIZE_MIN:
+                sentences.append(sentence)
+        return sentences
