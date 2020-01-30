@@ -56,7 +56,7 @@ TRANSLATE_TABLE = {
 def generate_word_pattern(words, match_subwords):
     u"""
     Generates list of patterns, that matches slovak accent insensitive lowercase word. Each word is
-    captured in group. If ``match_subwords`` is True, pattern will match too subword.
+    captured in group. If ``match_subwords`` is True, pattern will also match subwords.
     """
     patterns = []
     template = u'({})' if match_subwords else u'(\\b{}\\b)'
@@ -76,8 +76,8 @@ def generate_word_pattern(words, match_subwords):
 
 def generate_numeric_pattern(numbers, match_subwords):
     u"""
-    Generates list of patterns, that matches number, where digits can be splited with ' ' or '-'.
-    Each number is captured in group. If ``match_subwords`` is True, pattern will match too subword.
+    Generates list of patterns, that matches number, where digits can be separated with ' ' or '-'.
+    Each number is captured in group. If ``match_subwords`` is True, pattern will also match subwords.
     """
     patterns = []
     template = u'({})' if match_subwords else u'(\\b{}\\b)'
@@ -92,7 +92,7 @@ def generate_numeric_pattern(numbers, match_subwords):
 def generate_user_pattern(inforequest, match_subwords=False):
     u"""
     Generates pattern object, that matches user personal information from inforequest.
-    If ``match_subwords`` is True, pattern will match words too as a substring.
+    If ``match_subwords`` is True, pattern will also match subwords.
     """
     user = inforequest.applicant
     names = user.first_name.split() + user.last_name.split() + inforequest.applicant_name.split()
