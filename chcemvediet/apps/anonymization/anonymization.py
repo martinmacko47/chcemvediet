@@ -141,7 +141,7 @@ def anonymize_odt(attachment_recognition):
                     with zipfile.ZipFile(buffer_out, u'w') as zipfile_out:
                         for f in zipfile_in.filelist:
                             content = zipfile_in.read(f)
-                            if magic.from_buffer(content, mime=True) == content_types.XML_CONTENT_TYPE:
+                            if magic.from_buffer(content, mime=True) in content_types.XML_CONTENT_TYPES:
                                 zipfile_out.writestr(f, anonymize_markup(
                                         pattern, content, parser, u'.//text:span', namespace))
                             else:
