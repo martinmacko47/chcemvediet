@@ -59,6 +59,9 @@ msgstr "Meno, priezvisko a adresa používateľa sa anonymizujú automaticky."
 msgid "accounts:SettingsForm:custom_anonymization:label"
 msgstr "Pridanie položiek pre anonymizáciu"
 
+msgid "accounts:SettingsForm:custom_anonymized_strings:Error"
+msgstr "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne 3 znaky."
+
 msgid "accounts:SettingsForm:custom_anonymized_strings:help_text"
 msgstr "Veľkosť písmen a diakritika sa ignoruje. Slová zadané v jednom riadku musia ísť za sebou, a interpunkcia medzi nimi sa neignoruje. Všetky slová zadané v jednom riadku sa anonymizujú ako celok. Slová zadané v samostatných riadkoch sa anonymizujú samostatne."
 

@@ -10,6 +10,7 @@ from poleno.attachments.utils import attachment_file_check, attachment_orphaned_
 from poleno.utils.models import QuerySet
 from poleno.utils.date import utc_now
 from poleno.utils.misc import FormatMixin, random_string, squeeze, decorate, adjust_extension
+from chcemvediet.apps.inforequests.models import Action
 
 from . import content_types
 
@@ -229,6 +230,10 @@ class AttachmentAnonymizationQuerySet(QuerySet):
     def order_by_pk(self):
         return self.order_by(u'pk')
 
+    def owned_by(self, user):
+        ids = [action.id for action in Action.objects.filter(branch__inforequest__applicant=user)]
+        return self.filter(attachment__generic_id__in=ids)
+
 class AttachmentAnonymization(FormatMixin, models.Model):
 
     # May NOT be NULL
@@ -321,6 +326,10 @@ class AttachmentAnonymization(FormatMixin, models.Model):
 class AttachmentFinalizationQuerySet(QuerySet):
     def order_by_pk(self):
         return self.order_by(u'pk')
+
+    def owned_by(self, user):
+        ids = [action.id for action in Action.objects.filter(branch__inforequest__applicant=user)]
+        return self.filter(attachment__generic_id__in=ids)
 
 class AttachmentFinalization(FormatMixin, models.Model):
 

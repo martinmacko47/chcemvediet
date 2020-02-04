@@ -89,10 +89,10 @@ def generate_numeric_pattern(numbers, match_subwords):
         patterns.append(template.format(p))
     return patterns
 
-def generate_user_pattern(inforequest, match_subwords=False):
+def generate_user_default_pattern(inforequest, match_subwords):
     u"""
-    Generates pattern object, that matches user personal information from inforequest.
-    If ``match_subwords`` is True, pattern will also match subwords.
+    Generates pattern object, that matches user custom anonymization strings. If ``match_subwords``
+    is True, pattern will also match subwords.
     """
     user = inforequest.applicant
     names = user.first_name.split() + user.last_name.split() + inforequest.applicant_name.split()
@@ -106,6 +106,26 @@ def generate_user_pattern(inforequest, match_subwords=False):
             generate_numeric_pattern(set(zips), match_subwords)
     )
     return re.compile(u'|'.join(patterns), re.IGNORECASE | re.UNICODE)
+
+def generate_user_custom_pattern(words, match_subwords=False):
+    u"""
+    Generates pattern object, that matches user personal information from inforequest.
+    If ``match_subwords`` is True, pattern will also match subwords.
+    """
+    patterns = []
+    for word in words:
+        if re.sub(u'[ -]', u'', word).isdigit():
+            patterns += generate_numeric_pattern([word], match_subwords)
+        else:
+            patterns += generate_word_pattern([word], match_subwords)
+    return re.compile(u'|'.join(patterns), re.IGNORECASE | re.UNICODE)
+
+def generate_user_pattern(inforequest, match_subwords=False):
+    if inforequest.applicant.profile.custom_anonymized_strings is not None:
+        return generate_user_custom_pattern(inforequest.applicant.profile.custom_anonymized_strings,
+                                            match_subwords)
+    else:
+        return generate_user_default_pattern(inforequest, match_subwords)
 
 def anonymize_string(prog, content):
     if not prog.pattern:

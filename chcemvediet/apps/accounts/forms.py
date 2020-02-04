@@ -4,6 +4,8 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from chcemvediet.apps.anonymization.anonymization import WORD_SIZE_MIN
+from chcemvediet.apps.anonymization.models import AttachmentAnonymization, AttachmentFinalization
+
 
 class SignupForm(forms.Form):
     first_name = forms.CharField(
@@ -86,7 +88,6 @@ class SettingsForm(forms.Form):
             required=False,
             help_text=_(u'accounts:SettingsForm:custom_anonymized_strings:help_text'),
             widget=forms.Textarea(attrs={
-                u'placeholder': u'halali',
                 u'class': u'pln-autosize visible-if-true',
                 u'cols': u'', u'rows': u'',
                 }),
@@ -94,18 +95,47 @@ class SettingsForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
-        kwargs[u'initial'] = {u'anonymize_inforequests': user.profile.anonymize_inforequests}
+        kwargs[u'initial'] = {
+                u'anonymize_inforequests': user.profile.anonymize_inforequests,
+                u'custom_anonymization': bool(self.user.profile.custom_anonymized_strings),
+                u'custom_anonymized_strings': self.initial_custom_anonymized_strings(),
+                }
         super(SettingsForm, self).__init__(*args, **kwargs)
 
     def save(self):
-        self.user.profile.anonymize_inforequests = self.cleaned_data[u'anonymize_inforequests']
-        self.user.profile.save(update_fields=[u'anonymize_inforequests'])
+        profile = self.user.profile
+        custom_anonymized_strings = self.user.profile.custom_anonymized_strings
+        profile.anonymize_inforequests = self.cleaned_data[u'anonymize_inforequests']
+        profile.custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
+        if custom_anonymized_strings != self.cleaned_data[u'custom_anonymized_strings']:
+            AttachmentFinalization.objects.owned_by(self.user).delete()
+            AttachmentAnonymization.objects.owned_by(self.user).delete()
+            profile.save(update_fields=[u'anonymize_inforequests', u'custom_anonymized_strings'])
+        else:
+            profile.save(update_fields=[u'anonymize_inforequests'])
 
     def clean_custom_anonymized_strings(self):
+        if self.cleaned_data[u'custom_anonymization'] is False:
+            return None
         custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings'].split(u'\n')
         sentences = []
         for sentence in custom_anonymized_strings:
             sentence = sentence.strip()
             if len(sentence) >= WORD_SIZE_MIN:
                 sentences.append(sentence)
+        if sentences == []:
+            raise forms.ValidationError(_(u'accounts:SettingsForm:custom_anonymized_strings:Error'))
         return sentences
+
+    def initial_custom_anonymized_strings(self):
+        ret = self.user.profile.custom_anonymized_strings
+        if ret is None:
+            ret = (
+                    self.user.first_name.split() +
+                    self.user.last_name.split() +
+                    [self.user.profile.street] +
+                    [self.user.profile.city] +
+                    [self.user.profile.zip]
+                    )
+        return u'\n'.join(ret)
+

@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.auth.models import User
 from aggregate_if import Count
+from jsonfield import JSONField
 
 from poleno.mail.models import Message
 from poleno.utils.models import QuerySet
@@ -27,9 +28,13 @@ class Profile(FormatMixin, models.Model):
     zip = models.CharField(max_length=10)
 
     anonymize_inforequests = models.BooleanField(default=True,
-                help_text=squeeze(u"""
+            help_text=squeeze(u"""
                 If true, published inforequests will be shown anonymized, otherwise in their
                 original version.
+                """))
+    custom_anonymized_strings = JSONField(null=True, default=None,
+            help_text=squeeze(u"""
+                User defined strings for anonymization. NULL for default anonymization.
                 """))
 
 
