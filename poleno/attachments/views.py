@@ -31,6 +31,5 @@ def download(request, attachment, filename=None):
     u"""
     Download view for attachments and attachment like objects
     """
-    name = filename if filename else attachment.name
     path = os.path.join(settings.MEDIA_ROOT, attachment.file.name)
-    return send_file_response(request, path, name, attachment.content_type)
+    return send_file_response(request, path, filename or attachment.name, attachment.content_type)
