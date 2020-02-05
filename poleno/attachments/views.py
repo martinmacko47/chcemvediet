@@ -6,8 +6,6 @@ from django.conf import settings
 from django.http import JsonResponse
 
 from poleno.utils.http import send_file_response
-from chcemvediet.apps.anonymization.anonymization import anonymize_string, generate_user_pattern
-from chcemvediet.apps.anonymization.models import AttachmentFinalization
 
 from .models import Attachment
 
@@ -29,16 +27,10 @@ def upload(request, generic_object, download_url_func):
             })
     return JsonResponse({u'files': res})
 
-def download(request, attachment):
+def download(request, attachment, filename=None):
     u"""
-    Download view for attachments and attachment like objects. Anonymize attachment name, if it
-    needs to be.
+    Download view for attachments and attachment like objects
     """
-    filename = attachment.name
-    if isinstance(attachment, AttachmentFinalization):
-        inforequest = attachment.attachment.generic_object.branch.inforequest
-        if inforequest.anonymized_for(request.user):
-            prog = generate_user_pattern(inforequest, match_subwords=True)
-            filename = anonymize_string(prog, attachment.name)
+    name = filename if filename else attachment.name
     path = os.path.join(settings.MEDIA_ROOT, attachment.file.name)
-    return send_file_response(request, path, filename, attachment.content_type)
+    return send_file_response(request, path, name, attachment.content_type)
