@@ -39,9 +39,10 @@ def attachment_download(request, attachment_pk):
                 Message: Q(inforequest__applicant=request.user),
                 WizardDraft: Q(owner=request.user),
                 InforequestDraft: Q(applicant=request.user),
-                Action: Q(branch__inforequest__applicant=request.user) |
-                        (Q(branch__inforequest__published=True) &
-                        Q(branch__inforequest__applicant__profile__anonymize_inforequests=False)),
+                Action: Q(branch__inforequest__applicant=request.user) | (
+                            Q(branch__inforequest__published=True) &
+                            Q(branch__inforequest__applicant__profile__anonymize_inforequests=False)
+                        ),
                 }
 
     attachment = Attachment.objects.get_or_404(pk=attachment_pk)
