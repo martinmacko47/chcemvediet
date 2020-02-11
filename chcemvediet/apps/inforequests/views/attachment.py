@@ -27,15 +27,23 @@ def attachment_upload(request):
     return attachments_views.upload(request, session, download_url_func)
 
 @require_http_methods([u'HEAD', u'GET'])
-@login_required(raise_exception=True)
 def attachment_download(request, attachment_pk):
-    permitted = {
-            Session: Q(session_key=request.session.session_key),
-            Message: Q(inforequest__applicant=request.user),
-            WizardDraft: Q(owner=request.user),
-            InforequestDraft: Q(applicant=request.user),
-            Action: Q(branch__inforequest__applicant=request.user),
-            }
+    if request.user.is_anonymous():
+        permitted = {
+                Action: Q(branch__inforequest__published=True) &
+                        Q(branch__inforequest__applicant__profile__anonymize_inforequests=False),
+                }
+    else:
+        permitted = {
+                Session: Q(session_key=request.session.session_key),
+                Message: Q(inforequest__applicant=request.user),
+                WizardDraft: Q(owner=request.user),
+                InforequestDraft: Q(applicant=request.user),
+                Action: Q(branch__inforequest__applicant=request.user) | (
+                            Q(branch__inforequest__published=True) &
+                            Q(branch__inforequest__applicant__profile__anonymize_inforequests=False)
+                        ),
+                }
 
     attachment = Attachment.objects.get_or_404(pk=attachment_pk)
     attached_to_class = attachment.generic_type.model_class()
