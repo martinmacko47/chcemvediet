@@ -1,5 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.functional import cached_property
@@ -10,6 +11,7 @@ from jsonfield import JSONField
 from poleno.mail.models import Message
 from poleno.utils.models import QuerySet
 from poleno.utils.misc import FormatMixin, squeeze
+from chcemvediet.apps.anonymization.models import AttachmentAnonymization, AttachmentFinalization
 from chcemvediet.apps.inforequests.models import InforequestEmail
 
 
@@ -32,10 +34,15 @@ class Profile(FormatMixin, models.Model):
                 If true, published inforequests will be shown anonymized, otherwise in their
                 original version.
                 """))
-    custom_anonymized_strings = JSONField(null=True, default=None,
+
+    # May be NULL; Should NOT be empty
+    custom_anonymized_strings = JSONField(null=True, blank=True, default=None,
             help_text=squeeze(u"""
-                User defined strings for anonymization. NULL for default anonymization.
+                User defined strings for anonymization. JSON must be an array of strings. NULL for
+                default anonymization.
                 """))
+
+    __original_custom_anonymized_strings = None
 
 
     # Backward relations added to other models:
@@ -47,6 +54,10 @@ class Profile(FormatMixin, models.Model):
     #  -- user: OneToOneField
 
     objects = ProfileQuerySet.as_manager()
+
+    def __init__(self, *args, **kwargs):
+        super(Profile, self).__init__(*args, **kwargs)
+        self.__original_custom_anonymized_strings = self.custom_anonymized_strings
 
     @property
     def undecided_emails_set(self):
@@ -92,6 +103,33 @@ class Profile(FormatMixin, models.Model):
             return bool(self.undecided_emails)
         else:
             return self.undecided_emails_set.exists()
+
+    def clean(self):
+        if not self.custom_anonymized_strings:
+            self.custom_anonymized_strings = None
+            return
+        if type(self.custom_anonymized_strings) != list:
+            raise ValidationError(u'JSON must be an array of strings')
+        for line in self.custom_anonymized_strings:
+            if type(line) != unicode:
+                raise ValidationError(u'JSON must be an array of strings')
+
+    def save(self, *args, **kwargs):
+        self._delete_outdated_attachments()
+        super(Profile, self).save(*args, **kwargs)
+        self.__original_custom_anonymized_strings = self.custom_anonymized_strings
+
+    def _delete_outdated_attachments(self):
+        if self._diff_custom_anonymized_strings():
+            AttachmentFinalization.objects.owned_by(self.user).delete()
+            AttachmentAnonymization.objects.owned_by(self.user).delete()
+
+    def _diff_custom_anonymized_strings(self):
+        if not all([self.custom_anonymized_strings, self.__original_custom_anonymized_strings]):
+            return self.custom_anonymized_strings != self.__original_custom_anonymized_strings
+        else:
+            return (set(self.custom_anonymized_strings) !=
+                    set(self.__original_custom_anonymized_strings))
 
     def __unicode__(self):
         return format(self.pk)

@@ -53,17 +53,17 @@ msgstr "Súhlasím s podmienkami používania."
 msgid "accounts:SettingsForm:anonymize_inforequests:label"
 msgstr "Zverejnené infožiadosti zverejniť anonymizovane"
 
-msgid "accounts:SettingsForm:custom_anonymization:help_text"
-msgstr "Meno, priezvisko a adresa používateľa sa anonymizujú automaticky."
-
 msgid "accounts:SettingsForm:custom_anonymization:label"
-msgstr "Pridanie položiek pre anonymizáciu"
+msgstr "Zadať vlastné slovné spojenia pre anonymizáciu. Štandardne sa anonymizuje meno, priezvisko a adresa žiadateľa."
 
-msgid "accounts:SettingsForm:custom_anonymized_strings:Error"
-msgstr "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne 3 znaky."
+msgid "accounts:SettingsForm:custom_anonymized_strings:error:empty"
+msgstr "Toto pole je povinné."
+
+msgid "accounts:SettingsForm:custom_anonymized_strings:error:line_too_short"
+msgstr "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne {n} {plural_form}."
 
 msgid "accounts:SettingsForm:custom_anonymized_strings:help_text"
-msgstr "Veľkosť písmen a diakritika sa ignoruje. Slová zadané v jednom riadku musia ísť za sebou, a interpunkcia medzi nimi sa neignoruje. Všetky slová zadané v jednom riadku sa anonymizujú ako celok. Slová zadané v samostatných riadkoch sa anonymizujú samostatne."
+msgstr "Slovné spojenia zadané v jednom riadku sa anonymizujú ako celok, v texte musia ísť za sebou, pričom interpunkcia medzi nimi sa neignoruje. Ignoruje sa iba veľkosť písmen a diakritika. Slovné spojenia zadané v samostatných riadkoch sa anonymizujú nezávisle. Každé slovné spojenie musí mať minimálne {n} {plural_form}."
 
 msgid "accounts:SettingsForm:custom_anonymized_strings:label"
 msgstr "Anonymizované položky"

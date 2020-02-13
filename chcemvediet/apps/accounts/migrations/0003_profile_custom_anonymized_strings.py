@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='custom_anonymized_strings',
-            field=jsonfield.fields.JSONField(default=None, help_text='User defined strings for anonymization. NULL for default anonymization.', null=True),
+            field=jsonfield.fields.JSONField(default=None, help_text='User defined strings for anonymization. JSON must be an array of strings. NULL for default anonymization.', null=True, blank=True),
             preserve_default=True,
         ),
     ]
