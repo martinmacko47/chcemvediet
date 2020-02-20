@@ -17,7 +17,6 @@ from . import content_types
 
 ANONYMIZATION_STRING = u'xxxxx'
 WORD_SIZE_MIN = 3
-NUMBER_SIZE_MIN = 3
 
 TRANSLATE_TABLE = {
     u'a': u'(?:a|á|ä)',
@@ -77,13 +76,14 @@ def generate_word_pattern(words, match_subwords):
 def generate_numeric_pattern(numbers, match_subwords):
     u"""
     Generates list of patterns, that matches number, where digits can be separated with ' ' or '-'.
-    Each number is captured in group. If ``match_subwords`` is True, pattern will also match subwords.
+    Each number is captured in group. If ``match_subwords`` is True, pattern will also match
+    subwords.
     """
     patterns = []
     template = u'({})' if match_subwords else u'(\\b{}\\b)'
     for number in numbers:
         number = re.sub(u'[ -]', u'', number)
-        if len(number) < NUMBER_SIZE_MIN:
+        if len(number) < WORD_SIZE_MIN:
             continue
         p = u'[ -]?'.join([re.escape(c) for c in number])
         patterns.append(template.format(p))

@@ -5,11 +5,13 @@ from django.contrib import admin
 from poleno.utils.misc import decorate
 from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
 
+from .forms import ProfileAdminForm
 from .models import Profile
 
 
 @admin.register(Profile, site=admin.site)
 class ProfileAdmin(admin.ModelAdmin):
+    form = ProfileAdminForm
     date_hierarchy = None
     list_display = [
             u'id',

@@ -1,6 +1,5 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.functional import cached_property
@@ -104,27 +103,17 @@ class Profile(FormatMixin, models.Model):
         else:
             return self.undecided_emails_set.exists()
 
-    def clean(self):
-        if not self.custom_anonymized_strings:
-            self.custom_anonymized_strings = None
-            return
-        if type(self.custom_anonymized_strings) != list:
-            raise ValidationError(u'JSON must be an array of strings')
-        for line in self.custom_anonymized_strings:
-            if type(line) != unicode:
-                raise ValidationError(u'JSON must be an array of strings')
-
     def save(self, *args, **kwargs):
         self._delete_outdated_attachments()
         super(Profile, self).save(*args, **kwargs)
         self.__original_custom_anonymized_strings = self.custom_anonymized_strings
 
     def _delete_outdated_attachments(self):
-        if self._diff_custom_anonymized_strings():
+        if self._custom_anonymized_strings_changed():
             AttachmentFinalization.objects.owned_by(self.user).delete()
             AttachmentAnonymization.objects.owned_by(self.user).delete()
 
-    def _diff_custom_anonymized_strings(self):
+    def _custom_anonymized_strings_changed(self):
         if not all([self.custom_anonymized_strings, self.__original_custom_anonymized_strings]):
             return self.custom_anonymized_strings != self.__original_custom_anonymized_strings
         else:

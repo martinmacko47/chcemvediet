@@ -1,9 +1,10 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.utils.translation import ungettext, ugettext_lazy as _
 
-from poleno.utils.templatetags.poleno.utils import plural
+from chcemvediet.apps.accounts.models import Profile
 from chcemvediet.apps.anonymization.anonymization import (WORD_SIZE_MIN,
                                                           get_default_anonymized_strings_for_user)
 
@@ -84,23 +85,30 @@ class SettingsForm(forms.Form):
             }),
             )
 
-    help_text = _(u'accounts:SettingsForm:custom_anonymized_strings:help_text')
-    plural_form = plural(WORD_SIZE_MIN, u'1:znak', u'2~4:znaky', u'znakov')
+    help_text = ungettext(
+            u'accounts:SettingsForm:custom_anonymized_strings:help_text',
+            u'accounts:SettingsForm:custom_anonymized_strings:help_text %(count)s.',
+            WORD_SIZE_MIN) % {u'count': WORD_SIZE_MIN}
     custom_anonymized_strings = forms.CharField(
             label=_(u'accounts:SettingsForm:custom_anonymized_strings:label'),
             required=False,
-            help_text=help_text.format(n=WORD_SIZE_MIN, plural_form=plural_form),
+            help_text=help_text,
             widget=forms.Textarea(attrs={
                 u'class': u'pln-autosize chv-visible-if-custom-anonymization',
                 u'cols': u'', u'rows': u'',
                 }),
-            )#
+            )
+
+    error_message = ungettext(
+        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short',
+        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short %(count)s.',
+        WORD_SIZE_MIN) % {u'count': WORD_SIZE_MIN}
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs[u'initial'] = {
                 u'anonymize_inforequests': self.user.profile.anonymize_inforequests,
-                u'custom_anonymization': self.user.profile.custom_anonymized_strings,
+                u'custom_anonymization': self.user.profile.custom_anonymized_strings is not None,
                 u'custom_anonymized_strings': self._initial_custom_anonymized_strings(),
                 }
         super(SettingsForm, self).__init__(*args, **kwargs)
@@ -124,9 +132,7 @@ class SettingsForm(forms.Form):
             if len(line) >= WORD_SIZE_MIN:
                 lines.append(line)
             else:
-                msg = _(u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short')
-                raise forms.ValidationError(msg.format(n=WORD_SIZE_MIN,
-                                                       plural_form=self.plural_form))
+                raise forms.ValidationError(self.error_message)
         return lines
 
     def _initial_custom_anonymized_strings(self):
@@ -136,3 +142,19 @@ class SettingsForm(forms.Form):
             ret = words + numbers
         return u'\n'.join(ret)
 
+class ProfileAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = Profile
+        fields = u'__all__'
+
+    def clean_custom_anonymized_strings(self):
+        custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
+        if custom_anonymized_strings is None:
+            return None
+        if type(custom_anonymized_strings) != list:
+            raise ValidationError(u'JSON must be an array of strings')
+        for line in custom_anonymized_strings:
+            if type(line) != unicode:
+                raise ValidationError(u'JSON must be an array of strings')
+        return custom_anonymized_strings
