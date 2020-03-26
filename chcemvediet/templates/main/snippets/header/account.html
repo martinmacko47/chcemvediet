@@ -45,6 +45,11 @@
             {% trans 'main:menu:account:connections' %}
           </a>
         </li>
+        <li>
+          <a href="{% url 'accounts:settings' %}">
+            {% trans 'main:menu:account:settings' %}
+          </a>
+        </li>
         {% if user.invitationsupply.can_use_invitations %}
           <li class="divider"></li>
           <li>

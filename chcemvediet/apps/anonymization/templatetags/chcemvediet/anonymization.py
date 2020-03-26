@@ -14,11 +14,11 @@ from chcemvediet.apps.anonymization.anonymization import (generate_user_pattern,
 register = Library()
 
 @register.simple_tag(takes_context=True)
-def anonymize(context, inforequest, content):
+def anonymize(context, inforequest, content, match_subwords=False):
     request = context[u'request']
     if not inforequest.anonymized_for(request.user):
         return content
-    prog = generate_user_pattern(inforequest)
+    prog = generate_user_pattern(inforequest, match_subwords)
     return anonymize_string(prog, content)
 
 @register.simple_tag(takes_context=True)

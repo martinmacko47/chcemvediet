@@ -53,36 +53,46 @@ TRANSLATE_TABLE = {
     u'ž': u'(?:z|ž)',
 }
 
-def generate_word_pattern(words):
+def generate_word_pattern(words, match_subwords):
     u"""
     Generates list of patterns, that matches slovak accent insensitive lowercase word. Each word is
-    captured in group.
+    captured in group. If ``match_subwords`` is True, pattern will also match subwords.
     """
     patterns = []
+    template = u'({})' if match_subwords else u'(\\b{}\\b)'
     for word in words:
         if len(word) < WORD_SIZE_MIN:
             continue
-        p = u''.join([TRANSLATE_TABLE[c] if c in TRANSLATE_TABLE else re.escape(c) for c in word.lower()])
-        patterns.append(u'(\\b{}\\b)'.format(p))
+        p = u''
+        for c in word.lower():
+            if c in TRANSLATE_TABLE:
+                p += TRANSLATE_TABLE[c]
+            else:
+                p += re.escape(c)
+                if not c.isalnum() and match_subwords:
+                    p += u'?'
+        patterns.append(template.format(p))
     return patterns
 
-def generate_numeric_pattern(numbers):
+def generate_numeric_pattern(numbers, match_subwords):
     u"""
-    Generates list of patterns, that matches number, where digits can be splited with ' ' or '-'.
-    Each number is captured in group.
+    Generates list of patterns, that matches number, where digits can be separated with ' ' or '-'.
+    Each number is captured in group. If ``match_subwords`` is True, pattern will also match subwords.
     """
     patterns = []
+    template = u'({})' if match_subwords else u'(\\b{}\\b)'
     for number in numbers:
         number = re.sub(u'[ -]', u'', number)
         if len(number) < NUMBER_SIZE_MIN:
             continue
         p = u'[ -]?'.join([re.escape(c) for c in number])
-        patterns.append(u'(\\b{}\\b)'.format(p))
+        patterns.append(template.format(p))
     return patterns
 
-def generate_user_pattern(inforequest):
+def generate_user_pattern(inforequest, match_subwords=False):
     u"""
     Generates pattern object, that matches user personal information from inforequest.
+    If ``match_subwords`` is True, pattern will also match subwords.
     """
     user = inforequest.applicant
     names = user.first_name.split() + user.last_name.split() + inforequest.applicant_name.split()
@@ -90,10 +100,10 @@ def generate_user_pattern(inforequest):
     cities = [user.profile.city, inforequest.applicant_city]
     zips = [user.profile.zip, inforequest.applicant_zip]
     patterns = (
-        generate_word_pattern(set(names)) +
-        generate_word_pattern(set(streets)) +
-        generate_word_pattern(set(cities)) +
-        generate_numeric_pattern(set(zips))
+            generate_word_pattern(set(names), match_subwords) +
+            generate_word_pattern(set(streets), match_subwords) +
+            generate_word_pattern(set(cities), match_subwords) +
+            generate_numeric_pattern(set(zips), match_subwords)
     )
     return re.compile(u'|'.join(patterns), re.IGNORECASE | re.UNICODE)
 
@@ -131,7 +141,7 @@ def anonymize_odt(attachment_recognition):
                     with zipfile.ZipFile(buffer_out, u'w') as zipfile_out:
                         for f in zipfile_in.filelist:
                             content = zipfile_in.read(f)
-                            if magic.from_buffer(content, mime=True) == content_types.XML_CONTENT_TYPE:
+                            if magic.from_buffer(content, mime=True) in content_types.XML_CONTENT_TYPES:
                                 zipfile_out.writestr(f, anonymize_markup(
                                         pattern, content, parser, u'.//text:span', namespace))
                             else:

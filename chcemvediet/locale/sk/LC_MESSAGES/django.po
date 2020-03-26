@@ -50,6 +50,9 @@ msgstr "PSČ"
 msgid "accounts:SignupForm:agreement:label"
 msgstr "Súhlasím s podmienkami používania."
 
+msgid "accounts:SettingsForm:anonymize_inforequests:label"
+msgstr "Zverejnené infožiadosti zverejniť anonymizovane"
+
 msgid "accounts:profile:title"
 msgstr "Profil užívateľa"
 
@@ -82,6 +85,21 @@ msgstr "Spravovať pripojenia"
 
 msgid "accounts:profile:invitations"
 msgstr "Spravovať pozvánky"
+
+msgid "accounts:profile:settings"
+msgstr "Nastavenia"
+
+msgid "accounts:settings:title"
+msgstr "Nastavenia užívateľa"
+
+msgid "accounts:settings:heading"
+msgstr "Nastavenia užívateľa"
+
+msgid "accounts:settings:save"
+msgstr "Uložiť"
+
+msgid "accounts:urls:settings"
+msgstr "nastavenia"
 
 msgid "annonymization:anonymization:anonymize_html:error"
 msgstr "Obsah sa nepodarilo načítať."
@@ -1448,6 +1466,9 @@ msgstr "Odhlásiť"
 
 msgid "main:menu:account:login"
 msgstr "Prihlásiť"
+
+msgid "main:menu:account:settings"
+msgstr "Nastavenia"
 
 msgid "main:menu:about"
 msgstr "O projekte"

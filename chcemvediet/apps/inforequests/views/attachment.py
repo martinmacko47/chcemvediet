@@ -13,6 +13,7 @@ from poleno.utils.urls import reverse
 from poleno.utils.views import require_ajax, login_required
 from chcemvediet.apps.wizards.models import WizardDraft
 from chcemvediet.apps.inforequests.models import InforequestDraft, Action
+from chcemvediet.apps.anonymization.anonymization import generate_user_pattern, anonymize_string
 from chcemvediet.apps.anonymization.models import AttachmentFinalization
 
 
@@ -26,15 +27,23 @@ def attachment_upload(request):
     return attachments_views.upload(request, session, download_url_func)
 
 @require_http_methods([u'HEAD', u'GET'])
-@login_required(raise_exception=True)
 def attachment_download(request, attachment_pk):
-    permitted = {
-            Session: Q(session_key=request.session.session_key),
-            Message: Q(inforequest__applicant=request.user),
-            WizardDraft: Q(owner=request.user),
-            InforequestDraft: Q(applicant=request.user),
-            Action: Q(branch__inforequest__applicant=request.user),
-            }
+    if request.user.is_anonymous():
+        permitted = {
+                Action: Q(branch__inforequest__published=True) &
+                        Q(branch__inforequest__applicant__profile__anonymize_inforequests=False),
+                }
+    else:
+        permitted = {
+                Session: Q(session_key=request.session.session_key),
+                Message: Q(inforequest__applicant=request.user),
+                WizardDraft: Q(owner=request.user),
+                InforequestDraft: Q(applicant=request.user),
+                Action: Q(branch__inforequest__applicant=request.user) | (
+                            Q(branch__inforequest__published=True) &
+                            Q(branch__inforequest__applicant__profile__anonymize_inforequests=False)
+                        ),
+                }
 
     attachment = Attachment.objects.get_or_404(pk=attachment_pk)
     attached_to_class = attachment.generic_type.model_class()
@@ -58,5 +67,7 @@ def attachment_finalization_download(request, attachment_finalization_pk):
     generic_object = attachment_finalization.attachment.generic_object
     if isinstance(generic_object, Action):
         if generic_object.branch.inforequest.published:
-            return attachments_views.download(request, attachment_finalization)
+            prog = generate_user_pattern(generic_object.branch.inforequest, match_subwords=True)
+            filename = anonymize_string(prog, attachment_finalization.name)
+            return attachments_views.download(request, attachment_finalization, filename)
     raise Http404()

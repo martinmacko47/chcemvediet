@@ -448,7 +448,7 @@ class Inforequest(FormatMixin, models.Model):
         u"""
         Returns True, if inforequest needs to be anonymized for user, False otherwise.
         """
-        return user != self.applicant
+        return user != self.applicant and self.applicant.profile.anonymize_inforequests
 
     def branches_advanced_by(self, action):
         u"""

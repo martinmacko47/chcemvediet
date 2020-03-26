@@ -8,7 +8,7 @@ from aggregate_if import Count
 
 from poleno.mail.models import Message
 from poleno.utils.models import QuerySet
-from poleno.utils.misc import FormatMixin
+from poleno.utils.misc import FormatMixin, squeeze
 from chcemvediet.apps.inforequests.models import InforequestEmail
 
 
@@ -25,6 +25,13 @@ class Profile(FormatMixin, models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     zip = models.CharField(max_length=10)
+
+    anonymize_inforequests = models.BooleanField(default=True,
+                help_text=squeeze(u"""
+                If true, published inforequests will be shown anonymized, otherwise in their
+                original version.
+                """))
+
 
     # Backward relations added to other models:
     #
