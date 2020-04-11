@@ -389,3 +389,11 @@ Templates with their own translated versions can be edited directly. Editing tem
 place translation is a bit more complicated. To change the translation of such template, open
 localization file `locale/{sk,en}/LC_MESSAGES/django.po`, find the translations, edit them and
 recompile them. To recompile translations rerun `setup.py`.
+
+Localization files contain also translation strings defined in the code. If you add a new or remove
+an existing translation string in the code, you need to reflect the change in the localization files
+as well. You can do it manually or use the following command to scan the entire source tree of the
+current directory and update the localization files for you:
+
+	$ cd chcemvediet/chcemvediet
+	$ ../env/bin/python ../manage.py makemessages -l sk -l en --no-wrap --no-location
