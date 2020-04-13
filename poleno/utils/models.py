@@ -115,6 +115,20 @@ class FieldChoices(object):
         self._choices = choices
         self._inverse = inverse
 
+class OriginalValuesMixin(object):
+    u"""
+    The mixin class to store values of defined class attributes.
+    """
+
+    def __init__(self, attributes):
+        self.attributes = attributes
+
+    def get_value(self, name):
+        return self.attributes[name]
+
+    def set_value(self, name, value):
+        self.attributes[name] = value
+
 class QuerySet(models.query.QuerySet):
     u"""
     ``QuerySet`` with common custom methods.

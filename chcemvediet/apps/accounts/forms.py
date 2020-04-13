@@ -1,10 +1,9 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django import forms
-from django.core.exceptions import ValidationError
-from django.utils.translation import ungettext, ugettext_lazy as _
+from django.utils.translation import ungettext_lazy, ugettext_lazy as _
 
-from chcemvediet.apps.accounts.models import Profile
+from poleno.utils.lazy import lazy_format
 from chcemvediet.apps.anonymization.anonymization import (WORD_SIZE_MIN,
                                                           get_default_anonymized_strings_for_user)
 
@@ -85,10 +84,10 @@ class SettingsForm(forms.Form):
             }),
             )
 
-    help_text = ungettext(
+    help_text = lazy_format(ungettext_lazy(
             u'accounts:SettingsForm:custom_anonymized_strings:help_text',
-            u'accounts:SettingsForm:custom_anonymized_strings:help_text %(count)s.',
-            WORD_SIZE_MIN) % {u'count': WORD_SIZE_MIN}
+            u'accounts:SettingsForm:custom_anonymized_strings:help_text {count}s.',
+            WORD_SIZE_MIN), count=WORD_SIZE_MIN)
     custom_anonymized_strings = forms.CharField(
             label=_(u'accounts:SettingsForm:custom_anonymized_strings:label'),
             required=False,
@@ -98,11 +97,6 @@ class SettingsForm(forms.Form):
                 u'cols': u'', u'rows': u'',
                 }),
             )
-
-    error_message = ungettext(
-        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short',
-        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short %(count)s.',
-        WORD_SIZE_MIN) % {u'count': WORD_SIZE_MIN}
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -132,7 +126,11 @@ class SettingsForm(forms.Form):
             if len(line) >= WORD_SIZE_MIN:
                 lines.append(line)
             else:
-                raise forms.ValidationError(self.error_message)
+                error_message = lazy_format(ungettext_lazy(
+                        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short',
+                        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short {count}s.',
+                        WORD_SIZE_MIN), count=WORD_SIZE_MIN)
+                raise forms.ValidationError(error_message)
         return lines
 
     def _initial_custom_anonymized_strings(self):
@@ -141,20 +139,3 @@ class SettingsForm(forms.Form):
             words, numbers = get_default_anonymized_strings_for_user(self.user)
             ret = words + numbers
         return u'\n'.join(ret)
-
-class ProfileAdminForm(forms.ModelForm):
-
-    class Meta:
-        model = Profile
-        fields = u'__all__'
-
-    def clean_custom_anonymized_strings(self):
-        custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
-        if custom_anonymized_strings is None:
-            return None
-        if type(custom_anonymized_strings) != list:
-            raise ValidationError(u'JSON must be an array of strings')
-        for line in custom_anonymized_strings:
-            if type(line) != unicode:
-                raise ValidationError(u'JSON must be an array of strings')
-        return custom_anonymized_strings
