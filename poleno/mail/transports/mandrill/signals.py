@@ -15,6 +15,9 @@ webhook_event = Signal(providing_args=['event_type', 'data'])
 
 @receiver(webhook_event)
 def message_status_webhook_event(sender, event_type, data, **kwargs):
+    if u'_id' not in data:
+        return
+
     if event_type == u'deferral':
         status = Recipient.STATUSES.QUEUED
     elif event_type in [u'soft_bounce', u'hard_bounce', u'spam', u'reject']:
@@ -27,7 +30,7 @@ def message_status_webhook_event(sender, event_type, data, **kwargs):
         return
 
     try:
-        recipient = Recipient.objects.get(remote_id=data['_id'])
+        recipient = Recipient.objects.get(remote_id=data[u'_id'])
         recipient.status = status
         recipient.status_details = event_type
         recipient.save(update_fields=[u'status', u'status_details'])
