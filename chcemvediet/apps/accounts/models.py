@@ -52,12 +52,7 @@ class Profile(FormatMixin, OriginalValuesMixin, models.Model):
 
     objects = ProfileQuerySet.as_manager()
 
-    def __init__(self, *args, **kwargs):
-        models.Model.__init__(self, *args, **kwargs)
-        OriginalValuesMixin.__init__(
-                self,
-                {u'custom_anonymized_strings': self.custom_anonymized_strings}
-                )
+    tracked_fields = [u'custom_anonymized_strings']
 
     @property
     def undecided_emails_set(self):
@@ -107,7 +102,6 @@ class Profile(FormatMixin, OriginalValuesMixin, models.Model):
     def save(self, *args, **kwargs):
         self._delete_outdated_attachments()
         super(Profile, self).save(*args, **kwargs)
-        self.set_value(u'custom_anonymized_strings', self.custom_anonymized_strings)
 
     def _delete_outdated_attachments(self):
         if self._custom_anonymized_strings_changed():

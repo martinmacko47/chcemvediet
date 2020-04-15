@@ -117,17 +117,23 @@ class FieldChoices(object):
 
 class OriginalValuesMixin(object):
     u"""
-    The mixin class to store values of defined class attributes.
+    The mixin class to store values of defined class fields.
     """
+    tracked_fields = []
 
-    def __init__(self, attributes):
-        self.attributes = attributes
+    def __init__(self, *args, **kwargs):
+        super(OriginalValuesMixin, self).__init__(*args, **kwargs)
+        self._fields = {}
+        for name in self.tracked_fields:
+            self._fields[name] = getattr(self, name)
 
     def get_value(self, name):
-        return self.attributes[name]
+        return self._fields[name]
 
-    def set_value(self, name, value):
-        self.attributes[name] = value
+    def save(self, *args, **kwargs):
+        for name in self.tracked_fields:
+            self._fields[name] = getattr(self, name)
+        super(OriginalValuesMixin, self).save(*args, **kwargs)
 
 class QuerySet(models.query.QuerySet):
     u"""
