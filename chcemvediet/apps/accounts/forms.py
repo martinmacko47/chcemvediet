@@ -89,7 +89,7 @@ class SettingsForm(forms.Form):
             required=False,
             help_text=lazy_format(ungettext_lazy(
                 u'accounts:SettingsForm:custom_anonymized_strings:help_text',
-                u'accounts:SettingsForm:custom_anonymized_strings:help_text {count}.',
+                u'accounts:SettingsForm:custom_anonymized_strings:help_text {count}',
                 WORD_SIZE_MIN), count=WORD_SIZE_MIN),
             widget=forms.Textarea(attrs={
                 u'class': u'pln-autosize chv-visible-if-custom-anonymization',
@@ -127,7 +127,7 @@ class SettingsForm(forms.Form):
             else:
                 error_message = lazy_format(ungettext_lazy(
                         u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short',
-                        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short {count}.',
+                        u'accounts:SettingsForm:custom_anonymized_strings:error:line_too_short {count}',
                         WORD_SIZE_MIN), count=WORD_SIZE_MIN)
                 raise forms.ValidationError(error_message)
         return lines

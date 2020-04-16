@@ -12,10 +12,6 @@ from .models import Profile
 
 class ProfileAdminForm(forms.ModelForm):
 
-    class Meta:
-        model = Profile
-        fields = u'__all__'
-
     def clean_custom_anonymized_strings(self):
         custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
         if custom_anonymized_strings is None:
