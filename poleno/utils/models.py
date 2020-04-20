@@ -127,7 +127,7 @@ class OriginalValuesMixin(object):
         for name in self.tracked_fields:
             self._tracked_fields[name] = getattr(self, name)
 
-    def get_value(self, name):
+    def get_original_value(self, name):
         return self._tracked_fields[name]
 
     def save(self, *args, **kwargs):

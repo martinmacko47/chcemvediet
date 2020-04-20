@@ -109,7 +109,7 @@ class Profile(FormatMixin, OriginalValuesMixin, models.Model):
             AttachmentAnonymization.objects.owned_by(self.user).delete()
 
     def _custom_anonymized_strings_changed(self):
-        old_custom_anonymized_strings = self.get_value(u'custom_anonymized_strings')
+        old_custom_anonymized_strings = self.get_original_value(u'custom_anonymized_strings')
         new_custom_anonymized_strings = self.custom_anonymized_strings
         old_custom_anonymization = old_custom_anonymized_strings is not None
         new_custom_anonymization = new_custom_anonymized_strings is not None
