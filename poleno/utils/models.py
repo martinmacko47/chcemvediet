@@ -115,6 +115,26 @@ class FieldChoices(object):
         self._choices = choices
         self._inverse = inverse
 
+class OriginalValuesMixin(object):
+    u"""
+    Mixin to keep track of original values of changed fields.
+    """
+    tracked_fields = []
+
+    def __init__(self, *args, **kwargs):
+        super(OriginalValuesMixin, self).__init__(*args, **kwargs)
+        self._tracked_fields = {}
+        for name in self.tracked_fields:
+            self._tracked_fields[name] = getattr(self, name)
+
+    def get_original_value(self, name):
+        return self._tracked_fields[name]
+
+    def save(self, *args, **kwargs):
+        super(OriginalValuesMixin, self).save(*args, **kwargs)
+        for name in self.tracked_fields:
+            self._tracked_fields[name] = getattr(self, name)
+
 class QuerySet(models.query.QuerySet):
     u"""
     ``QuerySet`` with common custom methods.

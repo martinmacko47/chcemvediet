@@ -5,10 +5,12 @@ from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.auth.models import User
 from aggregate_if import Count
+from jsonfield import JSONField
 
 from poleno.mail.models import Message
-from poleno.utils.models import QuerySet
+from poleno.utils.models import QuerySet, OriginalValuesMixin
 from poleno.utils.misc import FormatMixin, squeeze
+from chcemvediet.apps.anonymization.models import AttachmentAnonymization, AttachmentFinalization
 from chcemvediet.apps.inforequests.models import InforequestEmail
 
 
@@ -20,16 +22,23 @@ class ProfileQuerySet(QuerySet):
         return self.annotate(undecided_emails_count=Count(u'user__inforequest__inforequestemail',
                 only=Q(user__inforequest__inforequestemail__type=InforequestEmail.TYPES.UNDECIDED)))
 
-class Profile(FormatMixin, models.Model):
+class Profile(FormatMixin, OriginalValuesMixin, models.Model):
     user = models.OneToOneField(User)
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     zip = models.CharField(max_length=10)
 
     anonymize_inforequests = models.BooleanField(default=True,
-                help_text=squeeze(u"""
+            help_text=squeeze(u"""
                 If true, published inforequests will be shown anonymized, otherwise in their
                 original version.
+                """))
+
+    # May be NULL; Should NOT be empty
+    custom_anonymized_strings = JSONField(null=True, blank=True, default=None,
+            help_text=squeeze(u"""
+                User defined strings for anonymization. JSON must be an array of strings. NULL for
+                default anonymization.
                 """))
 
 
@@ -42,6 +51,8 @@ class Profile(FormatMixin, models.Model):
     #  -- user: OneToOneField
 
     objects = ProfileQuerySet.as_manager()
+
+    tracked_fields = [u'custom_anonymized_strings']
 
     @property
     def undecided_emails_set(self):
@@ -87,6 +98,26 @@ class Profile(FormatMixin, models.Model):
             return bool(self.undecided_emails)
         else:
             return self.undecided_emails_set.exists()
+
+    def save(self, *args, **kwargs):
+        self._delete_outdated_attachments()
+        super(Profile, self).save(*args, **kwargs)
+
+    def _delete_outdated_attachments(self):
+        if self._custom_anonymized_strings_changed():
+            AttachmentFinalization.objects.owned_by(self.user).delete()
+            AttachmentAnonymization.objects.owned_by(self.user).delete()
+
+    def _custom_anonymized_strings_changed(self):
+        old_custom_anonymized_strings = self.get_original_value(u'custom_anonymized_strings')
+        new_custom_anonymized_strings = self.custom_anonymized_strings
+        old_custom_anonymization = old_custom_anonymized_strings is not None
+        new_custom_anonymization = new_custom_anonymized_strings is not None
+        if not old_custom_anonymization and not new_custom_anonymization:
+            return False
+        if old_custom_anonymization != new_custom_anonymization:
+            return True
+        return set(old_custom_anonymized_strings) != set(new_custom_anonymized_strings)
 
     def __unicode__(self):
         return format(self.pk)

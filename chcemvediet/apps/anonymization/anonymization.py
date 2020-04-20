@@ -17,7 +17,6 @@ from . import content_types
 
 ANONYMIZATION_STRING = u'xxxxx'
 WORD_SIZE_MIN = 3
-NUMBER_SIZE_MIN = 3
 
 TRANSLATE_TABLE = {
     u'a': u'(?:a|á|ä)',
@@ -77,33 +76,59 @@ def generate_word_pattern(words, match_subwords):
 def generate_numeric_pattern(numbers, match_subwords):
     u"""
     Generates list of patterns, that matches number, where digits can be separated with ' ' or '-'.
-    Each number is captured in group. If ``match_subwords`` is True, pattern will also match subwords.
+    Each number is captured in group. If ``match_subwords`` is True, pattern will also match
+    subwords.
     """
     patterns = []
     template = u'({})' if match_subwords else u'(\\b{}\\b)'
     for number in numbers:
         number = re.sub(u'[ -]', u'', number)
-        if len(number) < NUMBER_SIZE_MIN:
+        if len(number) < WORD_SIZE_MIN:
             continue
         p = u'[ -]?'.join([re.escape(c) for c in number])
         patterns.append(template.format(p))
     return patterns
 
+def get_default_anonymized_strings_for_user(user, inforequest=None):
+    u"""
+    Return `user` default anonymized strings in two lists. First list for words, second for numbers.
+    """
+    words = user.first_name.split() + user.last_name.split()
+    words.append(user.profile.street)
+    words.append(user.profile.city)
+    numbers = [user.profile.zip]
+    if inforequest:
+        words += inforequest.applicant_name.split()
+        words.append(inforequest.applicant_street)
+        words.append(inforequest.applicant_city)
+        numbers.append(inforequest.applicant_zip)
+    return words, numbers
+
+def get_custom_anonymized_strings_for_user(user):
+    words = []
+    numbers = []
+    for line in user.profile.custom_anonymized_strings:
+        if re.sub(u'[ -]', u'', line).isdigit():
+            numbers.append(line)
+        else:
+            words.append(line)
+    return words, numbers
+
+def get_anonymized_strings_for_user(inforequest):
+    if inforequest.applicant.profile.custom_anonymized_strings is None:
+        return get_default_anonymized_strings_for_user(inforequest.applicant, inforequest)
+    else:
+        return get_custom_anonymized_strings_for_user(inforequest.applicant)
+
 def generate_user_pattern(inforequest, match_subwords=False):
     u"""
-    Generates pattern object, that matches user personal information from inforequest.
-    If ``match_subwords`` is True, pattern will also match subwords.
+    Generates pattern object, that matches user anonymization strings. If ``match_subwords`` is
+    True, pattern will also match subwords.
     """
-    user = inforequest.applicant
-    names = user.first_name.split() + user.last_name.split() + inforequest.applicant_name.split()
-    streets = [user.profile.street, inforequest.applicant_street]
-    cities = [user.profile.city, inforequest.applicant_city]
-    zips = [user.profile.zip, inforequest.applicant_zip]
+    words, numbers = get_anonymized_strings_for_user(inforequest)
     patterns = (
-            generate_word_pattern(set(names), match_subwords) +
-            generate_word_pattern(set(streets), match_subwords) +
-            generate_word_pattern(set(cities), match_subwords) +
-            generate_numeric_pattern(set(zips), match_subwords)
+            generate_word_pattern(set(words), match_subwords) +
+            generate_numeric_pattern(set(numbers), match_subwords)
     )
     return re.compile(u'|'.join(patterns), re.IGNORECASE | re.UNICODE)
 

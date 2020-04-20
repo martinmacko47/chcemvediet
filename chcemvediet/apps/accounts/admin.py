@@ -1,6 +1,8 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 
 from poleno.utils.misc import decorate
 from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
@@ -8,8 +10,22 @@ from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
 from .models import Profile
 
 
+class ProfileAdminForm(forms.ModelForm):
+
+    def clean_custom_anonymized_strings(self):
+        custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
+        if custom_anonymized_strings is None:
+            return None
+        if type(custom_anonymized_strings) != list:
+            raise ValidationError(u'JSON must be an array of strings')
+        for line in custom_anonymized_strings:
+            if type(line) != unicode:
+                raise ValidationError(u'JSON must be an array of strings')
+        return custom_anonymized_strings
+
 @admin.register(Profile, site=admin.site)
 class ProfileAdmin(admin.ModelAdmin):
+    form = ProfileAdminForm
     date_hierarchy = None
     list_display = [
             u'id',

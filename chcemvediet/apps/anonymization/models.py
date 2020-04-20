@@ -229,6 +229,9 @@ class AttachmentAnonymizationQuerySet(QuerySet):
     def order_by_pk(self):
         return self.order_by(u'pk')
 
+    def owned_by(self, user):
+        return self.filter(attachment__action__branch__inforequest__applicant=user)
+
 class AttachmentAnonymization(FormatMixin, models.Model):
 
     # May NOT be NULL
@@ -321,6 +324,9 @@ class AttachmentAnonymization(FormatMixin, models.Model):
 class AttachmentFinalizationQuerySet(QuerySet):
     def order_by_pk(self):
         return self.order_by(u'pk')
+
+    def owned_by(self, user):
+        return self.filter(attachment__action__branch__inforequest__applicant=user)
 
 class AttachmentFinalization(FormatMixin, models.Model):
 

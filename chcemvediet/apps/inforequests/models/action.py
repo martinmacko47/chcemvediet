@@ -20,6 +20,9 @@ from poleno.utils.misc import Bunch, squeeze, decorate, FormatMixin
 
 
 class ActionQuerySet(QuerySet):
+    def owned_by(self, user):
+        return self.filter(branch__inforequest__applicant=user)
+
     # Applicant actions
     def applicant_actions(self):
         return self.filter(type__in=Action.APPLICANT_ACTION_TYPES)
@@ -160,7 +163,8 @@ class Action(FormatMixin, models.Model):
 
     # May be empty
     attachment_set = generic.GenericRelation(u'attachments.Attachment',
-            content_type_field=u'generic_type', object_id_field=u'generic_id')
+            content_type_field=u'generic_type', object_id_field=u'generic_id',
+            related_query_name=u'action')
 
     # May be empty
     file_number = models.CharField(blank=True, max_length=255,
