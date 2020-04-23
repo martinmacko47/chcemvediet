@@ -55,8 +55,16 @@ def inforequest_mine(request):
             .order_by_pk()
             .select_related(u'obligee')
             )
-    closed_inforequests = (Inforequest.objects
-            .closed()
+    answered_inforequests = (Inforequest.objects
+            .answered()
+            .owned_by(request.user)
+            .order_by_submission_date()
+            .prefetch_related(
+                Inforequest.prefetch_main_branch(None,
+                    Branch.objects.select_related(u'historicalobligee')))
+            )
+    unsuccessful_inforequests = (Inforequest.objects
+            .unsuccessful()
             .owned_by(request.user)
             .order_by_submission_date()
             .prefetch_related(
@@ -67,7 +75,8 @@ def inforequest_mine(request):
     return render(request, u'inforequests/mine/mine.html', {
             u'inforequests': inforequests,
             u'drafts': drafts,
-            u'closed_inforequests': closed_inforequests,
+            u'answered_inforequests': answered_inforequests,
+            u'unsuccessful_inforequests': unsuccessful_inforequests,
             })
 
 @require_http_methods([u'HEAD', u'GET', u'POST'])

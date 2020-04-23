@@ -1,0 +1,20 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load trans from i18n %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- unsuccessful_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %
+{% endcomment %}
+
+
+{% if unsuccessful_inforequests %}
+  <h2 id="{% trans 'inforequests:mine:unsuccessful:anchor' %}">
+    <i class="chv-icon chv-color-gray-ll icon-doc-inv"></i>&nbsp;
+    {% trans 'inforequests:mine:unsuccessful:heading' %}
+  </h2>
+  {% with class="chv-table-gray" objects=unsuccessful_inforequests %}
+    {% include "inforequests/tables/inforequests.html" %}
+  {% endwith %}
+{% endif %}
