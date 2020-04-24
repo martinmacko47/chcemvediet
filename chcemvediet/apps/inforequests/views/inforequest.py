@@ -41,7 +41,7 @@ def inforequest_index(request):
 @require_http_methods([u'HEAD', u'GET'])
 @login_required
 def inforequest_mine(request):
-    inforequests = (Inforequest.objects
+    pending_inforequests = (Inforequest.objects
             .not_closed()
             .owned_by(request.user)
             .order_by_submission_date()
@@ -73,7 +73,7 @@ def inforequest_mine(request):
             )
 
     return render(request, u'inforequests/mine/mine.html', {
-            u'inforequests': inforequests,
+            u'pending_inforequests': pending_inforequests,
             u'drafts': drafts,
             u'successful_inforequests': successful_inforequests,
             u'unsuccessful_inforequests': unsuccessful_inforequests,
