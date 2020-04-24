@@ -7,7 +7,7 @@
  % Context:
  %  -- inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
  %  -- drafts: [chcemvediet.apps.inforequests.models.InforequestDraft]
- %  -- answered_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %  -- successful_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
  %  -- unsuccessful_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
  %
 {% endcomment %}
@@ -20,6 +20,6 @@
   {% include "inforequests/mine/panels/main.html" %}
   {% include "inforequests/mine/drafts.html" %}
   {% include "inforequests/mine/pending.html" %}
-  {% include "inforequests/mine/answered.html" %}
+  {% include "inforequests/mine/successful.html" %}
   {% include "inforequests/mine/unsuccessful.html" %}
 {% endblock %}

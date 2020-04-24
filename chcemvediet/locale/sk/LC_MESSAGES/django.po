@@ -876,10 +876,10 @@ msgstr "Zverejnené infožiadosti"
 msgid "inforequests:index:heading"
 msgstr "Zoznam zverejnených infožiadostí"
 
-msgid "inforequests:mine:answered:anchor"
-msgstr "zodpovedane"
+msgid "inforequests:mine:successful:anchor"
+msgstr "uspesne"
 
-msgid "inforequests:mine:answered:heading"
+msgid "inforequests:mine:successful:heading"
 msgstr "Zodpovedané"
 
 msgid "inforequests:mine:unsuccessful:anchor"

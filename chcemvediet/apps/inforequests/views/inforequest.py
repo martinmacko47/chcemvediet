@@ -55,8 +55,8 @@ def inforequest_mine(request):
             .order_by_pk()
             .select_related(u'obligee')
             )
-    answered_inforequests = (Inforequest.objects
-            .answered()
+    successful_inforequests = (Inforequest.objects
+            .successful()
             .owned_by(request.user)
             .order_by_submission_date()
             .prefetch_related(
@@ -75,7 +75,7 @@ def inforequest_mine(request):
     return render(request, u'inforequests/mine/mine.html', {
             u'inforequests': inforequests,
             u'drafts': drafts,
-            u'answered_inforequests': answered_inforequests,
+            u'successful_inforequests': successful_inforequests,
             u'unsuccessful_inforequests': unsuccessful_inforequests,
             })
 

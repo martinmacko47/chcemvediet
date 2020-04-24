@@ -24,7 +24,7 @@ class InforequestQuerySet(QuerySet):
         return self.filter(closed=True)
     def not_closed(self):
         return self.filter(closed=False)
-    def answered(self):
+    def successful(self):
         return (self
                 .closed()
                 .filter(branch__action__disclosure_level__gte=Action.DISCLOSURE_LEVELS.PARTIAL)
