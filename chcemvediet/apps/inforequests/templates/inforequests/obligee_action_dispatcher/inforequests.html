@@ -5,7 +5,7 @@
 {% comment %}
  %
  % Context:
- %  -- inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %  -- pending_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
  %
 {% endcomment %}
 
@@ -20,7 +20,7 @@
     <div class="chv-td">{% trans 'inforequests:obligee_action_dispatcher:obligee' %}</div>
   </div>
   <div class="chv-tbody">
-    {% for inforequest in inforequests %}
+    {% for inforequest in pending_inforequests %}
       {% with collapse_id=idgenerator.next %}
         <div class="chv-tr-collapse collapsed" data-toggle="collapse" data-target="#{{ collapse_id }}">
           <i class="chv-icon icon-down-dir pull-right"></i>
