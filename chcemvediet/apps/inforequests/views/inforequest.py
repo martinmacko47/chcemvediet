@@ -148,7 +148,7 @@ def inforequest_delete_draft(request, draft_pk):
 @require_http_methods([u'HEAD', u'GET'])
 @login_required
 def obligee_action_dispatcher(request):
-    pending_inforequests = (Inforequest.objects
+    inforequests = (Inforequest.objects
             .not_closed()
             .owned_by(request.user)
             .order_by_submission_date()
@@ -162,18 +162,16 @@ def obligee_action_dispatcher(request):
     # and the user has only one pending inforequest, continue with it. If the user has no pending
     # inforequests, return to inforequest index. Finally, if the user has at least two pending
     # inforequests, let him choose with which to continue.
-    for inforequest in pending_inforequests:
+    for inforequest in inforequests:
         if inforequest.has_undecided_emails:
             return HttpResponseRedirect(
                     reverse(u'inforequests:obligee_action', kwargs=dict(inforequest=inforequest)))
-    if len(pending_inforequests) == 1:
+    if len(inforequests) == 1:
         return HttpResponseRedirect(
-                reverse(u'inforequests:obligee_action',
-                        kwargs=dict(inforequest=pending_inforequests[0])
-                ))
-    if len(pending_inforequests) == 0:
+                reverse(u'inforequests:obligee_action', kwargs=dict(inforequest=inforequests[0])))
+    if len(inforequests) == 0:
         return HttpResponseRedirect(reverse(u'inforequests:mine'))
 
     return render(request, u'inforequests/obligee_action_dispatcher/dispatcher.html', {
-            u'pending_inforequests': pending_inforequests,
+            u'inforequests': inforequests,
             })
