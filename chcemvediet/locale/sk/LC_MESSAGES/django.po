@@ -877,7 +877,7 @@ msgid "inforequests:index:heading"
 msgstr "Zoznam zverejnených infožiadostí"
 
 msgid "inforequests:mine:successful:anchor"
-msgstr "uspesne"
+msgstr "zodpovedane"
 
 msgid "inforequests:mine:successful:heading"
 msgstr "Zodpovedané"
