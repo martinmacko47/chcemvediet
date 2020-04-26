@@ -3,9 +3,10 @@
 {% comment %}
  %
  % Context:
- %  -- inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %  -- pending_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
  %  -- drafts: [chcemvediet.apps.inforequests.models.InforequestDraft]
- %  -- closed_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %  -- successful_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %  -- unsuccessful_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
  %
 {% endcomment %}
 
@@ -16,7 +17,7 @@
       {% include "inforequests/mine/panels/create_top.html" %}
       {% if undecided_emails_count %}
         {% include "inforequests/mine/panels/email_top.html" %}
-      {% elif inforequests %}
+      {% elif pending_inforequests %}
         {% include "inforequests/mine/panels/smail_top.html" %}
       {% else %}
         {% include "inforequests/mine/panels/nomail_top.html" %}
@@ -27,7 +28,7 @@
       {% include "inforequests/mine/panels/create_bottom.html" %}
       {% if undecided_emails_count %}
         {% include "inforequests/mine/panels/email_bottom.html" %}
-      {% elif inforequests %}
+      {% elif pending_inforequests %}
         {% include "inforequests/mine/panels/smail_bottom.html" %}
       {% else %}
         {% include "inforequests/mine/panels/nomail_bottom.html" %}

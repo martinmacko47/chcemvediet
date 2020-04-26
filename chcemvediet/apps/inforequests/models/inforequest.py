@@ -24,6 +24,17 @@ class InforequestQuerySet(QuerySet):
         return self.filter(closed=True)
     def not_closed(self):
         return self.filter(closed=False)
+    def successful(self):
+        return (self
+                .closed()
+                .filter(branch__action__disclosure_level__gte=Action.DISCLOSURE_LEVELS.PARTIAL)
+                .distinct()
+                )
+    def unsuccessful(self):
+        return (self
+                .closed()
+                .exclude(branch__action__disclosure_level__gte=Action.DISCLOSURE_LEVELS.PARTIAL)
+                )
     def published(self):
         return self.filter(published=True)
     def not_published(self):

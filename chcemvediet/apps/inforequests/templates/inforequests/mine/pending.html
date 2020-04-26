@@ -4,19 +4,19 @@
 {% comment %}
  %
  % Context:
- %  -- inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
+ %  -- pending_inforequests: [chcemvediet.apps.inforequests.models.Inforequest]
  %
 {% endcomment %}
 
 
-{% if inforequests %}
+{% if pending_inforequests %}
   <h2 id="{% trans 'inforequests:mine:pending:anchor' %}">
     {% with class="chv-icon-lg" color="chv-color-red-l" %}
       {% include "main/snippets/icons/chv-diag.html" %}
     {% endwith %}
     {% trans 'inforequests:mine:pending:heading' %}
   </h2>
-  {% with class="chv-table-red" objects=inforequests %}
+  {% with class="chv-table-red" objects=pending_inforequests %}
     {% include "inforequests/tables/inforequests.html" %}
   {% endwith %}
 {% endif %}

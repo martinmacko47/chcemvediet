@@ -876,11 +876,17 @@ msgstr "Zverejnené infožiadosti"
 msgid "inforequests:index:heading"
 msgstr "Zoznam zverejnených infožiadostí"
 
-msgid "inforequests:mine:closed:anchor"
-msgstr "uzavrete"
+msgid "inforequests:mine:successful:anchor"
+msgstr "zodpovedane"
 
-msgid "inforequests:mine:closed:heading"
-msgstr "Uzavreté"
+msgid "inforequests:mine:successful:heading"
+msgstr "Zodpovedané"
+
+msgid "inforequests:mine:unsuccessful:anchor"
+msgstr "neuspesne"
+
+msgid "inforequests:mine:unsuccessful:heading"
+msgstr "Neúspešné"
 
 msgid "inforequests:mine:drafts:anchor"
 msgstr "rozpisane"
