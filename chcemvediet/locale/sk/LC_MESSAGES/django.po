@@ -75,6 +75,12 @@ msgstr[2] "Slovné spojenia zadané v jednom riadku sa anonymizujú ako celok, v
 msgid "accounts:SettingsForm:custom_anonymized_strings:label"
 msgstr "Anonymizované položky"
 
+msgid "accounts:SettingsForm:days_to_publish_inforequests:help_text"
+msgstr "Počet dní, po ktorých sa zodpovedané a neúspešné infožiadosti zverejnia."
+
+msgid "accounts:SettingsForm:days_to_publish_inforequests:label"
+msgstr "Počet dní do zverejejnenia"
+
 msgid "accounts:profile:title"
 msgstr "Profil užívateľa"
 

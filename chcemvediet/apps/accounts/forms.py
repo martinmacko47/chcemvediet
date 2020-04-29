@@ -6,6 +6,7 @@ from django.utils.translation import ungettext_lazy, ugettext_lazy as _
 from poleno.utils.lazy import lazy_format
 from chcemvediet.apps.anonymization.anonymization import (WORD_SIZE_MIN,
                                                           get_default_anonymized_strings_for_user)
+from chcemvediet.apps.inforequests.constants import DAYS_TO_PUBLISH_INFOREQUEST
 
 
 class SignupForm(forms.Form):
@@ -97,12 +98,21 @@ class SettingsForm(forms.Form):
                 }),
             )
 
+    days_to_publish_inforequests = forms.IntegerField(
+            min_value=0,
+            max_value=365,
+            label=_(u'accounts:SettingsForm:days_to_publish_inforequests:label'),
+            required=True,
+            help_text=_(u'accounts:SettingsForm:days_to_publish_inforequests:help_text'),
+            )
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs[u'initial'] = {
                 u'anonymize_inforequests': self.user.profile.anonymize_inforequests,
                 u'custom_anonymization': self.user.profile.custom_anonymized_strings is not None,
                 u'custom_anonymized_strings': self._initial_custom_anonymized_strings(),
+                u'days_to_publish_inforequests': self._initial_days_to_publish_inforequests()
                 }
         super(SettingsForm, self).__init__(*args, **kwargs)
 
@@ -110,7 +120,12 @@ class SettingsForm(forms.Form):
         profile = self.user.profile
         profile.anonymize_inforequests = self.cleaned_data[u'anonymize_inforequests']
         profile.custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
-        profile.save(update_fields=[u'anonymize_inforequests', u'custom_anonymized_strings'])
+        profile.days_to_publish_inforequests = self.cleaned_data[u'days_to_publish_inforequests']
+        profile.save(update_fields=[u'anonymize_inforequests',
+                                    u'custom_anonymized_strings',
+                                    u'days_to_publish_inforequests',
+                                    ]
+                     )
 
     def clean_custom_anonymized_strings(self):
         if self.cleaned_data[u'custom_anonymization'] is False:
@@ -138,3 +153,8 @@ class SettingsForm(forms.Form):
             words, numbers = get_default_anonymized_strings_for_user(self.user)
             ret = words + numbers
         return u'\n'.join(ret)
+
+    def _initial_days_to_publish_inforequests(self):
+        if self.user.profile.days_to_publish_inforequests is None:
+            return DAYS_TO_PUBLISH_INFOREQUEST
+        return self.user.profile.days_to_publish_inforequests
