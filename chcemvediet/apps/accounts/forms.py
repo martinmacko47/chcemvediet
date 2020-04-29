@@ -102,7 +102,6 @@ class SettingsForm(forms.Form):
             min_value=0,
             max_value=365,
             label=_(u'accounts:SettingsForm:days_to_publish_inforequests:label'),
-            required=True,
             help_text=_(u'accounts:SettingsForm:days_to_publish_inforequests:help_text'),
             )
 
