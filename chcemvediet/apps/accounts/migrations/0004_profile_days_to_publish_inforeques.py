@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='profile',
-            name='days_to_publish_inforequests',
+            name='days_to_publish_inforequest',
             field=models.IntegerField(default=None, help_text='User defined number of days after which inforequest can be marked as published, after closing inforequest. NULL for default value DAYS_TO_PUBLISH_INFOREQUEST.', null=True, blank=True),
             preserve_default=True,
         ),

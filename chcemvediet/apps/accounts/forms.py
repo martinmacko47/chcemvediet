@@ -98,11 +98,11 @@ class SettingsForm(forms.Form):
                 }),
             )
 
-    days_to_publish_inforequests = forms.IntegerField(
+    days_to_publish_inforequest = forms.IntegerField(
             min_value=0,
             max_value=365,
-            label=_(u'accounts:SettingsForm:days_to_publish_inforequests:label'),
-            help_text=_(u'accounts:SettingsForm:days_to_publish_inforequests:help_text'),
+            label=_(u'accounts:SettingsForm:days_to_publish_inforequest:label'),
+            help_text=_(u'accounts:SettingsForm:days_to_publish_inforequest:help_text'),
             )
 
     def __init__(self, user, *args, **kwargs):
@@ -111,7 +111,7 @@ class SettingsForm(forms.Form):
                 u'anonymize_inforequests': self.user.profile.anonymize_inforequests,
                 u'custom_anonymization': self.user.profile.custom_anonymized_strings is not None,
                 u'custom_anonymized_strings': self._initial_custom_anonymized_strings(),
-                u'days_to_publish_inforequests': self._initial_days_to_publish_inforequests()
+                u'days_to_publish_inforequest': self._initial_days_to_publish_inforequest()
                 }
         super(SettingsForm, self).__init__(*args, **kwargs)
 
@@ -119,10 +119,10 @@ class SettingsForm(forms.Form):
         profile = self.user.profile
         profile.anonymize_inforequests = self.cleaned_data[u'anonymize_inforequests']
         profile.custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
-        profile.days_to_publish_inforequests = self.cleaned_data[u'days_to_publish_inforequests']
+        profile.days_to_publish_inforequest = self.cleaned_data[u'days_to_publish_inforequest']
         profile.save(update_fields=[u'anonymize_inforequests',
                                     u'custom_anonymized_strings',
-                                    u'days_to_publish_inforequests',
+                                    u'days_to_publish_inforequest',
                                     ]
                      )
 
@@ -153,7 +153,7 @@ class SettingsForm(forms.Form):
             ret = words + numbers
         return u'\n'.join(ret)
 
-    def _initial_days_to_publish_inforequests(self):
-        if self.user.profile.days_to_publish_inforequests is None:
+    def _initial_days_to_publish_inforequest(self):
+        if self.user.profile.days_to_publish_inforequest is None:
             return DAYS_TO_PUBLISH_INFOREQUEST
-        return self.user.profile.days_to_publish_inforequests
+        return self.user.profile.days_to_publish_inforequest

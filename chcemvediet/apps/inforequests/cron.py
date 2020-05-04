@@ -216,19 +216,19 @@ def publish_inforequests():
     filtered = []
     for inforequest in inforequests:
         user = inforequest.applicant
-        days_to_publish_inforequests = DAYS_TO_PUBLISH_INFOREQUEST
-        if user.profile.days_to_publish_inforequests is not None:
-            days_to_publish_inforequests = user.profile.days_to_publish_inforequests
+        days_to_publish_inforequest = DAYS_TO_PUBLISH_INFOREQUEST
+        if user.profile.days_to_publish_inforequest is not None:
+            days_to_publish_inforequest = user.profile.days_to_publish_inforequest
         try:
             for branch in inforequest.branches:
                 action = branch.last_action
                 if action.deadline:
-                    days_to_publish = DAYS_TO_CLOSE_INFOREQUEST + days_to_publish_inforequests
+                    days_to_publish = DAYS_TO_CLOSE_INFOREQUEST + days_to_publish_inforequest
                     if action.deadline.snooze_calendar_days_behind < days_to_publish:
                         break
                 else:
                     days_since_last_action = (local_today() - local_date(action.created)).days
-                    if days_since_last_action < days_to_publish_inforequests:
+                    if days_since_last_action < days_to_publish_inforequest:
                         break
             else:
                 # We publish the inforequest after it was closed for at least
