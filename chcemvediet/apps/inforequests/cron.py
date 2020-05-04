@@ -11,7 +11,7 @@ from poleno.utils.translation import translation
 from poleno.utils.date import local_date, local_today
 from poleno.utils.misc import nop
 
-from .constants import DAYS_TO_CLOSE_INFOREQUEST, DAYS_TO_PUBLISH_INFOREQUEST
+from .constants import DAYS_TO_CLOSE_INFOREQUEST, DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST
 from .models import Inforequest, Branch, Action
 
 
@@ -216,7 +216,7 @@ def publish_inforequests():
     filtered = []
     for inforequest in inforequests:
         user = inforequest.applicant
-        days_to_publish_inforequest = DAYS_TO_PUBLISH_INFOREQUEST
+        days_to_publish_inforequest = DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST
         if user.profile.days_to_publish_inforequest is not None:
             days_to_publish_inforequest = user.profile.days_to_publish_inforequest
         try:
@@ -232,12 +232,13 @@ def publish_inforequests():
                         break
             else:
                 # We publish the inforequest after it was closed for at least
-                # DAYS_TO_PUBLISH_INFOREQUEST calendar days. The inforequest was closed when all its
-                # branches with deadlines had been missed for at least DAYS_TO_CLOSE_INFOREQUEST
-                # calendar days. Therefore we publish it when all its branches with deadlines are
-                # missed for at least DAYS_TO_CLOSE_INFOREQUEST plus DAYS_TO_PUBLISH_INFOREQUEST
-                # calendar days, and last actions of all its branches without deadlines were added
-                # at least before DAYS_TO_PUBLISH_INFOREQUEST calendar days.
+                # DAYS_TO_PUBLISH_INFOREQUEST (user defined or DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST)
+                # calendar days. The inforequest was closed when all its branches with deadlines had
+                # been missed for at least DAYS_TO_CLOSE_INFOREQUEST calendar days. Therefore we
+                # publish it when all its branches with deadlines are missed for at least
+                # DAYS_TO_CLOSE_INFOREQUEST plus DAYS_TO_PUBLISH_INFOREQUEST calendar days, and last
+                # actions of all its branches without deadlines were added at least before
+                # DAYS_TO_PUBLISH_INFOREQUEST calendar days.
                 filtered.append(inforequest)
         except Exception:
             msg = u'Checking if inforequest should be published failed: {}\n{}'

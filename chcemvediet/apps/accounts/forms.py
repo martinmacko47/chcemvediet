@@ -6,7 +6,8 @@ from django.utils.translation import ungettext_lazy, ugettext_lazy as _
 from poleno.utils.lazy import lazy_format
 from chcemvediet.apps.anonymization.anonymization import (WORD_SIZE_MIN,
                                                           get_default_anonymized_strings_for_user)
-from chcemvediet.apps.inforequests.constants import DAYS_TO_PUBLISH_INFOREQUEST
+from chcemvediet.apps.inforequests.constants import (DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST,
+                                                     MAX_DAYS_TO_PUBLISH_INFOREQUEST)
 
 
 class SignupForm(forms.Form):
@@ -100,7 +101,7 @@ class SettingsForm(forms.Form):
 
     days_to_publish_inforequest = forms.IntegerField(
             min_value=0,
-            max_value=365,
+            max_value=MAX_DAYS_TO_PUBLISH_INFOREQUEST,
             label=_(u'accounts:SettingsForm:days_to_publish_inforequest:label'),
             help_text=_(u'accounts:SettingsForm:days_to_publish_inforequest:help_text'),
             )
@@ -155,5 +156,5 @@ class SettingsForm(forms.Form):
 
     def _initial_days_to_publish_inforequest(self):
         if self.user.profile.days_to_publish_inforequest is None:
-            return DAYS_TO_PUBLISH_INFOREQUEST
+            return DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST
         return self.user.profile.days_to_publish_inforequest
