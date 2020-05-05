@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 
-from chcemvediet.apps.inforequests.constants import DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST
-
 
 class Migration(migrations.Migration):
 
@@ -16,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='days_to_publish_inforequest',
-            field=models.IntegerField(default=DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST, help_text='User defined number of days after which inforequest can be marked as published, after closing inforequest.', null=True, blank=True),
+            field=models.IntegerField(default=60, help_text='User defined number of days after which inforequest can be marked as published, after closing inforequest.'),
             preserve_default=True,
         ),
     ]

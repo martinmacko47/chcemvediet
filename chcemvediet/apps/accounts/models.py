@@ -42,8 +42,8 @@ class Profile(FormatMixin, OriginalValuesMixin, models.Model):
                 default anonymization.
                 """))
 
-    days_to_publish_inforequest = models.IntegerField(null=True, blank=True,
-            default=DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST,
+    # May NOT be NULL
+    days_to_publish_inforequest = models.IntegerField(default=DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST,
             help_text=squeeze(u"""
                 User defined number of days after which inforequest can be marked as published,
                 after closing inforequest.
