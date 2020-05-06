@@ -12,6 +12,7 @@ from poleno.utils.models import QuerySet, OriginalValuesMixin
 from poleno.utils.misc import FormatMixin, squeeze
 from chcemvediet.apps.anonymization.models import AttachmentAnonymization, AttachmentFinalization
 from chcemvediet.apps.inforequests.models import InforequestEmail
+from chcemvediet.apps.inforequests.constants import DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST
 
 
 class ProfileQuerySet(QuerySet):
@@ -39,6 +40,13 @@ class Profile(FormatMixin, OriginalValuesMixin, models.Model):
             help_text=squeeze(u"""
                 User defined strings for anonymization. JSON must be an array of strings. NULL for
                 default anonymization.
+                """))
+
+    # May NOT be NULL
+    days_to_publish_inforequest = models.IntegerField(default=DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST,
+            help_text=squeeze(u"""
+                User defined number of days after which inforequest can be marked as published,
+                after closing inforequest.
                 """))
 
 

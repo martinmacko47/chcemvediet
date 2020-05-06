@@ -6,6 +6,7 @@ from django.utils.translation import ungettext_lazy, ugettext_lazy as _
 from poleno.utils.lazy import lazy_format
 from chcemvediet.apps.anonymization.anonymization import (WORD_SIZE_MIN,
                                                           get_default_anonymized_strings_for_user)
+from chcemvediet.apps.inforequests.constants import MAX_DAYS_TO_PUBLISH_INFOREQUEST
 
 
 class SignupForm(forms.Form):
@@ -97,12 +98,20 @@ class SettingsForm(forms.Form):
                 }),
             )
 
+    days_to_publish_inforequest = forms.IntegerField(
+            min_value=0,
+            max_value=MAX_DAYS_TO_PUBLISH_INFOREQUEST,
+            label=_(u'accounts:SettingsForm:days_to_publish_inforequest:label'),
+            help_text=_(u'accounts:SettingsForm:days_to_publish_inforequest:help_text'),
+            )
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs[u'initial'] = {
                 u'anonymize_inforequests': self.user.profile.anonymize_inforequests,
                 u'custom_anonymization': self.user.profile.custom_anonymized_strings is not None,
                 u'custom_anonymized_strings': self._initial_custom_anonymized_strings(),
+                u'days_to_publish_inforequest': self.user.profile.days_to_publish_inforequest
                 }
         super(SettingsForm, self).__init__(*args, **kwargs)
 
@@ -110,7 +119,12 @@ class SettingsForm(forms.Form):
         profile = self.user.profile
         profile.anonymize_inforequests = self.cleaned_data[u'anonymize_inforequests']
         profile.custom_anonymized_strings = self.cleaned_data[u'custom_anonymized_strings']
-        profile.save(update_fields=[u'anonymize_inforequests', u'custom_anonymized_strings'])
+        profile.days_to_publish_inforequest = self.cleaned_data[u'days_to_publish_inforequest']
+        profile.save(update_fields=[u'anonymize_inforequests',
+                                    u'custom_anonymized_strings',
+                                    u'days_to_publish_inforequest',
+                                    ]
+                     )
 
     def clean_custom_anonymized_strings(self):
         if self.cleaned_data[u'custom_anonymization'] is False:
