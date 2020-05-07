@@ -4,6 +4,7 @@ from django import forms
 from django.utils.translation import ungettext_lazy, ugettext_lazy as _
 
 from poleno.utils.lazy import lazy_format
+from poleno.utils.forms import RangeWidget
 from chcemvediet.apps.anonymization.anonymization import (WORD_SIZE_MIN,
                                                           get_default_anonymized_strings_for_user)
 from chcemvediet.apps.inforequests.constants import MAX_DAYS_TO_PUBLISH_INFOREQUEST
@@ -99,10 +100,14 @@ class SettingsForm(forms.Form):
             )
 
     days_to_publish_inforequest = forms.IntegerField(
-            min_value=0,
-            max_value=MAX_DAYS_TO_PUBLISH_INFOREQUEST,
             label=_(u'accounts:SettingsForm:days_to_publish_inforequest:label'),
             help_text=_(u'accounts:SettingsForm:days_to_publish_inforequest:help_text'),
+            widget=RangeWidget(attrs={
+                u'class': u'form-control-range',
+                u'min': 0,
+                u'step': 1,
+                u'max': MAX_DAYS_TO_PUBLISH_INFOREQUEST,
+                }),
             )
 
     def __init__(self, user, *args, **kwargs):

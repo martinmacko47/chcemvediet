@@ -199,6 +199,7 @@ ASSETS = (
     u'poleno/js/composite_text.js',
     u'poleno/js/datepicker.js',
     u'poleno/js/editable.js',
+    u'poleno/js/range_widget.js',
     u'poleno/js/hide_bootstrap_modal.js',
     u'poleno/js/not_implemented.js',
     u'poleno/js/post_link.js',

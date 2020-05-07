@@ -183,6 +183,16 @@ class EditableSpan(forms.Widget):
         return format_html(u'<span{0}>{1}</span><input{2} />',
                 flatatt(span_attrs), force_text(value), flatatt(input_attrs))
 
+class RangeWidget(forms.Widget):
+    def render(self, name, value, attrs=None):
+        if value is None:
+            value = u''
+        input_attrs = self.build_attrs(attrs, type=u'range', name=name, value=force_text(value))
+        return mark_safe(format_html(
+                u'<div class="pln-range-widget"><input{0} /><span></span></div>',
+                flatatt(input_attrs), force_text(value)
+                ))
+
 def validate_formatted_email(value):
     name, address = parseaddr(value)
     try:
