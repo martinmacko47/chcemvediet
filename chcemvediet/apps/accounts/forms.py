@@ -103,7 +103,6 @@ class SettingsForm(forms.Form):
             label=_(u'accounts:SettingsForm:days_to_publish_inforequest:label'),
             help_text=_(u'accounts:SettingsForm:days_to_publish_inforequest:help_text'),
             widget=RangeWidget(attrs={
-                u'class': u'form-control-range',
                 u'min': 0,
                 u'step': 1,
                 u'max': MAX_DAYS_TO_PUBLISH_INFOREQUEST,

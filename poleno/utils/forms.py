@@ -187,10 +187,11 @@ class RangeWidget(forms.Widget):
     def render(self, name, value, attrs=None):
         if value is None:
             value = u''
-        input_attrs = self.build_attrs(attrs, type=u'range', name=name, value=force_text(value))
+        input_attrs = merge_html_attrs(self.attrs, attrs, type=u'range', name=name,
+                value=force_text(value))
         return mark_safe(format_html(
                 u'<div class="pln-range-widget"><input{0} /><span></span></div>',
-                flatatt(input_attrs), force_text(value)
+                flatatt(input_attrs)
                 ))
 
 def validate_formatted_email(value):

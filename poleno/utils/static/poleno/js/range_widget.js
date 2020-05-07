@@ -6,9 +6,8 @@ $(function(){
 		var slider = $(this).children('input').eq(0);
 		var output = $(this).children('span').eq(0);
 		output.html($(slider).val());
-           $(slider).on('input', valueUpdated);
-           function valueUpdated (e) {
-               output.html($(slider).val());
-           }
+		$(document).on('input', '.pln-range-widget input', function(event) {
+			output.html($(slider).val());
+		})
 	});
 });
