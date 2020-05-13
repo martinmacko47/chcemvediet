@@ -100,6 +100,8 @@ class SettingsForm(forms.Form):
             )
 
     days_to_publish_inforequest = forms.IntegerField(
+            min_value=0,
+            max_value=MAX_DAYS_TO_PUBLISH_INFOREQUEST,
             label=_(u'accounts:SettingsForm:days_to_publish_inforequest:label'),
             help_text=_(u'accounts:SettingsForm:days_to_publish_inforequest:help_text'),
             widget=RangeWidget(attrs={
