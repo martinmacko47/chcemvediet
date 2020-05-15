@@ -203,6 +203,7 @@ ASSETS = (
     u'poleno/js/not_implemented.js',
     u'poleno/js/post_link.js',
     u'poleno/js/print_button.js',
+    u'poleno/js/range_widget.js',
     u'poleno/js/recursive_bootstrap_modal.js',
     u'poleno/js/reload_button.js',
     u'poleno/js/scrollto.js',
