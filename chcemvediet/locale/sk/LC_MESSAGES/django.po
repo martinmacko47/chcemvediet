@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-21 18:51+0100\n"
+"POT-Creation-Date: 2020-05-18 17:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,29 +57,31 @@ msgstr "Zverejnené infožiadosti zverejniť anonymizovane"
 msgid "accounts:SettingsForm:custom_anonymization:label"
 msgstr "Zadať vlastné slovné spojenia pre anonymizáciu. Štandardne sa anonymizuje meno, priezvisko a adresa žiadateľa."
 
-msgid "accounts:SettingsForm:custom_anonymized_strings:error:empty"
-msgstr "Toto pole je povinné."
+msgid "accounts:SettingsForm:custom_anonymized_strings:label"
+msgstr "Anonymizované položky"
 
-msgid "accounts:SettingsForm:custom_anonymized_strings:error:line_too_short"
-msgid_plural "accounts:SettingsForm:custom_anonymized_strings:error:line_too_short {count}"
-msgstr[0] "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne {count} znak."
-msgstr[1] "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne {count} znaky."
-msgstr[2] "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne {count} znakov."
-
+#, python-brace-format
 msgid "accounts:SettingsForm:custom_anonymized_strings:help_text"
 msgid_plural "accounts:SettingsForm:custom_anonymized_strings:help_text {count}"
 msgstr[0] "Slovné spojenia zadané v jednom riadku sa anonymizujú ako celok, v texte musia ísť za sebou, pričom interpunkcia medzi nimi sa neignoruje. Ignoruje sa iba veľkosť písmen a diakritika. Slovné spojenia zadané v samostatných riadkoch sa anonymizujú nezávisle. Každé slovné spojenie musí mať minimálne {count} znak."
 msgstr[1] "Slovné spojenia zadané v jednom riadku sa anonymizujú ako celok, v texte musia ísť za sebou, pričom interpunkcia medzi nimi sa neignoruje. Ignoruje sa iba veľkosť písmen a diakritika. Slovné spojenia zadané v samostatných riadkoch sa anonymizujú nezávisle. Každé slovné spojenie musí mať minimálne {count} znaky."
 msgstr[2] "Slovné spojenia zadané v jednom riadku sa anonymizujú ako celok, v texte musia ísť za sebou, pričom interpunkcia medzi nimi sa neignoruje. Ignoruje sa iba veľkosť písmen a diakritika. Slovné spojenia zadané v samostatných riadkoch sa anonymizujú nezávisle. Každé slovné spojenie musí mať minimálne {count} znakov."
 
-msgid "accounts:SettingsForm:custom_anonymized_strings:label"
-msgstr "Anonymizované položky"
+msgid "accounts:SettingsForm:days_to_publish_inforequest:label"
+msgstr "Počet dní do zverejejnenia"
 
 msgid "accounts:SettingsForm:days_to_publish_inforequest:help_text"
 msgstr "Počet dní, po ktorých sa zodpovedané a neúspešné infožiadosti zverejnia."
 
-msgid "accounts:SettingsForm:days_to_publish_inforequest:label"
-msgstr "Počet dní do zverejejnenia"
+msgid "accounts:SettingsForm:custom_anonymized_strings:error:empty"
+msgstr "Toto pole je povinné."
+
+#, python-brace-format
+msgid "accounts:SettingsForm:custom_anonymized_strings:error:line_too_short"
+msgid_plural "accounts:SettingsForm:custom_anonymized_strings:error:line_too_short {count}"
+msgstr[0] "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne {count} znak."
+msgstr[1] "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne {count} znaky."
+msgstr[2] "Slovné spojenie, ktoré sa anonymizuje, musí mať minimálne {count} znakov."
 
 msgid "accounts:profile:title"
 msgstr "Profil užívateľa"
@@ -363,21 +365,6 @@ msgstr "Prílohy"
 msgid "inforequests:InforequestForm:attachments:help_text"
 msgstr "Priložiť môžete najviac 20 príloh s celkovou velkosťou najviac 15 MB."
 
-msgid "inforequests:obligee_action:NotCategorized:label"
-msgstr "Nezaradené"
-
-msgid "inforequests:obligee_action:NotCategorized:help"
-msgstr "Áno, odpoveď nejako súvisí, chcem, aby mi admin pomohol identifikovať odpoveď inštitúcie."
-
-msgid "inforequests:obligee_action:NotCategorized:unrelated"
-msgstr "Nie, odpoveď inštitúcie zjavne nesúvisí s mojou žiadosťou."
-
-msgid "inforequests:obligee_action:NotCategorized:help_request:label"
-msgstr "Správa pre admina"
-
-msgid "inforequests:obligee_action:NotCategorized:help_request:placeholder"
-msgstr "Popíšte adminovi, čomu ste nerozumeli"
-
 msgid "inforequests:obligee_action:Categorized:label"
 msgstr "Zaradené"
 
@@ -414,59 +401,20 @@ msgstr "Nesmie byť starší ako dátum prílušného úkonu."
 msgid "inforequests:obligee_action:Categorized:last_action_dd:error:from_future"
 msgstr "Zadať môžete len dátum dnešného dňa, alebo dní predchádzajúcich."
 
-msgid "inforequests:obligee_action:InvalidReversion:label"
-msgstr "Chyba"
+msgid "inforequests:obligee_action:NotCategorized:label"
+msgstr "Nezaradené"
 
-msgid "inforequests:obligee_action:InvalidReversion:help_request:label"
+msgid "inforequests:obligee_action:NotCategorized:help"
+msgstr "Áno, odpoveď nejako súvisí, chcem, aby mi admin pomohol identifikovať odpoveď inštitúcie."
+
+msgid "inforequests:obligee_action:NotCategorized:unrelated"
+msgstr "Nie, odpoveď inštitúcie zjavne nesúvisí s mojou žiadosťou."
+
+msgid "inforequests:obligee_action:NotCategorized:help_request:label"
 msgstr "Správa pre admina"
 
-msgid "inforequests:obligee_action:InvalidReversion:help_request:placeholder"
-msgstr "Popíšte adminovi, čo sa stalo"
-
-msgid "inforequests:obligee_action:ReversionReasons:label"
-msgstr "Predĺženie lehoty"
-
-msgid "inforequests:obligee_action:WasItReturned:label"
-msgstr "Vrátenie"
-
-msgid "inforequests:obligee_action:WasItReturned:yes"
-msgstr "Áno, odovolací orgnán rozhodol o vrátení veci povinnej osobe na nové konanie."
-
-msgid "inforequests:obligee_action:WasItReturned:no"
-msgstr "Nie, odovolací orgnán zamietol vrátiť vec povinnej osobe na nové konanie."
-
-msgid "inforequests:obligee_action:WasItAccepted:label"
-msgstr "Uznané argumenty"
-
-msgid "inforequests:obligee_action:WasItAccepted:all"
-msgstr "Áno, odovlací orgán uznal všetky argumenty uvedené v odovolaní."
-
-msgid "inforequests:obligee_action:WasItAccepted:some"
-msgstr "Odvolací orgán uznal len časť argumentov uvedených v odvolaní."
-
-msgid "inforequests:obligee_action:WasItAccepted:none"
-msgstr "Nie, odovlací orgán neuznal žiaden argument uvedený v odovolaní."
-
-msgid "inforequests:obligee_action:ContainsAppealInfo:label"
-msgstr "Informácie"
-
-msgid "inforequests:obligee_action:ContainsAppealInfo:full"
-msgstr "Áno, inštitúcia mi poslala požadované informácie."
-
-msgid "inforequests:obligee_action:ContainsAppealInfo:partial"
-msgstr "Inštitúcia mi poslala požadované informácie len čiastočne."
-
-msgid "inforequests:obligee_action:ContainsAppealInfo:none"
-msgstr "Nie, inštitúcia mi neposlala žiadne z informácií, o ktoré som žiadal."
-
-msgid "inforequests:obligee_action:IsItAppealDecision:label"
-msgstr "Rozhodnutie o odvolaní"
-
-msgid "inforequests:obligee_action:IsItAppealDecision:yes"
-msgstr "Áno, je to rozhodnutie o mojom odvolaní."
-
-msgid "inforequests:obligee_action:IsItAppealDecision:no"
-msgstr "Nie, nie je to rozhodnutie o mojom odvolaní."
+msgid "inforequests:obligee_action:NotCategorized:help_request:placeholder"
+msgstr "Popíšte adminovi, čomu ste nerozumeli"
 
 msgid "inforequests:obligee_action:DisclosureReasons:label"
 msgstr "Dôvody"
@@ -545,6 +493,60 @@ msgstr "Áno, týka sa mojej žiadosti."
 
 msgid "inforequests:obligee_action:IsOnTopic:no"
 msgstr "Nie, vôbec sa mojej žiadosti netýka."
+
+msgid "inforequests:obligee_action:InvalidReversion:label"
+msgstr "Chyba"
+
+msgid "inforequests:obligee_action:InvalidReversion:help_request:label"
+msgstr "Správa pre admina"
+
+msgid "inforequests:obligee_action:InvalidReversion:help_request:placeholder"
+msgstr "Popíšte adminovi, čo sa stalo"
+
+msgid "inforequests:obligee_action:ReversionReasons:label"
+msgstr "Predĺženie lehoty"
+
+msgid "inforequests:obligee_action:WasItReturned:label"
+msgstr "Vrátenie"
+
+msgid "inforequests:obligee_action:WasItReturned:yes"
+msgstr "Áno, odovolací orgnán rozhodol o vrátení veci povinnej osobe na nové konanie."
+
+msgid "inforequests:obligee_action:WasItReturned:no"
+msgstr "Nie, odovolací orgnán zamietol vrátiť vec povinnej osobe na nové konanie."
+
+msgid "inforequests:obligee_action:WasItAccepted:label"
+msgstr "Uznané argumenty"
+
+msgid "inforequests:obligee_action:WasItAccepted:all"
+msgstr "Áno, odovlací orgán uznal všetky argumenty uvedené v odovolaní."
+
+msgid "inforequests:obligee_action:WasItAccepted:some"
+msgstr "Odvolací orgán uznal len časť argumentov uvedených v odvolaní."
+
+msgid "inforequests:obligee_action:WasItAccepted:none"
+msgstr "Nie, odovlací orgán neuznal žiaden argument uvedený v odovolaní."
+
+msgid "inforequests:obligee_action:ContainsAppealInfo:label"
+msgstr "Informácie"
+
+msgid "inforequests:obligee_action:ContainsAppealInfo:full"
+msgstr "Áno, inštitúcia mi poslala požadované informácie."
+
+msgid "inforequests:obligee_action:ContainsAppealInfo:partial"
+msgstr "Inštitúcia mi poslala požadované informácie len čiastočne."
+
+msgid "inforequests:obligee_action:ContainsAppealInfo:none"
+msgstr "Nie, inštitúcia mi neposlala žiadne z informácií, o ktoré som žiadal."
+
+msgid "inforequests:obligee_action:IsItAppealDecision:label"
+msgstr "Rozhodnutie o odvolaní"
+
+msgid "inforequests:obligee_action:IsItAppealDecision:yes"
+msgstr "Áno, je to rozhodnutie o mojom odvolaní."
+
+msgid "inforequests:obligee_action:IsItAppealDecision:no"
+msgstr "Nie, nie je to rozhodnutie o mojom odvolaní."
 
 msgid "inforequests:obligee_action:IsItConfirmation:label"
 msgstr "Potvrdenie"
@@ -882,18 +884,6 @@ msgstr "Zverejnené infožiadosti"
 msgid "inforequests:index:heading"
 msgstr "Zoznam zverejnených infožiadostí"
 
-msgid "inforequests:mine:successful:anchor"
-msgstr "zodpovedane"
-
-msgid "inforequests:mine:successful:heading"
-msgstr "Zodpovedané"
-
-msgid "inforequests:mine:unsuccessful:anchor"
-msgstr "neuspesne"
-
-msgid "inforequests:mine:unsuccessful:heading"
-msgstr "Neúspešné"
-
 msgid "inforequests:mine:drafts:anchor"
 msgstr "rozpisane"
 
@@ -939,35 +929,17 @@ msgstr "podane"
 msgid "inforequests:mine:pending:heading"
 msgstr "Podané"
 
-msgid "inforequests:mine:subject"
-msgstr "Predmet žiadosti"
+msgid "inforequests:mine:successful:anchor"
+msgstr "zodpovedane"
 
-msgid "inforequests:mine:obligee"
-msgstr "Inštitúcia"
+msgid "inforequests:mine:successful:heading"
+msgstr "Zodpovedané"
 
-msgid "inforequests:mine:date"
-msgstr "Posledná aktivita"
+msgid "inforequests:mine:unsuccessful:anchor"
+msgstr "neuspesne"
 
-msgid "inforequests:mine:status"
-msgstr "Aktivita"
-
-msgid "inforequests:mine:drafts:empty_subject"
-msgstr "(bez predmetu)"
-
-msgid "inforequests:mine:drafts:empty_obligee"
-msgstr "(bez inštitúcie)"
-
-msgid "inforequests:mine:status:disclosure_level:PARTIAL"
-msgstr "Čiastočne zodpovedaná"
-
-msgid "inforequests:mine:status:disclosure_level:FULL"
-msgstr "Plne zodpovedaná"
-
-msgid "inforequests:mine:status:draft"
-msgstr "Rozpísané"
-
-msgid "inforequests:mine:status:new_email"
-msgstr "Nový email"
+msgid "inforequests:mine:unsuccessful:heading"
+msgstr "Neúspešné"
 
 msgid "inforequests:modals:snooze:heading"
 msgstr "Počkať ešte 3 dni"
@@ -1019,6 +991,36 @@ msgstr "Predmet žiadosti"
 
 msgid "inforequests:obligee_action_dispatcher:obligee"
 msgstr "Inštitúcia"
+
+msgid "inforequests:mine:subject"
+msgstr "Predmet žiadosti"
+
+msgid "inforequests:mine:obligee"
+msgstr "Inštitúcia"
+
+msgid "inforequests:mine:date"
+msgstr "Posledná aktivita"
+
+msgid "inforequests:mine:status"
+msgstr "Aktivita"
+
+msgid "inforequests:mine:drafts:empty_subject"
+msgstr "(bez predmetu)"
+
+msgid "inforequests:mine:drafts:empty_obligee"
+msgstr "(bez inštitúcie)"
+
+msgid "inforequests:mine:status:draft"
+msgstr "Rozpísané"
+
+msgid "inforequests:mine:status:disclosure_level:FULL"
+msgstr "Plne zodpovedaná"
+
+msgid "inforequests:mine:status:disclosure_level:PARTIAL"
+msgstr "Čiastočne zodpovedaná"
+
+msgid "inforequests:mine:status:new_email"
+msgstr "Nový email"
 
 msgid "inforequests:urls:mine"
 msgstr "moje"
@@ -1432,12 +1434,6 @@ msgstr "Čakaj pripomienku"
 msgid "main:search:title"
 msgstr "Vyhľadávanie"
 
-msgid "main:snippets:search:heading"
-msgstr "Čo chceš <b>vedieť</b>?"
-
-msgid "main:snippets:search:placeholder"
-msgstr "Hľadaj v už zodpovedaných infožiadostiach..."
-
 msgid "main:ajax_fail:heading"
 msgstr "Niečo sa pokazilo"
 
@@ -1492,6 +1488,9 @@ msgstr "Spravovať e-maily"
 msgid "main:menu:account:connections"
 msgstr "Spravovať napojenia"
 
+msgid "main:menu:account:settings"
+msgstr "Nastavenia"
+
 msgid "main:menu:account:invite"
 msgstr "Pozvať"
 
@@ -1500,9 +1499,6 @@ msgstr "Odhlásiť"
 
 msgid "main:menu:account:login"
 msgstr "Prihlásiť"
-
-msgid "main:menu:account:settings"
-msgstr "Nastavenia"
 
 msgid "main:menu:about"
 msgstr "O projekte"
@@ -1524,6 +1520,12 @@ msgstr "Hľadaj..."
 
 msgid "main:header:search:button"
 msgstr "Hľadaj"
+
+msgid "main:snippets:search:heading"
+msgstr "Čo chceš <b>vedieť</b>?"
+
+msgid "main:snippets:search:placeholder"
+msgstr "Hľadaj v už zodpovedaných infožiadostiach..."
 
 msgid "socialaccount:authentication_error:title"
 msgstr "Zlyhalo prihlásenie cez sociálnu sieť"
