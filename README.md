@@ -116,6 +116,40 @@ If some migrations fail, try to run them once or twice again. Sometimes it helps
  4. Now, you can navigate your browser to: http://127.0.0.1:8000/ and start using it.
 
 
+### 1.5. Viewing the site using https
+
+To run a server with https you can use
+[RunServerPlus](https://django-extensions.readthedocs.org/en/latest/runserver_plus.html) from
+[django-extensions](https://github.com/django-extensions/django-extensions). You need the
+`libffi-dev` package installed in your system.
+
+ 1. Run the following commands:
+
+    	$ env/bin/pip install django-extensions==1.0.3
+    	$ env/bin/pip install Werkzeug==0.9
+    	$ env/bin/pip install pyOpenSSL==0.13
+
+ 2. Add `django_extension` to `INSTALLED_APPS` in `chcemvediet/settings/server_local.py` file:
+
+    	INSTALLED_APPS = (
+    	    ...
+    	    u'django_extensions',
+    	    ...
+    	    )
+
+ 3. Setup default protocol in `chcemvediet/settings/server_local.py`.
+
+    	ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'https'
+
+ 4. Run the server in ssl mode with:
+
+    	env/bin/python manage.py runserver_plus --cert /tmp/cert
+
+ 5. Now, you can navigate your browser to: https://127.0.0.1:8000/ and start using it.
+
+Or you can create a public https URL using [ngrok](https://ngrok.com/download).
+
+
 ## 2. Online Development and Production Servers
 
 We run production server on Apache using `mod_wsgi` and MySQL database.
@@ -252,6 +286,7 @@ your browser.
 
 ## 3. Social accounts application keys
 
+
 ### 3.1. Google OAuth
 
  1. Go to https://code.google.com/apis/console/ and create a project.
@@ -271,6 +306,26 @@ your browser.
 
  3. Run the configuration script `setup.py` and enter given 'Client ID for web application' and
     'Client secret'.
+
+
+### 3.2. Facebook OAuth
+
+ 1. Go to https://developers.facebook.com/apps/ and create an app.
+
+ 2. Add a Product 'Facebook Login' and select platform 'Web'. Enter 'Site URL' `https://{domain}/`.
+
+ 3. Go to 'Facebook Login' / 'Settings' and add 'Valid OAuth Redirect URIs':
+
+    	https://{domain}/accounts/facebook/login/callback/
+    	https://{domain}/sk/accounts/facebook/login/callback/
+    	https://{domain}/en/accounts/facebook/login/callback/
+
+    Where `{domain}` is your production domain or `127.0.0.1:8000` if in local development mode.
+    'Site URL' in form `127.0.0.1:8000` is invalid use `localhost:8000` instead.
+
+ 5. Run the configuration script `setup.py` and enter given 'App ID' and 'App Secret'.
+
+To use Facebook Login on localhost, you need to use [https connection](#15-viewing-the-site-using-https). 
 
 
 ## 4. Google custom search engine key
@@ -374,6 +429,7 @@ If you want to contribute, please, create a new branch for your changes:
 	$ git push -u origin <new_branch_name>
 
 And then submit a 'Pull Request' on GitHub.
+
 
 ### 7.1. Site Content and translations
 
