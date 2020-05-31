@@ -150,10 +150,6 @@ RUN \
     "" \
     # Google OAuth Secret (default)
     "" \
-    # LinkedIn OAuth Client ID (default)
-    "" \
-    # LinkedIn OAuth Secret (default)
-    "" \
     | su chcemvediet -c "PYTHONUNBUFFERED=1 python setup.py" && \
   su chcemvediet -c "env/bin/python manage.py collectstatic --noinput" && \
   :
