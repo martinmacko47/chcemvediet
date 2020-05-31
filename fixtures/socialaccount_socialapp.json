@@ -28,20 +28,6 @@
   }
 },
 {
-  "pk": 3, 
-  "model": "socialaccount.socialapp", 
-  "fields": {
-    "name": "Twitter OAuth", 
-    "sites": [
-      1
-    ], 
-    "secret": "(insert Client Secret here)", 
-    "client_id": "(insert Client ID here)", 
-    "key": "", 
-    "provider": "twitter"
-  }
-},
-{
   "pk": 4, 
   "model": "socialaccount.socialapp", 
   "fields": {

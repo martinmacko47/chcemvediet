@@ -1323,9 +1323,6 @@ msgstr "Prihlásiť pomocou Facebooku"
 msgid "account:social_buttons:google"
 msgstr "Prihlásiť pomocou Googlu"
 
-msgid "account:social_buttons:twitter"
-msgstr "Prihlásiť pomocou Twittra"
-
 msgid "account:social_buttons:linkedin"
 msgstr "Prihlásiť pomocou LinkedInu"
 

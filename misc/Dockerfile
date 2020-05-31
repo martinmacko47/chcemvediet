@@ -150,10 +150,6 @@ RUN \
     "" \
     # Google OAuth Secret (default)
     "" \
-    # Twitter OAuth Client ID (default)
-    "" \
-    # Twitter OAuth Secret (default)
-    "" \
     # LinkedIn OAuth Client ID (default)
     "" \
     # LinkedIn OAuth Secret (default)
