@@ -8,6 +8,30 @@ from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
 
+class BranchInline(admin.TabularInline):
+    model = Branch
+    fields = [
+            u'id_field',
+            u'obligee_field',
+            ]
+
+    def id_field(self, obj):
+        return admin_obj_format(obj, u'{obj.pk}')
+    id_field.short_description = u'id'
+
+    def obligee_field(self, obj):
+        return admin_obj_format(obj.obligee, u'{obj.name}')
+    obligee_field.short_description = u'obligee'
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 @admin.register(Inforequest, site=admin.site)
 class InforequestAdmin(admin.ModelAdmin):
     date_hierarchy = u'submission_date'
@@ -64,7 +88,15 @@ class InforequestAdmin(admin.ModelAdmin):
             u'applicant',
             ]
     inlines = [
+            BranchInline,
             ]
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        for inline in self.get_inline_instances(request, obj):
+            # hide BranchInline in the add view
+            if isinstance(inline, BranchInline) and obj is None:
+                continue
+            yield inline.get_formset(request, obj), inline
 
     def get_queryset(self, request):
         queryset = super(InforequestAdmin, self).get_queryset(request)
@@ -167,6 +199,36 @@ class InforequestEmailAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'email')
         return queryset
 
+class ActionInline(admin.TabularInline):
+    model = Action
+    fields = [
+            u'id_field',
+            u'email_field',
+            u'type',
+            u'created',
+            ]
+    ordering = [
+            u'-created',
+            u'-id',
+            ]
+
+    def id_field(self, obj):
+        return admin_obj_format(obj, u'{obj.pk}')
+    id_field.short_description = u'id'
+
+    def email_field(self, obj):
+        return admin_obj_format(obj.email, u'{obj}')
+    email_field.short_description = u'E-mail'
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 @admin.register(Branch, site=admin.site)
 class BranchAdmin(admin.ModelAdmin):
     date_hierarchy = None
@@ -214,7 +276,15 @@ class BranchAdmin(admin.ModelAdmin):
             u'advanced_by',
             ]
     inlines = [
+            ActionInline,
             ]
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        for inline in self.get_inline_instances(request, obj):
+            # hide ActionInline in the add view
+            if isinstance(inline, ActionInline) and obj is None:
+                continue
+            yield inline.get_formset(request, obj), inline
 
     def get_queryset(self, request):
         queryset = super(BranchAdmin, self).get_queryset(request)
@@ -263,7 +333,15 @@ class ActionAdmin(admin.ModelAdmin):
             u'email',
             ]
     inlines = [
+            BranchInline,
             ]
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        for inline in self.get_inline_instances(request, obj):
+            # hide BranchInline in the add view
+            if isinstance(inline, BranchInline) and obj is None:
+                continue
+            yield inline.get_formset(request, obj), inline
 
     def get_queryset(self, request):
         queryset = super(ActionAdmin, self).get_queryset(request)
