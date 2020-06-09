@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.contrib.sites.models import Site
 from django.db import models, migrations
 
+
+SITE_ID = 1
 
 def forward(apps, schema_editor):
     SocialApp = apps.get_model(u'socialaccount', u'SocialApp')
@@ -13,11 +14,10 @@ def forward(apps, schema_editor):
 
 def backward(apps, schema_editor):
     SocialApp = apps.get_model(u'socialaccount', u'SocialApp')
-    site = Site.objects.get_current()
     twitter = SocialApp.objects.create(provider=u'twitter', name=u'Twitter OAuth')
-    twitter.sites.add(site.pk)
+    twitter.sites.add(SITE_ID)
     linkedin = SocialApp.objects.create(provider=u'linkedin', name=u'Linkedin OAuth')
-    linkedin.sites.add(site.pk)
+    linkedin.sites.add(SITE_ID)
 
 class Migration(migrations.Migration):
 
