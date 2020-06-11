@@ -9,7 +9,7 @@ SITE_ID = 1
 def forward(apps, schema_editor):
     SocialApp = apps.get_model(u'socialaccount', u'SocialApp')
     SocialAccount = apps.get_model(u'socialaccount', u'SocialAccount')
-    SocialApp.objects.filter(provider__in=[u'twitter', 'linkedin']).delete()
+    SocialApp.objects.filter(provider__in=[u'twitter', u'linkedin']).delete()
     SocialAccount.objects.filter(provider__in=[u'twitter', u'linkedin']).delete()
 
 def backward(apps, schema_editor):
