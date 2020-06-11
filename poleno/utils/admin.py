@@ -37,3 +37,17 @@ def admin_obj_format(obj, format=u'{tag}', *args, **kwargs):
         except NoReverseMatch:
             pass
     return res
+
+class ReadOnlyAdminInlineMixin(object):
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.fields
+
+    def has_change_permission(self, request, obj=None):
+        return True if request.resolver_match.url_name.endswith(u'change') else False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

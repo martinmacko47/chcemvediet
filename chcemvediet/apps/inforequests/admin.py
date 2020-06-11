@@ -3,12 +3,13 @@
 from django.contrib import admin
 
 from poleno.utils.misc import decorate
-from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
+from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
+                                ReadOnlyAdminInlineMixin)
 
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
 
-class BranchInline(admin.TabularInline):
+class BranchInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
     model = Branch
     fields = [
             decorate(
@@ -20,18 +21,6 @@ class BranchInline(admin.TabularInline):
                 short_description=u'obligee',
                 ),
             ]
-
-    def get_readonly_fields(self, request, obj=None):
-        return self.fields
-
-    def has_change_permission(self, request, obj=None):
-        return True if request.resolver_match.url_name.endswith(u'change') else False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
 @admin.register(Inforequest, site=admin.site)
 class InforequestAdmin(admin.ModelAdmin):
@@ -193,7 +182,7 @@ class InforequestEmailAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'email')
         return queryset
 
-class ActionInline(admin.TabularInline):
+class ActionInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
     model = Action
     fields = [
             decorate(
@@ -211,18 +200,6 @@ class ActionInline(admin.TabularInline):
             u'-created',
             u'-id',
             ]
-
-    def get_readonly_fields(self, request, obj=None):
-        return self.fields
-
-    def has_change_permission(self, request, obj=None):
-        return True if request.resolver_match.url_name == u'inforequests_branch_change' else False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
 @admin.register(Branch, site=admin.site)
 class BranchAdmin(admin.ModelAdmin):
