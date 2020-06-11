@@ -11,20 +11,21 @@ from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Act
 class BranchInline(admin.TabularInline):
     model = Branch
     fields = [
-            u'id_field',
-            u'obligee_field',
+            decorate(
+                lambda o: admin_obj_format(o, u'{obj.pk}'),
+                short_description=u'id',
+                ),
+            decorate(
+                lambda o: admin_obj_format(o.obligee, u'{obj.name}'),
+                short_description=u'obligee',
+                ),
             ]
-
-    def id_field(self, obj):
-        return admin_obj_format(obj, u'{obj.pk}')
-    id_field.short_description = u'id'
-
-    def obligee_field(self, obj):
-        return admin_obj_format(obj.obligee, u'{obj.name}')
-    obligee_field.short_description = u'obligee'
 
     def get_readonly_fields(self, request, obj=None):
         return self.fields
+
+    def has_change_permission(self, request, obj=None):
+        return True if request.resolver_match.url_name.endswith(u'change') else False
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -90,13 +91,6 @@ class InforequestAdmin(admin.ModelAdmin):
     inlines = [
             BranchInline,
             ]
-
-    def get_formsets_with_inlines(self, request, obj=None):
-        for inline in self.get_inline_instances(request, obj):
-            # hide BranchInline in the add view
-            if isinstance(inline, BranchInline) and obj is None:
-                continue
-            yield inline.get_formset(request, obj), inline
 
     def get_queryset(self, request):
         queryset = super(InforequestAdmin, self).get_queryset(request)
@@ -202,8 +196,14 @@ class InforequestEmailAdmin(admin.ModelAdmin):
 class ActionInline(admin.TabularInline):
     model = Action
     fields = [
-            u'id_field',
-            u'email_field',
+            decorate(
+                lambda o: admin_obj_format(o, u'{obj.pk}'),
+                short_description=u'id',
+                ),
+            decorate(
+                lambda o: admin_obj_format(o.email, u'{obj}'),
+                short_description=u'E-mail',
+                ),
             u'type',
             u'created',
             ]
@@ -212,16 +212,11 @@ class ActionInline(admin.TabularInline):
             u'-id',
             ]
 
-    def id_field(self, obj):
-        return admin_obj_format(obj, u'{obj.pk}')
-    id_field.short_description = u'id'
-
-    def email_field(self, obj):
-        return admin_obj_format(obj.email, u'{obj}')
-    email_field.short_description = u'E-mail'
-
     def get_readonly_fields(self, request, obj=None):
         return self.fields
+
+    def has_change_permission(self, request, obj=None):
+        return True if request.resolver_match.url_name == u'inforequests_branch_change' else False
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -279,13 +274,6 @@ class BranchAdmin(admin.ModelAdmin):
             ActionInline,
             ]
 
-    def get_formsets_with_inlines(self, request, obj=None):
-        for inline in self.get_inline_instances(request, obj):
-            # hide ActionInline in the add view
-            if isinstance(inline, ActionInline) and obj is None:
-                continue
-            yield inline.get_formset(request, obj), inline
-
     def get_queryset(self, request):
         queryset = super(BranchAdmin, self).get_queryset(request)
         queryset = queryset.select_related(u'inforequest')
@@ -335,13 +323,6 @@ class ActionAdmin(admin.ModelAdmin):
     inlines = [
             BranchInline,
             ]
-
-    def get_formsets_with_inlines(self, request, obj=None):
-        for inline in self.get_inline_instances(request, obj):
-            # hide BranchInline in the add view
-            if isinstance(inline, BranchInline) and obj is None:
-                continue
-            yield inline.get_formset(request, obj), inline
 
     def get_queryset(self, request):
         queryset = super(ActionAdmin, self).get_queryset(request)
