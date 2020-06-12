@@ -13,7 +13,7 @@ class BranchInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
     model = Branch
     fields = [
             decorate(
-                lambda o: admin_obj_format(o, u'{obj.pk}'),
+                lambda o: admin_obj_format(o),
                 short_description=u'id',
                 ),
             decorate(
@@ -186,11 +186,11 @@ class ActionInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
     model = Action
     fields = [
             decorate(
-                lambda o: admin_obj_format(o, u'{obj.pk}'),
+                lambda o: admin_obj_format(o),
                 short_description=u'id',
                 ),
             decorate(
-                lambda o: admin_obj_format(o.email, u'{obj}'),
+                lambda o: admin_obj_format(o.email),
                 short_description=u'E-mail',
                 ),
             u'type',
