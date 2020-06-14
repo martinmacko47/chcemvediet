@@ -3,10 +3,24 @@
 from django.contrib import admin
 
 from poleno.utils.misc import decorate
-from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
+from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
+                                ReadOnlyAdminInlineMixin)
 
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
+
+class BranchInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
+    model = Branch
+    fields = [
+            decorate(
+                lambda o: admin_obj_format(o),
+                short_description=u'id',
+                ),
+            decorate(
+                lambda o: admin_obj_format(o.obligee, u'{obj.name}'),
+                short_description=u'obligee',
+                ),
+            ]
 
 @admin.register(Inforequest, site=admin.site)
 class InforequestAdmin(admin.ModelAdmin):
@@ -64,6 +78,7 @@ class InforequestAdmin(admin.ModelAdmin):
             u'applicant',
             ]
     inlines = [
+            BranchInline,
             ]
 
     def get_queryset(self, request):
@@ -167,6 +182,25 @@ class InforequestEmailAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'email')
         return queryset
 
+class ActionInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
+    model = Action
+    fields = [
+            decorate(
+                lambda o: admin_obj_format(o),
+                short_description=u'id',
+                ),
+            decorate(
+                lambda o: admin_obj_format(o.email),
+                short_description=u'E-mail',
+                ),
+            u'type',
+            u'created',
+            ]
+    ordering = [
+            u'-created',
+            u'-id',
+            ]
+
 @admin.register(Branch, site=admin.site)
 class BranchAdmin(admin.ModelAdmin):
     date_hierarchy = None
@@ -214,6 +248,7 @@ class BranchAdmin(admin.ModelAdmin):
             u'advanced_by',
             ]
     inlines = [
+            ActionInline,
             ]
 
     def get_queryset(self, request):
@@ -263,6 +298,7 @@ class ActionAdmin(admin.ModelAdmin):
             u'email',
             ]
     inlines = [
+            BranchInline,
             ]
 
     def get_queryset(self, request):

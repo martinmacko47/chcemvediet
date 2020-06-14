@@ -37,3 +37,22 @@ def admin_obj_format(obj, format=u'{tag}', *args, **kwargs):
         except NoReverseMatch:
             pass
     return res
+
+class ReadOnlyAdminInlineMixin(admin.options.InlineModelAdmin):
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.fields
+
+    def has_change_permission(self, request, obj=None):
+        u"""
+        Returns True, only to display model on change view. The model can not be changed.
+        """
+        info = self.parent_model._meta.app_label, self.parent_model._meta.model_name
+        url_name = u'{}_{}_change'.format(*info)
+        return url_name == request.resolver_match.url_name
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
