@@ -1,6 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+from django.forms.models import BaseInlineFormSet
 
 from poleno.utils.misc import decorate
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
@@ -9,8 +10,14 @@ from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
 
+class BranchFormSet(BaseInlineFormSet):
+    def get_queryset(self):
+        qs = super(BranchFormSet, self).get_queryset()
+        return sorted(qs, key=lambda branch: branch.tree_order)
+
 class BranchInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
     model = Branch
+    formset = BranchFormSet
     fields = [
             decorate(
                 lambda o: admin_obj_format(o),
