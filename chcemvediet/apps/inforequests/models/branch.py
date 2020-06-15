@@ -81,6 +81,13 @@ class Branch(FormatMixin, models.Model):
     def is_main(self):
         return self.advanced_by_id is None
 
+    @cached_property
+    def tree_order(self):
+        if self.is_main:
+            return (self.pk,)
+        else:
+            return self.advanced_by.branch.tree_order + (self.pk,)
+
     @staticmethod
     def prefetch_actions(path=None, queryset=None):
         u"""
