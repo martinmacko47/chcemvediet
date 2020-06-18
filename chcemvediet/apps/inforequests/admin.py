@@ -20,7 +20,7 @@ class BranchInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
     formset = BranchFormSet
     fields = [
             decorate(
-                lambda o: admin_obj_format(o),
+                lambda o: u'{} {}'.format(u'—' * (len(o.tree_order) - 1), admin_obj_format(o)),
                 short_description=u'id',
                 ),
             decorate(
