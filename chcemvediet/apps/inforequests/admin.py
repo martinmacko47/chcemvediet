@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
+from django.utils.html import format_html
 
 from poleno.utils.misc import decorate
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
@@ -20,7 +21,8 @@ class BranchInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
     formset = BranchFormSet
     fields = [
             decorate(
-                lambda o: u'{} {}'.format(u'—' * (len(o.tree_order) - 1), admin_obj_format(o)),
+                lambda o: format_html(u'{} {}', u'—' * (len(o.tree_order) - 1),
+                                      admin_obj_format(o)),
                 short_description=u'id',
                 ),
             decorate(
