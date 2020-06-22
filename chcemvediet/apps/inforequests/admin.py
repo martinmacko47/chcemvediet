@@ -315,3 +315,19 @@ class ActionAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'branch')
         queryset = queryset.select_related(u'email')
         return queryset
+
+    def get_actions(self, request):
+        actions = super(ActionAdmin, self).get_actions(request)
+        if u'delete_selected' in actions:
+            del actions[u'delete_selected']
+        return actions
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is None or (obj.type not in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST] and
+                len(obj.branch.actions) > 1):
+            return True
+        return False
+
+    def delete_model(self, request, obj):
+        # delete action.email.inforequestemail_set.all()
+        super(ActionAdmin, self).delete_model(request, obj)

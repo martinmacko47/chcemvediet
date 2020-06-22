@@ -315,7 +315,7 @@ class Action(FormatMixin, models.Model):
 
     @cached_property
     def next_action(self):
-        return self.branch.action_set.order_by_created().after(self).first()
+        return self.branch.action_set.exclude(pk=self.pk).order_by_created().after(self).first()
 
     @cached_property
     def action_path(self):
