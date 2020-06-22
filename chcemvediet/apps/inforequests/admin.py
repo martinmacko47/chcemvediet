@@ -1,8 +1,17 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import re
+
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
+from django.contrib.admin.utils import unquote, get_deleted_objects
+from django.core.exceptions import PermissionDenied
+from django.db import router
+from django.http import Http404
+from django.utils.encoding import force_text
+from django.utils.html import escape
+from django.utils.translation import ugettext as _
 
 from poleno.utils.misc import decorate
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
@@ -328,6 +337,79 @@ class ActionAdmin(admin.ModelAdmin):
             return True
         return False
 
+    def delete_view(self, request, object_id, extra_context=None):
+        "The 'delete' admin view for this model."
+        opts = self.model._meta
+        app_label = opts.app_label
+
+        obj = self.get_object(request, unquote(object_id))
+
+        if not self.has_delete_permission(request, obj):
+            raise PermissionDenied
+
+        if obj is None:
+            raise Http404(
+                _('%(name)s object with primary key %(key)r does not exist.') %
+                {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
+            )
+
+        using = router.db_for_write(self.model)
+
+        # Populate deleted_objects, a data structure of all related objects that
+        # will also be deleted.
+        (deleted_objects, perms_needed, protected) = get_deleted_objects(
+            [obj], opts, request.user, self.admin_site, using)
+        insert_inforequestemail(deleted_objects)
+
+        if request.POST:  # The user has already confirmed the deletion.
+            if perms_needed:
+                raise PermissionDenied
+            obj_display = force_text(obj)
+            self.log_deletion(request, obj, obj_display)
+            self.delete_model(request, obj)
+
+            return self.response_delete(request, obj_display)
+
+        object_name = force_text(opts.verbose_name)
+
+        if perms_needed or protected:
+            title = _("Cannot delete %(name)s") % {"name": object_name}
+        else:
+            title = _("Are you sure?")
+
+        context = dict(
+            self.admin_site.each_context(),
+            title=title,
+            object_name=object_name,
+            object=obj,
+            deleted_objects=deleted_objects,
+            perms_lacking=perms_needed,
+            protected=protected,
+            opts=opts,
+            app_label=app_label,
+            preserved_filters=self.get_preserved_filters(request),
+        )
+        context.update(extra_context or {})
+        return self.render_delete_form(request, context)
+
     def delete_model(self, request, obj):
         # delete action.email.inforequestemail_set.all()
         super(ActionAdmin, self).delete_model(request, obj)
+
+def insert_inforequestemail(deleted_objects):
+    for i in range(len(deleted_objects)):
+        obj = deleted_objects[i]
+        m = re.match(r'Action: <a href=\".*>\[(\d+)\]', unicode(obj))
+        if type(obj) == list:
+            insert_inforequestemail(obj)
+        elif m:
+            action = Action.objects.get(pk=m.group(1))
+            if action.email:
+                inforequestemails = action.email.inforequestemail_set.all()
+                try:
+                    if type(deleted_objects[i+1]) == list:
+                        deleted_objects[i+1].extend([unicode(ire) for ire in inforequestemails])
+                    else:
+                        deleted_objects.insert(i+1, [unicode(ire) for ire in inforequestemails])
+                except IndexError:
+                    deleted_objects.insert(i+1, [unicode(ire) for ire in inforequestemails])
