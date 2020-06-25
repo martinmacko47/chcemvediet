@@ -8,7 +8,6 @@ import subprocess
 import string
 import random
 import json
-import getpass
 import textwrap
 import unicodedata
 
@@ -103,7 +102,7 @@ class Configure(object):
         configured = self.data.get(key, u'')
         prompt = u'\n{} [{}]: '.format(prompt, u'*****' if configured else u'')
         while True:
-            inputed = getpass.getpass(PROMPT + prompt + RESET)
+            inputed = raw_input(PROMPT + prompt + RESET)
             if required and not inputed and not configured:
                 print(ERROR + u'\nError: The value is required.' + RESET)
                 continue
