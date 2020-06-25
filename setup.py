@@ -281,7 +281,7 @@ def install_requirements(configure):
             }[server_mode]
     requirements += {
             u'Y': [
-                u'-r', u'requirements/tests.txt'
+                u'-r', u'requirements/tests.txt',
                 u'-r', u'poleno/dummymail/requirements.txt'
                 ],
             u'N': [],
