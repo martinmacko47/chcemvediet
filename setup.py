@@ -8,6 +8,7 @@ import subprocess
 import string
 import random
 import json
+import getpass
 import textwrap
 import unicodedata
 
@@ -102,7 +103,7 @@ class Configure(object):
         configured = self.data.get(key, u'')
         prompt = u'\n{} [{}]: '.format(prompt, u'*****' if configured else u'')
         while True:
-            inputed = raw_input(PROMPT + prompt + RESET)
+            inputed = getpass.getpass(PROMPT + prompt + RESET)
             if required and not inputed and not configured:
                 print(ERROR + u'\nError: The value is required.' + RESET)
                 continue
@@ -280,10 +281,7 @@ def install_requirements(configure):
                 ],
             }[server_mode]
     requirements += {
-            u'Y': [
-                u'-r', u'requirements/tests.txt',
-                u'-r', u'poleno/dummymail/requirements.txt'
-                ],
+            u'Y': [u'-r', u'requirements/tests.txt'],
             u'N': [],
             }[enable_unittests]
     call(u'Installing requirements for the selected server mode:',
