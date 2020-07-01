@@ -1,27 +1,21 @@
-name: Python package
-
+name: Testing project
 on: push
-
 jobs:
   build:
-
     runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        python-version: [2.7.18]
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 2.7.18
     - name: Install dependencies
       run: |
         sudo apt-get update && sudo apt-get install virtualenv gettext
     - name: Run setup
       run: |
-        CREDENTIALS=(
+        CONFIGURATION=(
           # Server mode: Local development mode with dummy email infrastructure.
           "2"
           # Mock libreoffice?
@@ -67,7 +61,7 @@ jobs:
           # Google OAuth Secret (default)
           ""
         )
-        printf "%s\n" "${CREDENTIALS[@]}" | PYTHONUNBUFFERED=1 python setup.py
-    - name: Test
+        printf "%s\n" "${CONFIGURATION[@]}" | PYTHONUNBUFFERED=1 python setup.py
+    - name: Run tests
       run: |
         env/bin/python manage.py test
