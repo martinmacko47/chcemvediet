@@ -1,0 +1,67 @@
+name: Testing project
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 2.7.18
+    - name: Install dependencies
+      run: |
+        sudo apt-get update && sudo apt-get install virtualenv gettext
+    - name: Run setup
+      run: |
+        CONFIGURATION=(
+          # Server mode: Local development mode with dummy email infrastructure.
+          "2"
+          # Mock libreoffice?
+          "y"
+          # Mock imagemagic?
+          "y"
+          # Mock abbyyocr11?
+          "y"
+          # Install requirements for unittesting?
+          "y"
+          # Server domain
+          "localhost:8000"
+          # Admin e-mail (default)
+          ""
+          # Support e-mail (default)
+          ""
+          # Inforequest unique e-mail (default)
+          ""
+          # Default from e-mail (default)
+          ""
+          # Obligee dummy e-mail
+          "obilgee@chcemvediet.sk"
+          # Unique cache key prefix (default)
+          ""
+          # Google Custom Search API key (default)
+          ""
+          # Load datasheets / Neighbourhood dummy was omitted / Delete it?
+          "y"
+          # Load datasheets / Municipality dummy was omitted / Delete it?
+          "y"
+          # Load datasheets / District dummy was omitted / Delete it?
+          "y"
+          # Load datasheets / Region dummy was omitted / Delete it?
+          "y"
+          # Admin password
+          "admin"
+          # Facebook OAuth Client ID (default)
+          ""
+          # Facebook OAuth Secret (default)
+          ""
+          # Google OAuth Client ID (default)
+          ""
+          # Google OAuth Secret (default)
+          ""
+        )
+        printf "%s\n" "${CONFIGURATION[@]}" | PYTHONUNBUFFERED=1 python setup.py
+    - name: Run tests
+      run: |
+        env/bin/python manage.py test
