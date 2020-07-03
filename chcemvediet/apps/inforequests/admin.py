@@ -5,13 +5,6 @@ import re
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
-from django.contrib.admin.utils import unquote, get_deleted_objects
-from django.core.exceptions import PermissionDenied
-from django.db import router
-from django.http import Http404
-from django.utils.encoding import force_text
-from django.utils.html import escape
-from django.utils.translation import ugettext as _
 
 from poleno.utils.misc import decorate
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
@@ -332,84 +325,83 @@ class ActionAdmin(admin.ModelAdmin):
         return actions
 
     def has_delete_permission(self, request, obj=None):
-        if obj is None or (obj.type not in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST] and
-                len(obj.branch.actions) > 1):
+        if obj is None:
+            return True
+        if obj.type in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST]:
+            return False
+        if len(obj.branch.actions) > 1:
             return True
         return False
 
+    def render_delete_form(self, request, context):
+        action = context[u'object']
+        context[u'deleted_objects'].extend(
+            [format_inforequestemail(ire, request.user, self.admin_site) for ire in action.inforequestemails_to_delete])
+        return super(ActionAdmin, self).render_delete_form(request, context)
+
     def delete_view(self, request, object_id, extra_context=None):
-        "The 'delete' admin view for this model."
-        opts = self.model._meta
-        app_label = opts.app_label
-
-        obj = self.get_object(request, unquote(object_id))
-
-        if not self.has_delete_permission(request, obj):
-            raise PermissionDenied
-
-        if obj is None:
-            raise Http404(
-                _('%(name)s object with primary key %(key)r does not exist.') %
-                {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
-            )
-
-        using = router.db_for_write(self.model)
-
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
-            [obj], opts, request.user, self.admin_site, using)
-        insert_inforequestemail(deleted_objects)
-
+        from django.contrib.admin.utils import unquote
         if request.POST:  # The user has already confirmed the deletion.
-            if perms_needed:
-                raise PermissionDenied
-            obj_display = force_text(obj)
-            self.log_deletion(request, obj, obj_display)
-            self.delete_model(request, obj)
-
-            return self.response_delete(request, obj_display)
-
-        object_name = force_text(opts.verbose_name)
-
-        if perms_needed or protected:
-            title = _("Cannot delete %(name)s") % {"name": object_name}
-        else:
-            title = _("Are you sure?")
-
-        context = dict(
-            self.admin_site.each_context(),
-            title=title,
-            object_name=object_name,
-            object=obj,
-            deleted_objects=deleted_objects,
-            perms_lacking=perms_needed,
-            protected=protected,
-            opts=opts,
-            app_label=app_label,
-            preserved_filters=self.get_preserved_filters(request),
-        )
-        context.update(extra_context or {})
-        return self.render_delete_form(request, context)
+            obj = self.get_object(request, unquote(object_id))
+            for ire in obj.inforequestemails_to_delete.filter(type=InforequestEmail.TYPES.OBLIGEE_ACTION):
+                pass
+                # ire.type = int(request.POST['ire-{}'.format(ire.pk)])
+                # ire.save()
+        return super(ActionAdmin, self).delete_view(request, object_id, extra_context)
 
     def delete_model(self, request, obj):
-        # delete action.email.inforequestemail_set.all()
+        # obj.inforequestemails_to_delete.filter(type=InforequestEmail.TYPES.APPLICANT_ACTION).delete()
         super(ActionAdmin, self).delete_model(request, obj)
 
-def insert_inforequestemail(deleted_objects):
-    for i in range(len(deleted_objects)):
-        obj = deleted_objects[i]
-        m = re.match(r'Action: <a href=\".*>\[(\d+)\]', unicode(obj))
-        if type(obj) == list:
-            insert_inforequestemail(obj)
-        elif m:
-            action = Action.objects.get(pk=m.group(1))
-            if action.email:
-                inforequestemails = action.email.inforequestemail_set.all()
-                try:
-                    if type(deleted_objects[i+1]) == list:
-                        deleted_objects[i+1].extend([unicode(ire) for ire in inforequestemails])
-                    else:
-                        deleted_objects.insert(i+1, [unicode(ire) for ire in inforequestemails])
-                except IndexError:
-                    deleted_objects.insert(i+1, [unicode(ire) for ire in inforequestemails])
+def format_inforequestemail(ire, user, admin_site):
+    from django.utils.text import capfirst
+    from django.core.urlresolvers import reverse, NoReverseMatch
+    from django.contrib.admin.utils import quote
+    from django.contrib.auth import get_permission_codename
+    from poleno.utils.misc import squeeze
+    from django.utils.encoding import force_text
+    perms_needed = set()
+
+    has_admin = ire.__class__ in admin_site._registry
+    opts = ire._meta
+    no_edit_link = '%s: %s' % (capfirst(opts.verbose_name),
+                               force_text(ire))
+    if has_admin:
+        try:
+            admin_url = reverse('%s:%s_%s_change'
+                                % (admin_site.name,
+                                   opts.app_label,
+                                   opts.model_name),
+                                None, (quote(ire._get_pk_val()),))
+        except NoReverseMatch:
+            # Change url doesn't exist -- don't display link to edit
+            return no_edit_link
+        p = '%s.%s' % (opts.app_label,
+                       get_permission_codename('delete', opts))
+        if not user.has_perm(p):
+            perms_needed.add(opts.verbose_name)
+        # Display a link to the admin page.
+        select_form = squeeze(u"""
+                <div style="display:inline">
+                <label class="required" for="ire-{4}"></label>
+                <select id="ire-{4}" name="ire-{4}">
+                <option value="3">Nerozhodnuté</option>
+                <option value="4">Nesúvisiace</option>
+                </select>
+                </div>
+                """
+                )
+        form = u'{0}: <a href="{1}">{2}</a> {3}'
+        if ire.type == InforequestEmail.TYPES.OBLIGEE_ACTION:
+            form += select_form
+        return format_html(form,
+                           capfirst(opts.verbose_name),
+                           admin_url,
+                           ire,
+                           ire.get_type_display(),
+                           ire.pk,
+                           )
+    else:
+        # Don't display link to edit, because it either has no
+        # admin or is edited inline.
+        return no_edit_link

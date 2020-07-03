@@ -340,6 +340,18 @@ class Action(FormatMixin, models.Model):
         return self.email_id is not None
 
     @cached_property
+    def inforequestemails_to_delete(self):
+        from chcemvediet.apps.inforequests.models import InforequestEmail
+        from poleno.mail.models import Message
+        from django.db.models import Q
+        return InforequestEmail.objects.filter(
+                inforequest=self.branch.inforequest,
+                email=Message.objects.filter(
+                    Q(action=Action.objects.filter(branch=Branch.objects.filter(advanced_by=self)))
+                    | Q(action=self)
+                ))
+
+    @cached_property
     def has_obligee_deadline(self):
         return self.deadline and self.deadline.is_obligee_deadline
 
