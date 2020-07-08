@@ -6,7 +6,7 @@ import contextlib
 from django.utils.http import urlencode
 from django.test import TestCase
 
-from poleno.utils.views import reverse
+from poleno.utils.urls import reverse
 
 
 @contextlib.contextmanager
