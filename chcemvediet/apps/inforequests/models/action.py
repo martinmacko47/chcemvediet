@@ -315,7 +315,7 @@ class Action(FormatMixin, models.Model):
 
     @cached_property
     def next_action(self):
-        return self.branch.action_set.exclude(pk=self.pk).order_by_created().after(self).first()
+        return self.branch.action_set.order_by_created().after(self).first()
 
     @cached_property
     def action_path(self):
@@ -338,18 +338,6 @@ class Action(FormatMixin, models.Model):
     @cached_property
     def is_by_email(self):
         return self.email_id is not None
-
-    @cached_property
-    def inforequestemails_to_delete(self):
-        from chcemvediet.apps.inforequests.models import InforequestEmail
-        from poleno.mail.models import Message
-        from django.db.models import Q
-        return InforequestEmail.objects.filter(
-                inforequest=self.branch.inforequest,
-                email=Message.objects.filter(
-                    Q(action=Action.objects.filter(branch=Branch.objects.filter(advanced_by=self)))
-                    | Q(action=self)
-                ))
 
     @cached_property
     def has_obligee_deadline(self):
