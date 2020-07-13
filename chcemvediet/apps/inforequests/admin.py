@@ -1,14 +1,17 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.contrib.admin.utils import NestedObjects
 from django.db import router
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
+from django.utils.translation import ugettext_lazy as _
 
 from poleno.utils.misc import decorate
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
                                 ReadOnlyAdminInlineMixin)
+from poleno.utils.template import render_to_string
+from poleno.utils.urls import reverse
 
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
@@ -334,41 +337,52 @@ class ActionAdmin(admin.ModelAdmin):
         return False
 
     def render_delete_form(self, request, context):
-        using = router.db_for_write(self.model)
-        collector = admin.utils.NestedObjects(using)
-        collector.collect([context[u'object']])
-        to_delete = collector.nested()
-        for object in traverse(to_delete):
-            if isinstance(object, Action) and object.email:
-                for inforequestemail in object.email.inforequestemail_set.filter(
-                        type=InforequestEmail.TYPES.APPLICANT_ACTION):
-                    context[u'deleted_objects'].append(
-                        format_inforequestemail(inforequestemail, self.admin_site))
+        action = context[u'object']
+        outbound, inbound = self.collect_nested_inforequestemail(action)
+        outbound = [format_inforequestemail(inforequestemail) for inforequestemail in outbound]
+        inbound = [format_inforequestemail(inforequestemail) for inforequestemail in inbound]
+        if outbound:
+            context[u'deleted_objects'].extend([_(u'admin:InforequestEmail:outbound'), outbound])
+        if inbound:
+            context[u'deleted_objects'].extend([_(u'admin:InforequestEmail:inbound'), inbound])
+        if not action.is_last_action:
+            warning_text = render_to_string(u'inforequests/admin/texts/last_action.txt')
+            context[u'deleted_objects'].append(warning_text)
         return super(ActionAdmin, self).render_delete_form(request, context)
 
     def delete_model(self, request, obj):
-        using = router.db_for_write(self.model)
-        collector = admin.utils.NestedObjects(using)
-        collector.collect([obj])
-        to_delete = collector.nested()
-        for object in traverse(to_delete):
-            if isinstance(object, Action) and object.email:
-                (object.email.inforequestemail_set
-                      .filter(type=InforequestEmail.TYPES.APPLICANT_ACTION).delete())
-                (object.email.inforequestemail_set
-                    .filter(type=InforequestEmail.TYPES.OBLIGEE_ACTION)
-                    .update(type=InforequestEmail.TYPES.UNRELATED))
+        outbound, inbound = self.collect_nested_inforequestemail(obj)
+        for inforequestemail in outbound:
+            inforequestemail.delete()
+        for inforequestemail in inbound:
+            inforequestemail.type = InforequestEmail.TYPES.UNDECIDED
+            inforequestemail.save()
         super(ActionAdmin, self).delete_model(request, obj)
 
-def format_inforequestemail(inforequestemail, admin_site):
-    admin_url = reverse(u'{}:inforequests_inforequestemail_change'.format(admin_site.name),
-                        None, (inforequestemail.pk,))
-    return format_html(u'Inforequest email: <a href="{0}">{1}</a>', admin_url, inforequestemail)
+    def collect_nested_inforequestemail(self, action):
+        using = router.db_for_write(self.model)
+        collector = NestedObjects(using)
+        collector.collect([action])
+        to_delete = collector.nested()
+        outbound, inbound = [], []
+        for obj in self.nested_objects_traverse(to_delete):
+            if isinstance(obj, Action) and obj.email:
+                outbound.extend(obj.email.inforequestemail_set
+                    .filter(inforequest=action.branch.inforequest,
+                            type=InforequestEmail.TYPES.APPLICANT_ACTION))
+                inbound.extend(obj.email.inforequestemail_set
+                    .filter(inforequest=action.branch.inforequest,
+                            type=InforequestEmail.TYPES.OBLIGEE_ACTION))
+        return outbound, inbound
 
-def traverse(item):
-    try:
-        for i in iter(item):
-            for j in traverse(i):
-                yield j
-    except TypeError:
-        yield item
+    def nested_objects_traverse(self, to_delete):
+        try:
+            for obj in iter(to_delete):
+                for nested_obj in self.nested_objects_traverse(obj):
+                    yield nested_obj
+        except TypeError:
+            yield to_delete
+
+def format_inforequestemail(inforequestemail):
+    admin_url = reverse(u'admin:inforequests_inforequestemail_change', args=[inforequestemail.pk])
+    return format_html(u'Inforequest email: <a href="{0}">{1}</a>', admin_url, inforequestemail)

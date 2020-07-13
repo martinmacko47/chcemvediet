@@ -1,0 +1,12 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+
+{% comment %}
+ %
+ % Context:
+ %  -- None
+ %
+{% endcomment %}
+
+
+<b>Warning:</b> The deleted action is not the last action in the branch. Deleting it may cause
+logical errors in the inforequest history.
