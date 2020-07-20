@@ -335,7 +335,7 @@ class ActionAdmin(admin.ModelAdmin):
 
     def render_delete_form(self, request, context):
         action = context[u'object']
-        outbound, inbound = self.collect_nested_inforequestemail(action)
+        outbound, inbound = self.nested_inforequestemail_queryset(action)
         if outbound:
             context[u'deleted_objects'].extend([
                 u'Outbound messages will be deleted:',
@@ -354,19 +354,19 @@ class ActionAdmin(admin.ModelAdmin):
         return super(ActionAdmin, self).render_delete_form(request, context)
 
     def delete_model(self, request, obj):
-        outbound, inbound = self.collect_nested_inforequestemail(obj)
+        outbound, inbound = self.nested_inforequestemail_queryset(obj)
         outbound.delete()
         inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
         super(ActionAdmin, self).delete_model(request, obj)
 
-    def collect_nested_inforequestemail(self, action):
+    def nested_inforequestemail_queryset(self, action):
         using = router.db_for_write(self.model)
         collector = NestedObjects(using)
         collector.collect([action])
         to_delete = collector.nested()
         actions = [obj for obj in self.nested_objects_traverse(to_delete)
-                   if isinstance(obj, Action) and obj.email]
-        emails = [action.email for action in actions]
+                   if isinstance(obj, Action)]
+        emails = [action.email for action in actions if action.email]
         outbound = InforequestEmail.objects.filter(inforequest=action.branch.inforequest,
                                                    email__in=emails,
                                                    type=InforequestEmail.TYPES.APPLICANT_ACTION)
