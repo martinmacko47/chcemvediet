@@ -318,6 +318,10 @@ class Action(FormatMixin, models.Model):
         return self.branch.action_set.order_by_created().after(self).first()
 
     @cached_property
+    def is_last_action(self):
+        return self.next_action is None
+
+    @cached_property
     def action_path(self):
         res = [] if self.branch.is_main else self.branch.advanced_by.action_path
         res += self.branch.actions[:self.branch.actions.index(self)+1]

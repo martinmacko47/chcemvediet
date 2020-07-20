@@ -1,10 +1,12 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+from django.contrib.admin.utils import NestedObjects
+from django.db import router
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
 
-from poleno.utils.misc import decorate
+from poleno.utils.misc import decorate, squeeze
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
                                 ReadOnlyAdminInlineMixin)
 
@@ -315,3 +317,68 @@ class ActionAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'branch')
         queryset = queryset.select_related(u'email')
         return queryset
+
+    def get_actions(self, request):
+        actions = super(ActionAdmin, self).get_actions(request)
+        if u'delete_selected' in actions:
+            del actions[u'delete_selected']
+        return actions
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is None:
+            return True
+        if obj.type in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST]:
+            return False
+        if len(obj.branch.actions) > 1:
+            return True
+        return False
+
+    def render_delete_form(self, request, context):
+        action = context[u'object']
+        outbound, inbound = self.nested_inforequestemail_queryset(action)
+        if outbound:
+            context[u'deleted_objects'].extend([
+                u'Outbound messages will be deleted:',
+                [admin_obj_format(inforequestemail) for inforequestemail in outbound]
+            ])
+        if inbound:
+            context[u'deleted_objects'].extend([
+                u'Inbound messages will be marked undecided:',
+                [admin_obj_format(inforequestemail) for inforequestemail in inbound]
+            ])
+        if not action.is_last_action:
+            context[u'deleted_objects'].append(format_html(squeeze(u"""
+                <b>Warning:</b> The deleted action is not the last action in the branch. Deleting it
+                may cause logical errors in the inforequest history.
+                """)))
+        return super(ActionAdmin, self).render_delete_form(request, context)
+
+    def delete_model(self, request, obj):
+        outbound, inbound = self.nested_inforequestemail_queryset(obj)
+        outbound.delete()
+        inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
+        super(ActionAdmin, self).delete_model(request, obj)
+
+    def nested_inforequestemail_queryset(self, action):
+        using = router.db_for_write(self.model)
+        collector = NestedObjects(using)
+        collector.collect([action])
+        to_delete = collector.nested()
+        actions = [obj for obj in self.nested_objects_traverse(to_delete)
+                   if isinstance(obj, Action)]
+        emails = [action.email for action in actions if action.email]
+        outbound = InforequestEmail.objects.filter(inforequest=action.branch.inforequest,
+                                                   email__in=emails,
+                                                   type=InforequestEmail.TYPES.APPLICANT_ACTION)
+        inbound = InforequestEmail.objects.filter(inforequest=action.branch.inforequest,
+                                                  email__in=emails,
+                                                  type=InforequestEmail.TYPES.OBLIGEE_ACTION)
+        return outbound, inbound
+
+    def nested_objects_traverse(self, to_delete):
+        try:
+            for obj in iter(to_delete):
+                for nested_obj in self.nested_objects_traverse(obj):
+                    yield nested_obj
+        except TypeError:
+            yield to_delete
