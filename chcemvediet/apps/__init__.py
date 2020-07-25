@@ -4,7 +4,7 @@ from django.apps import AppConfig
 
 
 class ChcemvedietConfig(AppConfig):
-    name = u'chcemvediet.apps'
+    name = u'chcemvediet'
 
     def ready(self):
         if settings.DATABASES[u'default'][u'ENGINE'] == u'django.db.backends.sqlite3':
