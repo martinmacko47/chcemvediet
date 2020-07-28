@@ -12,9 +12,6 @@ from poleno.utils.lazy import lazy_format
 from . import views
 from .sitemaps import sitemaps
 
-# Initializes the project
-from . import ready
-
 
 urlpatterns = patterns(u'',
     url(r'^sitemap[.]xml$', u'django.contrib.sitemaps.views.sitemap', kwargs=dict(sitemaps=sitemaps)),
