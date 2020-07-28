@@ -83,6 +83,26 @@ class BranchInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
                 ),
             ]
 
+class ActionInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
+    model = Action
+    fields = [
+            decorate(
+                lambda o: admin_obj_format(o),
+                short_description=u'id',
+                ),
+            decorate(
+                lambda o: admin_obj_format(o.email),
+                short_description=u'E-mail',
+                ),
+            u'type',
+            u'created',
+            ]
+    ordering = [
+            u'-created',
+            u'-id',
+            ]
+
+
 @admin.register(Inforequest, site=admin.site)
 class InforequestAdmin(admin.ModelAdmin):
     date_hierarchy = u'submission_date'
@@ -242,25 +262,6 @@ class InforequestEmailAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'inforequest')
         queryset = queryset.select_related(u'email')
         return queryset
-
-class ActionInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
-    model = Action
-    fields = [
-            decorate(
-                lambda o: admin_obj_format(o),
-                short_description=u'id',
-                ),
-            decorate(
-                lambda o: admin_obj_format(o.email),
-                short_description=u'E-mail',
-                ),
-            u'type',
-            u'created',
-            ]
-    ordering = [
-            u'-created',
-            u'-id',
-            ]
 
 @admin.register(Branch, site=admin.site)
 class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
