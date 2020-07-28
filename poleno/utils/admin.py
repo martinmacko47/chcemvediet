@@ -56,3 +56,10 @@ class ReadOnlyAdminInlineMixin(admin.options.InlineModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+class NoBulkDeleteAdminMixin(admin.ModelAdmin):
+
+    def get_actions(self, request):
+        actions = super(NoBulkDeleteAdminMixin, self).get_actions(request)
+        if u'delete_selected' in actions:
+            del actions[u'delete_selected']

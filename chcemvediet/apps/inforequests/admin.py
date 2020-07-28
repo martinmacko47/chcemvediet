@@ -8,30 +8,29 @@ from django.utils.html import format_html
 
 from poleno.utils.misc import decorate, squeeze
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
-                                ReadOnlyAdminInlineMixin)
+                                ReadOnlyAdminInlineMixin, NoBulkDeleteAdminMixin)
 
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
 
-class NestedInforequestemailAdminMixin(object):
+class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
+
     def get_inforequest(self, obj):
-        if isinstance(obj, Branch):
-            return obj.inforequest
-        elif isinstance(obj, Action):
-            return obj.branch.inforequest
+        raise NotImplementedError
 
     def nested_inforequestemail_queryset(self, obj):
         using = router.db_for_write(self.model)
         collector = NestedObjects(using)
         collector.collect([obj])
         to_delete = collector.nested()
+        inforequest = self.get_inforequest(obj)
         actions = [obj for obj in self.nested_objects_traverse(to_delete)
                    if isinstance(obj, Action)]
         emails = [action.email for action in actions if action.email]
-        outbound = InforequestEmail.objects.filter(inforequest=self.get_inforequest(obj),
+        outbound = InforequestEmail.objects.filter(inforequest=inforequest,
                                                    email__in=emails,
                                                    type=InforequestEmail.TYPES.APPLICANT_ACTION)
-        inbound = InforequestEmail.objects.filter(inforequest=self.get_inforequest(obj),
+        inbound = InforequestEmail.objects.filter(inforequest=inforequest,
                                                   email__in=emails,
                                                   type=InforequestEmail.TYPES.OBLIGEE_ACTION)
         return outbound, inbound
@@ -44,7 +43,7 @@ class NestedInforequestemailAdminMixin(object):
         except TypeError:
             yield to_delete
 
-    def extend_context(self, context):
+    def render_delete_form(self, request, context):
         obj = context[u'object']
         outbound, inbound = self.nested_inforequestemail_queryset(obj)
         if outbound:
@@ -57,6 +56,14 @@ class NestedInforequestemailAdminMixin(object):
                 u'Inbound messages will be marked undecided:',
                 [admin_obj_format(inforequestemail) for inforequestemail in inbound]
             ])
+        return super(DeleteNestedInforequestEmailAdminMixin, self).render_delete_form(request,
+                                                                                      context)
+
+    def delete_model(self, request, obj):
+        outbound, inbound = self.nested_inforequestemail_queryset(obj)
+        outbound.delete()
+        inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
+        super(DeleteNestedInforequestEmailAdminMixin, self).delete_model(request, obj)
 
 class BranchFormSet(BaseInlineFormSet):
     def get_queryset(self):
@@ -258,7 +265,7 @@ class ActionInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
             ]
 
 @admin.register(Branch, site=admin.site)
-class BranchAdmin(NestedInforequestemailAdminMixin, admin.ModelAdmin):
+class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin):
     date_hierarchy = None
     list_display = [
             u'id',
@@ -314,29 +321,16 @@ class BranchAdmin(NestedInforequestemailAdminMixin, admin.ModelAdmin):
         queryset = queryset.select_related(u'advanced_by')
         return queryset
 
-    def get_actions(self, request):
-        actions = super(BranchAdmin, self).get_actions(request)
-        if u'delete_selected' in actions:
-            del actions[u'delete_selected']
-        return actions
+    def get_inforequest(self, obj):
+        return obj.inforequest
 
     def has_delete_permission(self, request, obj=None):
         if obj is None:
             return True
         return not obj.is_main
 
-    def render_delete_form(self, request, context):
-        self.extend_context(context)
-        return super(BranchAdmin, self).render_delete_form(request, context)
-
-    def delete_model(self, request, obj):
-        outbound, inbound = self.nested_inforequestemail_queryset(obj)
-        outbound.delete()
-        inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
-        super(BranchAdmin, self).delete_model(request, obj)
-
 @admin.register(Action, site=admin.site)
-class ActionAdmin(NestedInforequestemailAdminMixin, admin.ModelAdmin):
+class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin):
     date_hierarchy = u'created'
     list_display = [
             u'id',
@@ -384,11 +378,8 @@ class ActionAdmin(NestedInforequestemailAdminMixin, admin.ModelAdmin):
         queryset = queryset.select_related(u'email')
         return queryset
 
-    def get_actions(self, request):
-        actions = super(ActionAdmin, self).get_actions(request)
-        if u'delete_selected' in actions:
-            del actions[u'delete_selected']
-        return actions
+    def get_inforequest(self, obj):
+        return obj.branch.inforequest
 
     def has_delete_permission(self, request, obj=None):
         if obj is None:
@@ -401,16 +392,9 @@ class ActionAdmin(NestedInforequestemailAdminMixin, admin.ModelAdmin):
 
     def render_delete_form(self, request, context):
         action = context[u'object']
-        self.extend_context(context)
         if not action.is_last_action:
-            context[u'deleted_objects'].append(format_html(squeeze(u"""
+            context[u'deleted_objects'].insert(0, format_html(squeeze(u"""
                 <b>Warning:</b> The deleted action is not the last action in the branch. Deleting it
                 may cause logical errors in the inforequest history.
                 """)))
         return super(ActionAdmin, self).render_delete_form(request, context)
-
-    def delete_model(self, request, obj):
-        outbound, inbound = self.nested_inforequestemail_queryset(obj)
-        outbound.delete()
-        inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
-        super(ActionAdmin, self).delete_model(request, obj)
