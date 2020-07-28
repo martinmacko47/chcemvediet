@@ -27,12 +27,10 @@ class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
         actions = [obj for obj in self.nested_objects_traverse(to_delete)
                    if isinstance(obj, Action)]
         emails = [action.email for action in actions if action.email]
-        outbound = InforequestEmail.objects.filter(inforequest=inforequest,
-                                                   email__in=emails,
-                                                   type=InforequestEmail.TYPES.APPLICANT_ACTION)
-        inbound = InforequestEmail.objects.filter(inforequest=inforequest,
-                                                  email__in=emails,
-                                                  type=InforequestEmail.TYPES.OBLIGEE_ACTION)
+        inforequestemails_qs = InforequestEmail.objects.filter(inforequest=inforequest,
+                                                               email__in=emails)
+        outbound = inforequestemails_qs.filter(type=InforequestEmail.TYPES.APPLICANT_ACTION)
+        inbound = inforequestemails_qs.filter(type=InforequestEmail.TYPES.OBLIGEE_ACTION)
         return outbound, inbound
 
     def nested_objects_traverse(self, to_delete):
@@ -265,7 +263,7 @@ class ActionInline(ReadOnlyAdminInlineMixin, admin.TabularInline):
             ]
 
 @admin.register(Branch, site=admin.site)
-class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin):
+class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     date_hierarchy = None
     list_display = [
             u'id',
@@ -330,7 +328,7 @@ class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
         return not obj.is_main
 
 @admin.register(Action, site=admin.site)
-class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin):
+class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     date_hierarchy = u'created'
     list_display = [
             u'id',
