@@ -1,17 +1,22 @@
 from chcemvediet import settings
 
-from adminplus.sites import AdminSitePlus
 from django.apps import AppConfig
-from django.contrib import admin
 
 
 class ChcemvedietConfig(AppConfig):
     name = u'chcemvediet'
 
     def ready(self):
+        self.init_admin_site_plus()
+        self.workaround_sqlite_format_dtdelta_bug()
+
+    def init_admin_site_plus(self):
+        from adminplus.sites import AdminSitePlus
+        from django.contrib import admin
         admin.site = AdminSitePlus()
         admin.autodiscover()
 
+    def workaround_sqlite_format_dtdelta_bug(self):
         if settings.DATABASES[u'default'][u'ENGINE'] == u'django.db.backends.sqlite3':
             # Workaround for a bug in `_sqlite_format_dtdelta`.
             #
