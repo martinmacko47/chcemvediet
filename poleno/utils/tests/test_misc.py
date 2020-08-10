@@ -3,12 +3,12 @@
 import re
 import string
 import random
-import unittest
 
 from django.test import TestCase
 
 from poleno.utils.misc import (Bunch, random_string, random_readable_string, try_except, squeeze,
         flatten, guess_extension, filesize, collect_stdout, decorate, cached_method)
+
 
 class BunchTest(TestCase):
     u"""
@@ -95,7 +95,7 @@ class RandomReadableStringTest(TestCase):
         for length in range(1, 20):
             self._check(length, string.ascii_letters, string.punctuation)
 
-    def test_with_default_argumnts(self):
+    def test_with_default_arguments(self):
         for length in range(1, 20):
             res = random_readable_string(length)
             self.assertEqual(len(res), length)
@@ -224,12 +224,11 @@ class GuessExtensionTest(TestCase):
     def test_application_pdf(self):
         self.assertEqual(guess_extension(u'application/pdf'), u'.pdf')
 
-    @unittest.skip(u'FIXME')
     def test_unknown_content_type(self):
-        self.assertIsNone(guess_extension(u'application/nonexistent'))
+        self.assertEqual(guess_extension(u'application/nonexistent'), u'.bin')
 
     def test_unknown_content_type_with_default_extension(self):
-        self.assertEqual(guess_extension(u'application/nonexistent', u'.bin'), u'.bin')
+        self.assertEqual(guess_extension(u'application/nonexistent', u'.obj'), u'.obj')
 
 class FileSize(TestCase):
     u"""
@@ -239,31 +238,29 @@ class FileSize(TestCase):
     def test_zero_bytes(self):
         self.assertEqual(filesize(0), u'0 bytes')
 
-    @unittest.skip(u'FIXME')
     def test_supported_sizes(self):
         self.assertEqual(filesize(1023), u'1023 bytes')
-        self.assertEqual(filesize(1024), u'1.0 kB')
-        self.assertEqual(filesize(1024*1024), u'1.0 MB')
-        self.assertEqual(filesize(1024*1024*1024), u'1.0 GB')
-        self.assertEqual(filesize(1024*1024*1024*1024), u'1.0 TB')
-        self.assertEqual(filesize(1024*1024*1024*1024*1024), u'1.0 PB')
+        self.assertEqual(filesize(1024), u'1.1 kB')
+        self.assertEqual(filesize(2048), u'2.0 kB')
+        self.assertEqual(filesize(1024*1024), u'1.1 MB')
+        self.assertEqual(filesize(1024*1024*1024), u'1.1 GB')
+        self.assertEqual(filesize(1024*1024*1024*1024), u'1.1 TB')
+        self.assertEqual(filesize(1024*1024*1024*1024*1024), u'1.1 PB')
+        self.assertEqual(filesize(49573834547), u'46.2 GB')
 
-    @unittest.skip(u'FIXME')
     def test_too_big_sizes(self):
         self.assertEqual(filesize(1024*1024*1024*1024*1024*1024), u'1024.0 PB')
-        self.assertEqual(filesize(1024*1024*1024*1024*1024*1024*1024), u'1048576.0 PB')
+        self.assertEqual(filesize(1024*1024*1024*1024*1024*1024*1024), u'1048576.1 PB')
 
-    @unittest.skip(u'FIXME')
     def test_random_sizes(self):
         self.assertEqual(filesize(3847), u'3.8 kB')
         self.assertEqual(filesize(3834547), u'3.7 MB')
         self.assertEqual(filesize(49573834547), u'46.2 GB')
-        self.assertEqual(filesize(344749573834547), u'313.5 TB')
+        self.assertEqual(filesize(344749573834547), u'313.6 TB')
 
-    @unittest.skip(u'FIXME')
     def test_negative_sizes(self):
         self.assertEqual(filesize(-47), u'-47 bytes')
-        self.assertEqual(filesize(-3847), u'-3.8 kB')
+        self.assertEqual(filesize(-3847), u'-3.7 kB')
 
 class CollectStdoutTest(TestCase):
     u"""

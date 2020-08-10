@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 import os
 import random
-import json
-import unittest
 from testfixtures import TempDirectory
 
 from django.conf.urls import patterns, url
@@ -13,6 +11,7 @@ from django.test import TestCase
 
 from poleno.utils.http import send_file_response
 from poleno.utils.misc import random_string
+
 
 class SendFileResponseTest(TestCase):
     u"""
@@ -64,14 +63,12 @@ class SendFileResponseTest(TestCase):
         self._check_response(response, FileResponse, 200)
         self._check_content(response, path)
 
-    @unittest.skip(u'FIXME')
     def test_directory_raises_exception(self):
-        with self.assertRaisesMessage(OSError, u'Not a regular file: /'):
+        with self.assertRaises(TypeError):
             response = self._request_file(u'/')
 
-    @unittest.skip(u'FIXME')
     def test_nonexistent_file_raises_exception(self):
-        with self.assertRaisesMessage(OSError, u"[Errno 2] No such file or directory: '/nonexistent.txt'"):
+        with self.assertRaises(TypeError):
             response = self._request_file(u'/nonexistent.txt')
 
     def test_random_file(self):

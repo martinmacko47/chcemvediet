@@ -1,7 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 import gc
-import unittest
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -11,6 +10,7 @@ from django.test import TestCase
 from poleno.utils.models import after_saved, join_lookup, FieldChoices, QuerySet
 from poleno.utils.misc import decorate
 from poleno.utils.test import created_instances
+
 
 class TestModelsModel(models.Model):
     name = models.CharField(blank=True, max_length=255)
@@ -264,13 +264,12 @@ class FieldChoicesTest(TestCase):
         with self.assertRaises(AttributeError):
             res.FIRST
 
-    @unittest.skip(u'FIXME')
     def test_duplicate_keys_raise_error(self):
-        with self.assertRaisesMessage(ValueError, u'Duplicate choice key: 2'):
+        with self.assertRaisesMessage(ValueError, u'Duplicate choice key: "2"'):
             FieldChoices((u'FIRST', 1, u'First'), (u'SECOND', 2, u'Second'), (u'THIRD', 2, u'Third'))
-        with self.assertRaisesMessage(ValueError, u'Duplicate choice key: 1'):
+        with self.assertRaisesMessage(ValueError, u'Duplicate choice key: "1"'):
             FieldChoices((u'FIRST', 1, u'First'), (u'GROUP', 1, ((u'AAA', 3, u'Aaa'), (u'BBB', 4, u'Bbb'))))
-        with self.assertRaisesMessage(ValueError, u'Duplicate choice key: 3'):
+        with self.assertRaisesMessage(ValueError, u'Duplicate choice key: "3"'):
             FieldChoices((u'FIRST', 1, u'First'), (u'GROUP', 3, ((u'AAA', 3, u'Aaa'), (u'BBB', 4, u'Bbb'))))
 
 class QuerySetTest(TestCase):

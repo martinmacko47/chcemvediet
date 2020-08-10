@@ -59,7 +59,7 @@ def random_readable_string(length, vowels=u'aeiouy', consonants=u'bcdfghjklmnprs
     [:vowel:]? ([:consonant:][:vowel:])* [:consonant:]?
 
     Where `[:vowel:]` is the set of all vowels `[aeiouy]` and `['consonant']` is the set of
-    consonants `[bcdfghjklmnprstvxz]`. Use can use ``vowels`` and ``consonants`` arguments to set
+    consonants `[bcdfghjklmnprstvxz]`. User can use ``vowels`` and ``consonants`` arguments to set
     your own sets of vowels and consonants.
     """
     res = []

@@ -28,7 +28,7 @@ def require_ajax(view):
 def login_required(view=None, **kwargs):
     u"""
     Decorator for views that checks that the user is logged in, redirecting to the log-in page if
-    necessary. If ``raise_exception`` is True, ``PermissionDenied`` is rased instead of
+    necessary. If ``raise_exception`` is True, ``PermissionDenied`` is raised instead of
     redirecting.
 
     Based on: django.contrib.auth.decorators.login_required
@@ -58,7 +58,7 @@ def login_required(view=None, **kwargs):
 def secure_required(view=None, raise_exception=False):
     u"""
     Decorator for views that checks that the request is over HTTPS, redirecting if necessary. If
-    ``raise_exception`` is True, ``PermissionDenied`` is rased instead of redirection. Note that
+    ``raise_exception`` is True, ``PermissionDenied`` is raised instead of redirection. Note that
     the HTTPS check is disabled if DEBUG is true.
 
     Example:

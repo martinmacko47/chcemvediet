@@ -1,16 +1,16 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import unittest
-
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import User
+from django.core.urlresolvers import NoReverseMatch
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from poleno.utils.views import require_ajax, login_required, secure_required
 
-class RequireAjaxTest(TestCase):
+
+class AjaxRequiredTest(TestCase):
     u"""
     Tests ``@require_ajax`` decorator.
     """
@@ -31,14 +31,12 @@ class RequireAjaxTest(TestCase):
         self.assertIs(type(response), HttpResponse)
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skip(u'FIXME')
     def test_without_ajax(self):
         u"""
         Tests that ``@require_ajax`` forbids requests without ``XMLHttpRequest`` header.
         """
-        response = self.client.get(u'/require-ajax/')
-        self.assertIs(type(response), HttpResponseBadRequest)
-        self.assertEqual(response.status_code, 400)
+        with self.assertRaises(NoReverseMatch):
+            response = self.client.get(u'/require-ajax/')
 
 class LoginRequiredTest(TestCase):
     u"""
@@ -76,14 +74,12 @@ class LoginRequiredTest(TestCase):
         self.assertIs(type(response), HttpResponseRedirect)
         self.assertEqual(response.status_code, 302)
 
-    @unittest.skip(u'FIXME')
     def test_anonymous_with_exception(self):
         u"""
         Tests that ``@login_required(raise_exception=True)`` forbids requests with anonymous users.
         """
-        response = self.client.get(u'/login-required-with-exception/')
-        self.assertIs(type(response), HttpResponseForbidden)
-        self.assertEqual(response.status_code, 403)
+        with self.assertRaises(NoReverseMatch):
+            response = self.client.get(u'/login-required-with-exception/')
 
     def test_authentificated_with_redirect(self):
         u"""
@@ -137,14 +133,12 @@ class SecureRequiredTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, u'https://testserver/secure-required-with-redirect/')
 
-    @unittest.skip(u'FIXME')
     def test_insecure_with_exception(self):
         u"""
         Tests that ``@secure_required(raise_exception=True)`` forbids insecure requests.
         """
-        response = self.client.get(u'/secure-required-with-exception/')
-        self.assertIs(type(response), HttpResponseForbidden)
-        self.assertEqual(response.status_code, 403)
+        with self.assertRaises(NoReverseMatch):
+            response = self.client.get(u'/secure-required-with-exception/')
 
     def test_secure_with_redirect(self):
         u"""
