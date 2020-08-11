@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import random
 import datetime
-import unittest
 from testfixtures import TempDirectory
 
 from django.core.files.base import ContentFile
@@ -16,6 +15,7 @@ from poleno.timewarp import timewarp
 from poleno.utils.date import utc_now, utc_datetime_from_local, local_datetime_from_local
 
 from ..models import Attachment
+
 
 class AttachmentModelTest(TestCase):
     u"""
@@ -68,9 +68,8 @@ class AttachmentModelTest(TestCase):
         self.assertEqual(obj.generic_id, self.user.pk)
         self.assertEqual(obj.generic_object, self.user)
 
-    @unittest.skip(u'FIXME')
     def test_generic_object_field_may_not_be_omitted(self):
-        with self.assertRaisesMessage(IntegrityError, u'attachments_attachment.generic_type_id may not be NULL'):
+        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: attachments_attachment.generic_type_id'):
             obj = self._create_instance(_omit=[u'generic_object'])
 
     def test_file_field(self):
@@ -107,17 +106,14 @@ class AttachmentModelTest(TestCase):
         self.assertEqual(obj.name, u'changed')
         self.assertEqual(obj.file.name, original_filename)
 
-    @unittest.skip(u'FIXME')
     def test_name_and_content_type_fields(self):
         obj = self._create_instance(name=u'filename', content_type=u'text/plain')
-        self.assertEqual(obj.name, u'filename')
+        self.assertEqual(obj.name, u'filename.txt')
         self.assertEqual(obj.content_type, u'text/plain')
 
-    @unittest.skip(u'FIXME')
-    def test_name_and_content_type_fields_with_empty_values_if_omitted(self):
-        obj = self._create_instance(_omit=[u'name', u'content_type'])
-        self.assertEqual(obj.name, u'')
-        self.assertEqual(obj.content_type, u'')
+    def test_name_field_with_default_value_if_omitted(self):
+        obj = self._create_instance(_omit=[u'name'])
+        self.assertEqual(obj.name, u'attachment.txt')
 
     def test_created_field_with_explicit_value(self):
         obj = self._create_instance(created=utc_datetime_from_local(u'2014-10-05 15:33:10'))

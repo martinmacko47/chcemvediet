@@ -1,6 +1,5 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import unittest
 from testfixtures import TempDirectory
 
 from django import forms
@@ -13,6 +12,7 @@ from django.test.utils import override_settings
 
 from ..models import Attachment
 from ..forms import AttachmentsField
+
 
 class AttachmentsFieldTest(TestCase):
     u"""
@@ -44,12 +44,12 @@ class AttachmentsFieldTest(TestCase):
 
 
         self.user1 = User.objects.create_user(u'john', u'lennon@thebeatles.com', u'johnpassword')
-        self.attachment1a = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1a'), name=u'filename1a', content_type=u'text/plain')
-        self.attachment1b = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1b'), name=u'filename1b', content_type=u'text/plain')
-        self.attachment1c = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1c'), name=u'filename1c', content_type=u'text/plain')
+        self.attachment1a = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1a'), name=u'filename1a.txt', content_type=u'text/plain')
+        self.attachment1b = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1b'), name=u'filename1b.txt', content_type=u'text/plain')
+        self.attachment1c = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1c'), name=u'filename1c.txt', content_type=u'text/plain')
 
         self.user2 = User.objects.create_user(u'smith', u'agent@smith.com', u'big_secret')
-        self.attachment2 = Attachment.objects.create(generic_object=self.user2, file=ContentFile(u'content2'), name=u'filename2', content_type=u'text/plain')
+        self.attachment2 = Attachment.objects.create(generic_object=self.user2, file=ContentFile(u'content2'), name=u'filename2.txt', content_type=u'text/plain')
 
     def tearDown(self):
         self.settings_override.disable()
@@ -60,36 +60,35 @@ class AttachmentsFieldTest(TestCase):
         return Template(template).render(Context(context))
 
 
-    @unittest.skip(u'FIXME')
     def test_new_form(self):
         form = self.AttachmentsFieldForm(attached_to=self.user1)
         rendered = self._render(u'{{ form }}', form=form)
         self.assertInHTML(u'<label for="id_attachments">Attachments:</label>', rendered)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",,">', rendered)
         self.assertInHTML(u"""
-                <span class="btn btn-default btn-file"><i class="icon-folder-open"></i> Browse
-                  <input class="fileupload" type="file" name="files" multiple="multiple" data-url="/upload/"
-                         data-field="#id_attachments" data-target="#attachments-target">
-                </span>
+                <div class="btn btn-default pln-attachments-btn">
+                  <i class="chv-icon chv-icon-lg icon-attach"></i>
+                  &nbsp;
+                  Browse
+                  <input type="file" name="files" multiple="multiple" data-url="/upload/">
+                </div>
                 """, rendered)
 
-    @unittest.skip(u'FIXME')
     def test_new_form_with_initial_value_as_list_of_attachment_instances(self):
         attachments = [self.attachment1a, self.attachment1b]
         form = self.AttachmentsFieldForm(initial={u'attachments': attachments}, attached_to=self.user1)
         rendered = self._render(u'{{ form }}', form=form)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",%s,%s,">' % (self.attachment1a.pk, self.attachment1b.pk), rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1a</a>' % self.attachment1a.pk, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1b</a>' % self.attachment1b.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1a.txt</a>' % self.attachment1a.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1b.txt</a>' % self.attachment1b.pk, rendered)
 
-    @unittest.skip(u'FIXME')
     def test_new_form_with_initial_value_as_comma_separated_string_of_attachment_pks(self):
         attachments = u'%s,%s' % (self.attachment1a.pk, self.attachment1b.pk)
         form = self.AttachmentsFieldForm(initial={u'attachments': attachments}, attached_to=self.user1)
         rendered = self._render(u'{{ form }}', form=form)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",%s,">' % attachments, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1a</a>' % self.attachment1a.pk, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1b</a>' % self.attachment1b.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1a.txt</a>' % self.attachment1a.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1b.txt</a>' % self.attachment1b.pk, rendered)
 
     def test_submitted_form_with_no_attachments_but_required(self):
         attachments = u',,,,'
@@ -111,7 +110,6 @@ class AttachmentsFieldTest(TestCase):
         self.assertInHTML(u'<li>This field is required.</li>', rendered, count=0)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",,">', rendered)
 
-    @unittest.skip(u'FIXME')
     def test_submitted_form_with_one_attachment(self):
         attachments = u',,%s,,' % self.attachment1a.pk
         form = self.AttachmentsFieldForm({u'attachments': attachments}, attached_to=self.user1)
@@ -121,9 +119,8 @@ class AttachmentsFieldTest(TestCase):
         rendered = self._render(u'{{ form }}', form=form)
         self.assertInHTML(u'<li>This field is required.</li>', rendered, count=0)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",%s,">' % self.attachment1a.pk, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1a</a>' % self.attachment1a.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1a.txt</a>' % self.attachment1a.pk, rendered)
 
-    @unittest.skip(u'FIXME')
     def test_submitted_form_with_multiple_attachments(self):
         attachments = u'%s,%s,%s' % (self.attachment1a.pk, self.attachment1b.pk, self.attachment1c.pk)
         form = self.AttachmentsFieldForm({u'attachments': attachments}, attached_to=self.user1)
@@ -132,9 +129,9 @@ class AttachmentsFieldTest(TestCase):
 
         rendered = self._render(u'{{ form }}', form=form)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",%s,">' % attachments, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1a</a>' % self.attachment1a.pk, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1b</a>' % self.attachment1b.pk, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1c</a>' % self.attachment1c.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1a.txt</a>' % self.attachment1a.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1b.txt</a>' % self.attachment1b.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1c.txt</a>' % self.attachment1c.pk, rendered)
 
     def test_submitted_form_with_forbidden_attachment(self):
         attachments = u',,%s,,' % self.attachment2.pk
@@ -165,7 +162,6 @@ class AttachmentsFieldTest(TestCase):
         self.assertInHTML(u'<ul class="errorlist"><li>This field is required.</li></ul>', rendered)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",,">', rendered)
 
-    @unittest.skip(u'FIXME')
     def test_form_with_attached_to_as_list(self):
         attachments = u'%s,%s' % (self.attachment1b.pk, self.attachment2.pk)
         form = self.AttachmentsFieldForm({u'attachments': attachments}, attached_to=[self.user1, self.user2])
@@ -174,8 +170,8 @@ class AttachmentsFieldTest(TestCase):
 
         rendered = self._render(u'{{ form }}', form=form)
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",%s,">' % attachments, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename1b</a>' % self.attachment1b.pk, rendered)
-        self.assertInHTML(u'<a href="/download/%s/">filename2</a>' % self.attachment2.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename1b.txt</a>' % self.attachment1b.pk, rendered)
+        self.assertInHTML(u'<a href="/download/%s/">filename2.txt</a>' % self.attachment2.pk, rendered)
 
     def test_attachments_field_properties(self):
         u"""
