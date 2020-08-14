@@ -97,6 +97,7 @@ def devtools_push_history(request, inforequest_pk):
                 sent_date=F(u'sent_date') - delta,
                 delivered_date=F(u'delivered_date') - delta,
                 legal_date=F(u'legal_date') - delta,
+                snooze=F(u'snooze') - delta,
                 last_deadline_reminder=F(u'last_deadline_reminder') - delta,
                 )
         messages.success(request,
