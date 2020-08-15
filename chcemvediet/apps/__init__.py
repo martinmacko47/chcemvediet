@@ -35,7 +35,12 @@ class ChcemvedietConfig(AppConfig):
 
             def new_sqlite_format_dtdelta(*args):
                 res = original_sqlite_format_dtdelta(*args)
-                return res.strip(u'+00:00') if res else None
+                if not res:
+                    return None
+                elif res.endswith(u'+00:00'):
+                    return res[:-6]
+                else:
+                    return res
 
             django.db.backends.sqlite3.base._sqlite_format_dtdelta = new_sqlite_format_dtdelta
 
