@@ -272,6 +272,8 @@ class CompositeTextFieldTest(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
         self.settings_override = override_settings(
+            TEMPLATE_LOADERS=((u'poleno.utils.template.TranslationLoader', u'django.template.loaders.filesystem.Loader'),
+                              (u'poleno.utils.template.TranslationLoader', u'django.template.loaders.app_directories.Loader')),
             TEMPLATE_DIRS=(self.tempdir.path,),
             )
         self.settings_override.enable()
@@ -280,6 +282,7 @@ class CompositeTextFieldTest(TestCase):
     def tearDown(self):
         self.settings_override.disable()
         self.tempdir.cleanup()
+
 
     def test_new_form(self):
         form = self.Form()
@@ -414,11 +417,18 @@ class ValidateFormattedEmail(TestCase):
             validate_formatted_email(u'')
 
     def test_valid_values(self):
-        validate_formatted_email(u'smith@example.com')
-        validate_formatted_email(u'John Smith <smith@example.com>')
-        validate_formatted_email(u'"John \\"Agent\\" Smith" <smith@example.com>')
-        validate_formatted_email(u'"Smith, John" <smith@example.com>')
-        validate_formatted_email(u'"smith@example.com" <smith@example.com>')
+        validate_formatted_email(u'smith@example.com') # // Parsed as: smith@example.com
+        validate_formatted_email(u'John Smith <smith@example.com>') # // Parsed as: John Smith smith@example.com
+        validate_formatted_email(u'"John \\"Agent\\" Smith" <smith@example.com>') # // Parsed as: John "Agent" Smith smith@example.com
+        validate_formatted_email(u'"Smith, John" <smith@example.com>') # // Parsed as: Smith, John smith@example.com
+        validate_formatted_email(u'"smith@example.com" <smith@example.com>') # // Parsed as: smith@example.com smith@example.com
+        validate_formatted_email(u'<smith@example.com>') # // Parsed as: smith@example.com
+        validate_formatted_email(u'john smith@example.com') # // Parsed as: johnsmith@example.com
+        validate_formatted_email(u'"John" <smith@example.com>') # // Parsed as: John smith@example.com
+        validate_formatted_email(u'"Smith, John" Agent <smith@example.com>') # // Parsed as: Smith, John Agent smith@example.com
+        validate_formatted_email(u'john@example.com <smith@example.com>') # // Parsed as: john@example.com
+        validate_formatted_email(u'smith@example.com,') # // Parsed as: smith@example.com
+        validate_formatted_email(u'John Smith <smith@example.com>, john@example.com') # // Parsed as: John Smith smith@example.com
 
     def test_invalid_values(self):
         with self.assertRaisesMessage(ValidationError, u'"invalid" is not a valid email address'):
@@ -441,11 +451,17 @@ class ValidateCommaSeparatedEmailsTest(TestCase):
         validate_comma_separated_emails(u'')
 
     def test_valid_values(self):
-        validate_comma_separated_emails(u'smith@example.com')
-        validate_comma_separated_emails(u'John Smith <smith@example.com>, john@example.com')
-        validate_comma_separated_emails(u'"John \\"Agent\\" Smith" <smith@example.com>')
-        validate_comma_separated_emails(u'"Smith, John" <smith@example.com>')
-        validate_comma_separated_emails(u'"smith@example.com" <smith@example.com>')
+        validate_comma_separated_emails(u'smith@example.com') # // Parsed as smith@example.com
+        validate_comma_separated_emails(u'John Smith <smith@example.com>, john@example.com') # // Parsed as John Smith smith@example.com; john@example.com
+        validate_comma_separated_emails(u'"John \\"Agent\\" Smith" <smith@example.com>') # // Parsed as: John "Agent" Smith smith@example.com
+        validate_comma_separated_emails(u'"Smith, John" <smith@example.com>') # // Parsed as: Smith, John smith@example.com
+        validate_comma_separated_emails(u'"smith@example.com" <smith@example.com>') # // Parsed as: smith@example.com smith@example.com
+        validate_comma_separated_emails(u'<smith@example.com>') # // Parsed as: smith@example.com
+        validate_comma_separated_emails(u'john smith@example.com') # // Parsed as: johnsmith@example.com
+        validate_comma_separated_emails(u'"John" <smith@example.com>') # // Parsed as: John smith@example.com
+        validate_comma_separated_emails(u'"Smith, John" Agent <smith@example.com>') # // Parsed as: Smith, John Agent smith@example.com
+        validate_comma_separated_emails(u'john@example.com <smith@example.com>') # // Parsed as: john@example.com; smith@example.com
+        validate_comma_separated_emails(u'smith@example.com,') # // Parsed as: smith@example.com
 
     def test_invalid_values(self):
         with self.assertRaisesMessage(ValidationError, u'"invalid" is not a valid email address'):

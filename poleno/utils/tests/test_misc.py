@@ -190,7 +190,7 @@ class FlattenTest(TestCase):
 
     def test_list_with_strings(self):
         result = flatten([u'one', [u'two', u'three']])
-        self.assertEqual(list(result), ['one', 'two', 'three'])
+        self.assertEqual(list(result), [u'one', u'two', u'three'])
 
     def test_empty_list(self):
         result = flatten([])
@@ -213,7 +213,7 @@ class GuessExtensionTest(TestCase):
     Tests ``guess_extension()`` function.
     """
 
-    # Overriden guesses
+    # Overridden guesses
     def test_text_plain(self):
         self.assertEqual(guess_extension(u'text/plain'), u'.txt')
 
@@ -230,6 +230,9 @@ class GuessExtensionTest(TestCase):
     def test_unknown_content_type_with_default_extension(self):
         self.assertEqual(guess_extension(u'application/nonexistent', u'.obj'), u'.obj')
 
+    def test_unknown_content_type_with_default_extension_None(self):
+        self.assertIsNone(guess_extension(u'application/nonexistent', None))
+
 class FileSize(TestCase):
     u"""
     Tests ``filesize()`` function.
@@ -240,17 +243,17 @@ class FileSize(TestCase):
 
     def test_supported_sizes(self):
         self.assertEqual(filesize(1023), u'1023 bytes')
-        self.assertEqual(filesize(1024), u'1.1 kB')
+        self.assertEqual(filesize(1024), u'1.0 kB')
         self.assertEqual(filesize(2048), u'2.0 kB')
-        self.assertEqual(filesize(1024*1024), u'1.1 MB')
-        self.assertEqual(filesize(1024*1024*1024), u'1.1 GB')
-        self.assertEqual(filesize(1024*1024*1024*1024), u'1.1 TB')
-        self.assertEqual(filesize(1024*1024*1024*1024*1024), u'1.1 PB')
+        self.assertEqual(filesize(1024*1024), u'1.0 MB')
+        self.assertEqual(filesize(1024*1024*1024), u'1.0 GB')
+        self.assertEqual(filesize(1024*1024*1024*1024), u'1.0 TB')
+        self.assertEqual(filesize(1024*1024*1024*1024*1024), u'1.0 PB')
         self.assertEqual(filesize(49573834547), u'46.2 GB')
 
     def test_too_big_sizes(self):
         self.assertEqual(filesize(1024*1024*1024*1024*1024*1024), u'1024.0 PB')
-        self.assertEqual(filesize(1024*1024*1024*1024*1024*1024*1024), u'1048576.1 PB')
+        self.assertEqual(filesize(1024*1024*1024*1024*1024*1024*1024), u'1048576.0 PB')
 
     def test_random_sizes(self):
         self.assertEqual(filesize(3847), u'3.8 kB')

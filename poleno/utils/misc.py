@@ -59,7 +59,7 @@ def random_readable_string(length, vowels=u'aeiouy', consonants=u'bcdfghjklmnprs
     [:vowel:]? ([:consonant:][:vowel:])* [:consonant:]?
 
     Where `[:vowel:]` is the set of all vowels `[aeiouy]` and `['consonant']` is the set of
-    consonants `[bcdfghjklmnprstvxz]`. User can use ``vowels`` and ``consonants`` arguments to set
+    consonants `[bcdfghjklmnprstvxz]`. You can use ``vowels`` and ``consonants`` arguments to set
     your own sets of vowels and consonants.
     """
     res = []
@@ -142,7 +142,7 @@ def flatten(l):
 
 def guess_extension(content_type, default=u'.bin'):
     u"""
-    Guesses file extention based on file content type. Wrapper around ``mimetypes.guess_extension``
+    Guesses file extension based on file content type. Wrapper around ``mimetypes.guess_extension``
     to return ``default`` extension if the given content type is not known by ``mimetypes`` module,
     and to fix stupid guesses like: "text/plain" -> ".ksh".
 
@@ -215,20 +215,20 @@ def filesize(size):
         0 -> "0 bytes"
         1023 -> "1023 bytes"
         49573834547 -> "46.2 GB"
-        -3847 -> "-3.8 kB"
+        -3847 -> "-3.7 kB"
     """
     if size is None:
         return None
 
     for fmt in [u'{:.0f} bytes', u'{:.1f} kB', u'{:.1f} MB', u'{:.1f} GB', u'{:.1f} TB']:
         if abs(size) < 1024.0:
-            return fmt.format(round(size + 0.05, 1))
+            return fmt.format(round(size + 0.04999, 1))
         size /= 1024.0
-    return u'{:.1f} PB'.format(round(size + 0.05, 1))
+    return u'{:.1f} PB'.format(round(size + 0.04999, 1))
 
 def parsefilesize(value):
     u"""
-    Parses files sizes formated with `filesize` function above.
+    Parses files sizes formatted with `filesize` function above.
 
     Example:
         "0 bytes" -> 0.0
