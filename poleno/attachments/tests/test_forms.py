@@ -44,12 +44,12 @@ class AttachmentsFieldTest(TestCase):
 
 
         self.user1 = User.objects.create_user(u'john', u'lennon@thebeatles.com', u'johnpassword')
-        self.attachment1a = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1a'), name=u'filename1a.txt', content_type=u'text/plain')
-        self.attachment1b = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1b'), name=u'filename1b.txt', content_type=u'text/plain')
-        self.attachment1c = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1c'), name=u'filename1c.txt', content_type=u'text/plain')
+        self.attachment1a = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1a'), name=u'filename1a.txt')
+        self.attachment1b = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1b'), name=u'filename1b.txt')
+        self.attachment1c = Attachment.objects.create(generic_object=self.user1, file=ContentFile(u'content1c'), name=u'filename1c.txt')
 
         self.user2 = User.objects.create_user(u'smith', u'agent@smith.com', u'big_secret')
-        self.attachment2 = Attachment.objects.create(generic_object=self.user2, file=ContentFile(u'content2'), name=u'filename2.txt', content_type=u'text/plain')
+        self.attachment2 = Attachment.objects.create(generic_object=self.user2, file=ContentFile(u'content2'), name=u'filename2.txt')
 
     def tearDown(self):
         self.settings_override.disable()
@@ -67,9 +67,7 @@ class AttachmentsFieldTest(TestCase):
         self.assertInHTML(u'<input id="id_attachments" name="attachments" type="hidden" value=",,">', rendered)
         self.assertInHTML(u"""
                 <div class="btn btn-default pln-attachments-btn">
-                  <i class="chv-icon chv-icon-lg icon-attach"></i>
-                  &nbsp;
-                  Browse
+                  <i class="chv-icon chv-icon-lg icon-attach"></i>&nbsp; Browse
                   <input type="file" name="files" multiple="multiple" data-url="/upload/">
                 </div>
                 """, rendered)
