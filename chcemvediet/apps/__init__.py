@@ -34,11 +34,10 @@ class ChcemvedietConfig(AppConfig):
             original_sqlite_format_dtdelta = django.db.backends.sqlite3.base._sqlite_format_dtdelta
 
             def new_sqlite_format_dtdelta(*args):
+                timezone_suffix = u'+00:00'
                 res = original_sqlite_format_dtdelta(*args)
-                if not res:
-                    return None
-                elif res.endswith(u'+00:00'):
-                    return res[:-6]
+                if res and res.endswith(timezone_suffix):
+                    return res[:-len(timezone_suffix)]
                 else:
                     return res
 
