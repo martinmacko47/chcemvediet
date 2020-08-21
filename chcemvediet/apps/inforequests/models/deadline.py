@@ -103,10 +103,7 @@ class Deadline(FormatMixin, object):
 
     @cached_property
     def snooze_date(self):
-        res = self._snooze or self.deadline_date
-        res = max(res, self.deadline_date)
-        res = min(res, self.deadline_date + datetime.timedelta(days=8))
-        return res
+        return max(self._snooze, self.deadline_date) if self._snooze else self.deadline_date
 
     @cached_property
     def is_snoozed(self):
