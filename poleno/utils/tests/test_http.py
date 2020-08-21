@@ -36,7 +36,7 @@ class SendFileResponseTest(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
         self.settings_override = override_settings(
-            TEMPLATE_LOADERS=((u'poleno.utils.template.TranslationLoader', u'django.template.loaders.filesystem.Loader'),),
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
         )
         self.settings_override.enable()
 

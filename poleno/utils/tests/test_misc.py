@@ -230,7 +230,7 @@ class GuessExtensionTest(TestCase):
     def test_unknown_content_type_with_default_extension(self):
         self.assertEqual(guess_extension(u'application/nonexistent', u'.obj'), u'.obj')
 
-    def test_unknown_content_type_with_default_extension_None(self):
+    def test_unknown_content_type_with_no_default_extension(self):
         self.assertIsNone(guess_extension(u'application/nonexistent', None))
 
 class FileSize(TestCase):

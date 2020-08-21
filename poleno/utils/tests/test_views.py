@@ -23,7 +23,7 @@ class AjaxRequiredTest(TestCase):
 
     def setUp(self):
         self.settings_override = override_settings(
-            TEMPLATE_LOADERS=((u'poleno.utils.template.TranslationLoader', u'django.template.loaders.filesystem.Loader'),),
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
         )
         self.settings_override.enable()
 
@@ -67,7 +67,7 @@ class LoginRequiredTest(TestCase):
     def setUp(self):
         self.settings_override = override_settings(
             PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
-            TEMPLATE_LOADERS=((u'poleno.utils.template.TranslationLoader', u'django.template.loaders.filesystem.Loader'),),
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
         )
         self.settings_override.enable()
 
@@ -135,7 +135,7 @@ class SecureRequiredTest(TestCase):
 
     def setUp(self):
         self.settings_override = override_settings(
-            TEMPLATE_LOADERS=((u'poleno.utils.template.TranslationLoader', u'django.template.loaders.filesystem.Loader'),),
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
         )
         self.settings_override.enable()
 
