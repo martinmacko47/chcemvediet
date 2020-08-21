@@ -3,7 +3,6 @@
 import time
 import datetime
 import json
-import unittest
 from testfixtures import TempDirectory
 
 from django.core.files.base import ContentFile
@@ -18,6 +17,7 @@ from poleno.utils.date import utc_now
 
 from ..models import Attachment
 from ..views import upload, download
+
 
 class AttachmentViewsTest(TestCase):
     u"""
@@ -90,37 +90,35 @@ class AttachmentViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(u''.join(response.streaming_content), u'content')
 
-    @unittest.skip(u'FIXME')
     def test_upload(self):
-        response = self.client.post(u'/upload/', {u'files': ContentFile(u'uploaded', name=u'filename')})
+        response = self.client.post(u'/upload/', {u'files': ContentFile(u'uploaded', name=u'filename.txt')})
         self.assertIs(type(response), JsonResponse)
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(json.loads(response.content), {u'files': [
-            {u'url': u'/download/1/', u'pk': 1, u'name': u'filename', u'size': 8},
+            {u'url': u'/download/1/', u'pk': 1, u'name': u'filename.txt', u'size': 8},
             ]})
         obj = Attachment.objects.get(pk=1)
         self.assertEqual(obj.generic_object, self.user)
-        self.assertEqual(obj.name, u'filename')
-        self.assertEqual(obj.content_type, u'application/octet-stream')
+        self.assertEqual(obj.name, u'filename.txt')
+        self.assertEqual(obj.content_type, u'text/plain')
         self.assertAlmostEqual(obj.created, utc_now(), delta=datetime.timedelta(seconds=10))
         self.assertEqual(obj.size, 8)
         self.assertEqual(obj.content, u'uploaded')
 
-    @unittest.skip(u'FIXME')
     def test_upload_multiple_files(self):
         response = self.client.post(u'/upload/', {u'files': [
-            ContentFile(u'uploaded', name=u'filename'),
-            ContentFile(u'uploaded2', name=u'filename2'),
-            ContentFile(u'uploaded3', name=u'filename3'),
+            ContentFile(u'uploaded', name=u'filename.txt'),
+            ContentFile(u'uploaded2', name=u'filename2.txt'),
+            ContentFile(u'uploaded3', name=u'filename3.txt'),
             ]})
         self.assertIs(type(response), JsonResponse)
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(json.loads(response.content), {u'files': [
-            {u'url': u'/download/1/', u'pk': 1, u'name': u'filename', u'size': 8},
-            {u'url': u'/download/2/', u'pk': 2, u'name': u'filename2', u'size': 9},
-            {u'url': u'/download/3/', u'pk': 3, u'name': u'filename3', u'size': 9},
+            {u'url': u'/download/1/', u'pk': 1, u'name': u'filename.txt', u'size': 8},
+            {u'url': u'/download/2/', u'pk': 2, u'name': u'filename2.txt', u'size': 9},
+            {u'url': u'/download/3/', u'pk': 3, u'name': u'filename3.txt', u'size': 9},
             ]})
         obj = Attachment.objects.get(pk=1)
         self.assertEqual(obj.content, u'uploaded')
