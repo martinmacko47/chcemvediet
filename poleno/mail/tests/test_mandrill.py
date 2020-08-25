@@ -2,17 +2,15 @@
 # -*- coding: utf-8 -*-
 import json
 import mock
-import datetime
 import contextlib
-import unittest
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.test import TestCase
+from django.test.utils import override_settings
 
-from poleno.utils.date import utc_now
 from poleno.utils.misc import Bunch
 from poleno.utils.test import override_signals, created_instances, patch_with_exception, ViewTestCaseMixin
 
@@ -21,6 +19,7 @@ from ..models import Message, Recipient
 from ..cron import mail as mail_cron_job
 from ..signals import message_sent, message_received
 from ..transports.mandrill.signals import webhook_event, message_status_webhook_event, inbound_email_webhook_event
+
 
 class MandrillTransportTest(MailTestCaseMixin, TestCase):
     u"""
@@ -84,7 +83,7 @@ class MandrillTransportTest(MailTestCaseMixin, TestCase):
         with mock.patch(u'poleno.mail.cron.cron_logger', logger):
             self._run_mail_cron_job(status_code=404)
         logged = logger.error.call_args[0][0]
-        self.assertIn(u'Seding email failed: <Message: %s>' % msg.pk, logged)
+        self.assertIn(u'Sending email failed: <Message: %s>' % msg.pk, logged)
         self.assertIn(u'RuntimeError: Sending Message(pk=%s) failed with status code 404.' % msg.pk, logged)
 
     def test_mandrill_api_key_setting(self):
@@ -117,7 +116,7 @@ class MandrillTransportTest(MailTestCaseMixin, TestCase):
         requests = self._run_mail_cron_job()
         self.assertEqual(requests[0].data[u'message'][u'subject'], u'Testing subject')
 
-    def test_message_with_mising_subject(self):
+    def test_message_with_missing_subject(self):
         msg = self._create_message(omit=[u'subject'])
         rcpt = self._create_recipient(message=msg)
         requests = self._run_mail_cron_job()
@@ -209,16 +208,15 @@ class MandrillTransportTest(MailTestCaseMixin, TestCase):
             {u'type': u'bcc', u'email': u'bcc2@a.com'},
             ])
 
-    @unittest.skip(u'FIXME')
     def test_message_attachments(self):
         msg = self._create_message()
         rcpt = self._create_recipient(message=msg)
-        attch1 = self._create_attachment(generic_object=msg, content=u'Text content', name=u'filename.txt', content_type=u'text/plain')
-        attch2 = self._create_attachment(generic_object=msg, content=u'(attachment content)', name=u'filename.pdf', content_type=u'application/pdf')
+        attch1 = self._create_attachment(generic_object=msg, content=u'Text content', name=u'filename.txt')
+        attch2 = self._create_attachment(generic_object=msg, content=u'%PDF-2.0', name=u'filename.pdf')
         requests = self._run_mail_cron_job()
         self.assertEqual(requests[0].data[u'message'][u'attachments'], [
             {u'content': u'VGV4dCBjb250ZW50', u'type': u'text/plain', u'name': u'filename.txt'},
-            {u'content': u'KGF0dGFjaG1lbnQgY29udGVudCk=', u'type': u'application/pdf', u'name': u'filename.pdf'},
+            {u'content': u'JVBERi0yLjA=', u'type': u'application/pdf', u'name': u'filename.pdf'},
             ])
 
     def test_response_id_saved_as_recipient_remote_id(self):
@@ -303,6 +301,12 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
 
     urls = u'poleno.mail.transports.mandrill.urls'
 
+    def setUp(self):
+        self.settings_override = override_settings(
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
+        )
+        self.settings_override.enable()
+
     @contextlib.contextmanager
     def _overrides(self, delete_settings=(), **override_settings):
         overrides = {
@@ -328,24 +332,20 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
         if content is not None:
             self.assertEqual(response.content, content)
 
-    @unittest.skip(u'FIXME')
     def test_allowed_http_methods(self):
         allowed = [u'HEAD', u'GET', u'POST']
         self.assert_allowed_http_methods(allowed, self._webhook_url())
 
-    @unittest.skip(u'FIXME')
     def test_post_method_needs_signature(self):
         with self._overrides():
             response = self.client.post(self._webhook_url(), secure=True)
-        self._check_response(response, HttpResponseForbidden, 403, u'X-Mandrill-Signature not set')
+        self._check_response(response, HttpResponseForbidden, 403)
 
-    @unittest.skip(u'FIXME')
     def test_non_secure_requests_forbidden(self):
         with self._overrides():
             response = self.client.head(self._webhook_url(), secure=False)
         self._check_response(response, HttpResponseForbidden, 403)
 
-    @unittest.skip(u'FIXME')
     def test_undefined_webhook_secret_raises_exception(self):
         with self._overrides(delete_settings=[u'MANDRILL_WEBHOOK_SECRET']):
             with self.assertRaisesMessage(ImproperlyConfigured, u'Setting MANDRILL_WEBHOOK_SECRET is not set.'):
@@ -361,19 +361,16 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
             response = self.client.head(self._webhook_url(u'secret', u'value'), secure=True)
         self._check_response(response)
 
-    @unittest.skip(u'FIXME')
     def test_webhook_secret_with_custom_name_does_not_match(self):
         with self._overrides(MANDRILL_WEBHOOK_SECRET_NAME=u'custom_name', MANDRILL_WEBHOOK_SECRET=u'value'):
             response = self.client.head(self._webhook_url(u'custom_name', u'wrong_value'), secure=True)
         self._check_response(response, HttpResponseForbidden, 403)
 
-    @unittest.skip(u'FIXME')
     def test_webhook_secret_with_default_name_does_not_match(self):
         with self._overrides(MANDRILL_WEBHOOK_SECRET=u'value', delete_settings=[u'MANDRILL_WEBHOOK_SECRET_NAME']):
             response = self.client.head(self._webhook_url(u'secret', u'wrong_value'), secure=True)
         self._check_response(response, HttpResponseForbidden, 403)
 
-    @unittest.skip(u'FIXME')
     def test_undefined_webhook_url_raises_exception_for_post_request(self):
         with self._overrides(delete_settings=[u'MANDRILL_WEBHOOK_URL']):
             with self.assertRaisesMessage(ImproperlyConfigured, u'Setting MANDRILL_WEBHOOK_URL is not set.'):
@@ -384,7 +381,6 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
             response = self.client.head(self._webhook_url(), secure=True)
         self._check_response(response)
 
-    @unittest.skip(u'FIXME')
     def test_undefined_webhook_keys_raises_exception_for_post_request(self):
         with self._overrides(delete_settings=[u'MANDRILL_WEBHOOK_KEYS']):
             with self.assertRaisesMessage(ImproperlyConfigured, u'Setting MANDRILL_WEBHOOK_KEYS is not set.'):
@@ -395,17 +391,15 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
             response = self.client.head(self._webhook_url(), secure=True)
         self._check_response(response)
 
-    @unittest.skip(u'FIXME')
     def test_post_request_with_missing_signature_forbidden(self):
         with self._overrides():
             response = self.client.post(self._webhook_url(), secure=True)
-        self._check_response(response, HttpResponseForbidden, 403, u'X-Mandrill-Signature not set')
+        self._check_response(response, HttpResponseForbidden, 403)
 
-    @unittest.skip(u'FIXME')
     def test_post_request_with_invalid_signature_forbidden(self):
         with self._overrides():
             response = self.client.post(self._webhook_url(), secure=True, HTTP_X_MANDRILL_SIGNATURE=u'invalid')
-        self._check_response(response, HttpResponseForbidden, 403, u'Signature does not match')
+        self._check_response(response, HttpResponseForbidden, 403)
 
     def test_post_request_with_valid_signature(self):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
@@ -414,20 +408,18 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
                     HTTP_X_MANDRILL_SIGNATURE=u'mOvq6ELcRGPELc0BwAFZn/PLZQA=')
         self._check_response(response)
 
-    @unittest.skip(u'FIXME')
     def test_post_request_with_missing_data_returns_bad_request(self):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
             response = self.client.post(self._webhook_url(), secure=True,
                     HTTP_X_MANDRILL_SIGNATURE=u'UkKakpnkvjXLMRLs1kVknNgKXpk=')
-        self._check_response(response, HttpResponseBadRequest, 400, u'Request syntax error')
+        self._check_response(response, HttpResponseBadRequest, 400)
 
-    @unittest.skip(u'FIXME')
     def test_post_request_with_invalid_data_returns_bad_request(self):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
             response = self.client.post(self._webhook_url(), secure=True,
                     data={u'mandrill_events': u'invalid'},
                     HTTP_X_MANDRILL_SIGNATURE=u'Cu4i92MszJnwAhrkRXirRhGBb1o=')
-        self._check_response(response, HttpResponseBadRequest, 400, u'Request syntax error')
+        self._check_response(response, HttpResponseBadRequest, 400)
 
     def test_post_request_with_valid_data_emits_webhook_events(self):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
@@ -446,7 +438,7 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
             mock.call(signal=webhook_event, data={u'_id': u'remote-2', u'event': u'soft_bounce'}, event_type=u'soft_bounce', sender=None),
             mock.call(signal=webhook_event, data={u'_id': u'remote-3', u'event': u'click'}, event_type=u'click', sender=None),
             ])
-    @unittest.skip(u'FIXME')
+
     def test_post_request_with_valid_data_rolls_back_if_exception_raised(self):
         def receiver(*args, **kwargs):
             self._create_message()
@@ -454,7 +446,7 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
             webhook_event.connect(receiver)
 
-            # No exceptions, data commited
+            # No exceptions, data committed
             with created_instances(Message.objects) as msg_set:
                 self.client.post(self._webhook_url(), secure=True,
                         data={u'mandrill_events': json.dumps([
@@ -598,7 +590,7 @@ class InboundEmailWebhookEvent(MailTestCaseMixin, TestCase):
         self.assertIsNotNone(msgs[0].pk)
         self.assertEqual(msgs[0].type, Message.TYPES.INBOUND)
 
-    def test_event_type_inbound_without_msg_in_data_does_nothig(self):
+    def test_event_type_inbound_without_msg_in_data_does_nothing(self):
         msgs = self._call_webhook(data={})
         self.assertItemsEqual(msgs, [])
 
@@ -687,11 +679,10 @@ class InboundEmailWebhookEvent(MailTestCaseMixin, TestCase):
         for rcpt in msgs[0].recipient_set.all():
             self.assertEqual(rcpt.status, Recipient.STATUSES.INBOUND)
 
-    @unittest.skip(u'FIXME')
     def test_message_attachments(self):
         msgs = self._call_webhook(attachments={
             u'file.txt': {u'name': u'file.txt', u'type': u'text/plain', u'content': u'Text Content'},
-            u'file.html': {u'name': u'file.html', u'type': u'text/html', u'content': u'<p>HTML Content</p>'},
+            u'file.html': {u'name': u'file.html', u'type': u'text/html', u'content': u'<html><body><p>HTML Content</p></body></html>'},
             # attachments with missing ``name``, ``type`` or ``content``
             u'aaa': {u'type': u'text/plain', u'content': u'Text Content'},
             u'bbb': {u'name': u'file.txt', u'content': u'Text Content'},
@@ -700,11 +691,11 @@ class InboundEmailWebhookEvent(MailTestCaseMixin, TestCase):
         attchs = [(a.name, a.content_type, a.content) for a in msgs[0].attachment_set.all()]
         self.assertItemsEqual(attchs, [
             (u'file.txt', u'text/plain', u'Text Content'),
-            (u'file.html', u'text/html', u'<p>HTML Content</p>'),
+            (u'file.html', u'text/html', u'<html><body><p>HTML Content</p></body></html>'),
             # missing ``name``, ``type`` and ``content`` are replaced with empty strings
-            (u'', u'text/plain', u'Text Content'),
-            (u'file.txt', u'', u'Text Content'),
-            (u'file.txt', u'text/plain', u''),
+            (u'attachment.txt', u'text/plain', u'Text Content'),
+            (u'file.txt', u'text/plain', u'Text Content'),
+            (u'file.bin', u'application/x-empty', u''),
             ])
 
     def test_message_attachment_base64_encoded(self):

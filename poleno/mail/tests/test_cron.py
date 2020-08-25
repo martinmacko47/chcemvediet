@@ -16,6 +16,7 @@ from ..models import Message
 from ..cron import mail as mail_cron_job
 from ..signals import message_sent, message_received
 
+
 class MailCronjobTest(MailTestCaseMixin, TestCase):
     u"""
     Tests ``poleno.mail.cron.mail`` cron job. Checks that the job is run once every minute and
@@ -32,7 +33,7 @@ class MailCronjobTest(MailTestCaseMixin, TestCase):
             get_messages_method=mock.DEFAULT, message_received_receiver=None):
         u"""
         Mocks mail transport, overrides ``message_sent`` and ``message_received`` signals, calls
-        ``mail`` cron job and eats any stdout prited by the called job.
+        ``mail`` cron job and eats any stdout printed by the called job.
         """
         transport = u'poleno.mail.transports.base.BaseTransport'
         outbound_transport = transport if outbound else None
@@ -76,7 +77,7 @@ class MailCronjobTest(MailTestCaseMixin, TestCase):
     def test_outbound_transport(self):
         u"""
         Checks that the registered transport is used to send the queued message, the sent message
-        is marked as processed and ``message_sent`` signal is emmited for it.
+        is marked as processed and ``message_sent`` signal is emitted for it.
         """
         msg = self._create_message(type=Message.TYPES.OUTBOUND, processed=None)
         method, receiver = mock.Mock(), mock.Mock()
@@ -88,7 +89,7 @@ class MailCronjobTest(MailTestCaseMixin, TestCase):
 
     def test_outbound_transport_with_no_queued_messages(self):
         u"""
-        Checks that no transport method is called and no ``message_sent`` signal is emmited if
+        Checks that no transport method is called and no ``message_sent`` signal is emitted if
         there are no queued messages.
         """
         method, receiver = mock.Mock(), mock.Mock()
@@ -109,7 +110,7 @@ class MailCronjobTest(MailTestCaseMixin, TestCase):
         self.assertItemsEqual(method.mock_calls, [mock.call(m) for m in msgs])
         self.assertItemsEqual(receiver.mock_calls, [mock.call(message=m, sender=None, signal=message_sent) for m in msgs])
 
-    def test_outbound_transport_lefts_message_unprocessed_if_exception_raised_while_pocessing_it(self):
+    def test_outbound_transport_lefts_message_unprocessed_if_exception_raised_while_processing_it(self):
         msgs = [self._create_message(type=Message.TYPES.OUTBOUND, processed=None) for i in range(3)]
 
         with mock.patch(u'poleno.mail.cron.nop', side_effect=[None, Exception, None]):
@@ -118,12 +119,12 @@ class MailCronjobTest(MailTestCaseMixin, TestCase):
         self.assertItemsEqual(Message.objects.filter(pk__in=(m.pk for m in msgs)).processed(), [msgs[0], msgs[2]])
         self.assertEqual(len(logger.mock_calls), 3)
         self.assertRegexpMatches(logger.mock_calls[0][1][0], u'Sent email: <Message: %s>' % msgs[0].pk)
-        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Seding email failed: <Message: %s>' % msgs[1].pk)
+        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Sending email failed: <Message: %s>' % msgs[1].pk)
         self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Sent email: <Message: %s>' % msgs[2].pk)
 
     def test_inbound_transport(self):
         u"""
-        Checks that ``message_received`` signal is emmited for all messages returned by the
+        Checks that ``message_received`` signal is emitted for all messages returned by the
         transport ``get_messages`` method.
         """
         msgs = []
@@ -193,7 +194,7 @@ class MailCronjobTest(MailTestCaseMixin, TestCase):
         self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Receiving emails failed:')
         self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Processed received email: <Message: %s>' % msgs[0].pk)
 
-    def test_inbound_transport_lefts_message_unprocessed_if_exception_raised_while_pocessing_it(self):
+    def test_inbound_transport_lefts_message_unprocessed_if_exception_raised_while_processing_it(self):
         msgs = []
         def method(transport):
             for i in range(3):

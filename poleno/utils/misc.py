@@ -142,7 +142,7 @@ def flatten(l):
 
 def guess_extension(content_type, default=u'.bin'):
     u"""
-    Guesses file extention based on file content type. Wrapper around ``mimetypes.guess_extension``
+    Guesses file extension based on file content type. Wrapper around ``mimetypes.guess_extension``
     to return ``default`` extension if the given content type is not known by ``mimetypes`` module,
     and to fix stupid guesses like: "text/plain" -> ".ksh".
 
@@ -154,6 +154,7 @@ def guess_extension(content_type, default=u'.bin'):
     """
     override = {
             u'text/plain': u'.txt', # was: ".ksh"
+            u'text/html': u'.html', # was: ".htm"
             u'application/octet-stream': u'.bin', # was: ".obj"
             }
     if content_type in override:
