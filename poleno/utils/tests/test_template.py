@@ -1,6 +1,5 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import os
 from testfixtures import TempDirectory
 
 from django.template.base import TemplateDoesNotExist
@@ -16,7 +15,7 @@ class TranslationLoaderTest(TestCase):
     u"""
     Tests ``TranslationLoader`` template loader. Checks that the loader loads original template
     only if there is no translated template for the active language. If there is a translated
-    template for the active languate, the loader loads this translated template. Also tests that an
+    template for the active language, the loader loads this translated template. Also tests that an
     exception is raised if there is no original nor translated template.
     """
 

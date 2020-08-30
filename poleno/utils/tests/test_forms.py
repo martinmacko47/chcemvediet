@@ -272,9 +272,7 @@ class CompositeTextFieldTest(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
         self.settings_override = override_settings(
-            TEMPLATE_LOADERS=((u'django.template.loaders.filesystem.Loader',),
-                              (u'django.template.loaders.app_directories.Loader',),
-                              ),
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader', u'django.template.loaders.app_directories.Loader',),
             TEMPLATE_DIRS=(self.tempdir.path,),
             )
         self.settings_override.enable()
