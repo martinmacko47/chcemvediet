@@ -123,7 +123,7 @@ class SmtpTransportTest(MailTestCaseMixin, TestCase):
                 --===============.*==--"""))
 
     def test_message_with_html_body_only(self):
-        msg = self._create_message(html=u'<p>HTML content</p>', omit=[u'text'])
+        msg = self._create_message(html=u'<html><body>HTML content</body></html>', omit=[u'text'])
         rcpt = self._create_recipient(message=msg)
         result = self._run_mail_cron_job()
         self.assertRegexpMatches(result[0].headers[u'Content-Type'][0], u'multipart/mixed; boundary="===============.*=="')
@@ -133,11 +133,11 @@ class SmtpTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============.*==--"""))
 
     def test_message_with_both_text_and_html_body(self):
-        msg = self._create_message(text=u'Text content', html=u'<p>HTML content</p>')
+        msg = self._create_message(text=u'Text content', html=u'<html><body>HTML content</body></html>')
         rcpt = self._create_recipient(message=msg)
         result = self._run_mail_cron_job()
         self.assertRegexpMatches(result[0].headers[u'Content-Type'][0], u'multipart/mixed; boundary="===============.*=="')
@@ -158,7 +158,7 @@ class SmtpTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============.*==--
 
                 --===============.*==--"""))
@@ -181,10 +181,10 @@ class SmtpTransportTest(MailTestCaseMixin, TestCase):
         self.assertEqual(result[0].headers[u'X-Another-Header'], [u'Another Value'])
 
     def test_message_with_attachments(self):
-        msg = self._create_message(text=u'Text content', html=u'<p>HTML content</p>')
+        msg = self._create_message(text=u'Text content', html=u'<html><body>HTML content</body></html>')
         rcpt = self._create_recipient(message=msg)
         attch1 = self._create_attachment(generic_object=msg, content=u'content', name=u'filename.txt')
-        attch2 = self._create_attachment(generic_object=msg, content=u'<html><body><p>content</p></body></html>', name=u'filename.html')
+        attch2 = self._create_attachment(generic_object=msg, content=u'<html><body>content</body></html>', name=u'filename.html')
         result = self._run_mail_cron_job()
         self.assertRegexpMatches(result[0].headers[u'Content-Type'][0], u'multipart/mixed; boundary="===============.*=="')
         self.assertRegexpMatches(result[0].body, dedent(u"""\
@@ -204,7 +204,7 @@ class SmtpTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============.*==--
 
                 --===============.*==
@@ -220,7 +220,7 @@ class SmtpTransportTest(MailTestCaseMixin, TestCase):
                 Content-Transfer-Encoding: 7bit
                 Content-Disposition: attachment; filename="filename.html"
 
-                <html><body><p>content</p></body></html>
+                <html><body>content</body></html>
                 --===============.*==--"""))
 
     def test_message_with_to_and_cc_recipients(self):

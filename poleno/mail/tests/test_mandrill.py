@@ -9,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, patch_logger
 
 from poleno.utils.misc import Bunch
 from poleno.utils.test import override_signals, created_instances, patch_with_exception, ViewTestCaseMixin
@@ -158,18 +158,18 @@ class MandrillTransportTest(MailTestCaseMixin, TestCase):
         self.assertNotIn(u'html', requests[0].data[u'message'])
 
     def test_message_with_html_body_only(self):
-        msg = self._create_message(html=u'<p>HTML content</p>', omit=[u'text'])
+        msg = self._create_message(html=u'<html><body>HTML content</body></html>', omit=[u'text'])
         rcpt = self._create_recipient(message=msg)
         requests = self._run_mail_cron_job()
         self.assertNotIn(u'text', requests[0].data[u'message'])
-        self.assertEqual(requests[0].data[u'message'][u'html'], u'<p>HTML content</p>')
+        self.assertEqual(requests[0].data[u'message'][u'html'], u'<html><body>HTML content</body></html>')
 
     def test_message_with_both_text_and_html_body(self):
-        msg = self._create_message(text=u'Text content', html=u'<p>HTML content</p>')
+        msg = self._create_message(text=u'Text content', html=u'<html><body>HTML content</body></html>')
         rcpt = self._create_recipient(message=msg)
         requests = self._run_mail_cron_job()
         self.assertEqual(requests[0].data[u'message'][u'text'], u'Text content')
-        self.assertEqual(requests[0].data[u'message'][u'html'], u'<p>HTML content</p>')
+        self.assertEqual(requests[0].data[u'message'][u'html'], u'<html><body>HTML content</body></html>')
 
     def test_message_with_neither_text_nor_html_body(self):
         msg = self._create_message(omit=[u'text', u'html'])
@@ -409,17 +409,21 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
         self._check_response(response)
 
     def test_post_request_with_missing_data_returns_bad_request(self):
-        with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
-            response = self.client.post(self._webhook_url(), secure=True,
-                    HTTP_X_MANDRILL_SIGNATURE=u'UkKakpnkvjXLMRLs1kVknNgKXpk=')
-        self._check_response(response, HttpResponseBadRequest, 400)
+        with patch_logger(u'django.security.SuspiciousOperation', u'error') as log_messages:
+            with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
+                response = self.client.post(self._webhook_url(), secure=True,
+                        HTTP_X_MANDRILL_SIGNATURE=u'UkKakpnkvjXLMRLs1kVknNgKXpk=')
+            self._check_response(response, HttpResponseBadRequest, 400)
+            self.assertIn(u'Request syntax error', log_messages)
 
     def test_post_request_with_invalid_data_returns_bad_request(self):
-        with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
-            response = self.client.post(self._webhook_url(), secure=True,
-                    data={u'mandrill_events': u'invalid'},
-                    HTTP_X_MANDRILL_SIGNATURE=u'Cu4i92MszJnwAhrkRXirRhGBb1o=')
-        self._check_response(response, HttpResponseBadRequest, 400)
+        with patch_logger(u'django.security.SuspiciousOperation', u'error') as log_messages:
+            with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
+                response = self.client.post(self._webhook_url(), secure=True,
+                        data={u'mandrill_events': u'invalid'},
+                        HTTP_X_MANDRILL_SIGNATURE=u'Cu4i92MszJnwAhrkRXirRhGBb1o=')
+            self._check_response(response, HttpResponseBadRequest, 400)
+            self.assertIn(u'Request syntax error', log_messages)
 
     def test_post_request_with_valid_data_emits_webhook_events(self):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
@@ -562,7 +566,7 @@ class InboundEmailWebhookEvent(MailTestCaseMixin, TestCase):
                 u'email': u'default_testing_for_mail@example.com',
                 u'subject': u'Default Testing Subject',
                 u'text': u'Default Testing Text Content',
-                u'html': u'<p>Default Testing HTML Content</p>',
+                u'html': u'<html><body>Default Testing HTML Content</body></html>',
                 u'to': [(u'Default Testing To Name', u'default_testing_to@example.com')],
                 u'cc': [(u'Default Testing Cc Name', u'default_testing_cc@example.com')],
                 u'bcc': [(u'Default Testing Bcc Name', u'default_testing_bcc@example.com')],
@@ -653,8 +657,8 @@ class InboundEmailWebhookEvent(MailTestCaseMixin, TestCase):
         self.assertEqual(msgs[0].text, u'')
 
     def test_message_html_body(self):
-        msgs = self._call_webhook(html=u'<p>HTML Content</p>')
-        self.assertEqual(msgs[0].html, u'<p>HTML Content</p>')
+        msgs = self._call_webhook(html=u'<html><body>HTML content</body></html>')
+        self.assertEqual(msgs[0].html, u'<html><body>HTML content</body></html>')
 
     def test_message_with_data_missing_html_body(self):
         msgs = self._call_webhook(omit=[u'html'])
@@ -682,7 +686,7 @@ class InboundEmailWebhookEvent(MailTestCaseMixin, TestCase):
     def test_message_attachments(self):
         msgs = self._call_webhook(attachments={
             u'file.txt': {u'name': u'file.txt', u'type': u'text/plain', u'content': u'Text Content'},
-            u'file.html': {u'name': u'file.html', u'type': u'text/html', u'content': u'<html><body><p>HTML Content</p></body></html>'},
+            u'file.html': {u'name': u'file.html', u'type': u'text/html', u'content': u'<html><body>HTML Content</body></html>'},
             # attachments with missing ``name``, ``type`` or ``content``
             u'aaa': {u'type': u'text/plain', u'content': u'Text Content'},
             u'bbb': {u'name': u'file.txt', u'content': u'Text Content'},
@@ -691,8 +695,8 @@ class InboundEmailWebhookEvent(MailTestCaseMixin, TestCase):
         attchs = [(a.name, a.content_type, a.content) for a in msgs[0].attachment_set.all()]
         self.assertItemsEqual(attchs, [
             (u'file.txt', u'text/plain', u'Text Content'),
-            (u'file.html', u'text/html', u'<html><body><p>HTML Content</p></body></html>'),
-            # missing ``name``, ``type`` and ``content`` are replaced with empty strings
+            (u'file.html', u'text/html', u'<html><body>HTML Content</body></html>'),
+            # missing name and type are guessed and missing content is replaced with an empty string
             (u'attachment.txt', u'text/plain', u'Text Content'),
             (u'file.txt', u'text/plain', u'Text Content'),
             (u'file.bin', u'application/x-empty', u''),

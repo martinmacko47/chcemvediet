@@ -62,6 +62,6 @@ class MailTestCaseMixin(TestCase):
             u'received_for': u'default_testing_for_mail@example.com',
             u'subject': u'Default Testing Subject',
             u'text': u'Default Testing Text Content',
-            u'html': u'<p>Default Testing HTML Content</p>',
+            u'html': u'<html><body>Default Testing HTML Content</body></html>',
             u'headers': {u'X-Default-Testing-Extra-Header': u'Default Testing Value'},
             })
