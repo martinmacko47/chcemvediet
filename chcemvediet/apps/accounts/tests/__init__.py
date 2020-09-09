@@ -3,6 +3,7 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 
+
 class AccountsTestCaseMixin(TestCase):
 
     def _pre_setup(self):
