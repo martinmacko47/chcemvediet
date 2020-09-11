@@ -26,63 +26,6 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         self.assertEqual(oblg.name, u'')
 
     @unittest.skip(u'FIXME')
-    def test_street_field(self):
-        oblg = self._create_obligee(street=u'123 Westside')
-        self.assertEqual(oblg.street, u'123 Westside')
-
-    @unittest.skip(u'FIXME')
-    def test_street_field_default_value_if_omitted(self):
-        oblg = self._create_obligee(omit=[u'street'])
-        self.assertEqual(oblg.street, u'')
-
-    @unittest.skip(u'FIXME')
-    def test_city_field(self):
-        oblg = self._create_obligee(city=u'Winterfield')
-        self.assertEqual(oblg.city, u'Winterfield')
-
-    @unittest.skip(u'FIXME')
-    def test_city_field_default_value_if_omitted(self):
-        oblg = self._create_obligee(omit=[u'city'])
-        self.assertEqual(oblg.city, u'')
-
-    @unittest.skip(u'FIXME')
-    def test_zip_field(self):
-        oblg = self._create_obligee(zip=u'12345')
-        self.assertEqual(oblg.zip, u'12345')
-
-    @unittest.skip(u'FIXME')
-    def test_zip_field_default_value_if_omitted(self):
-        oblg = self._create_obligee(omit=[u'zip'])
-        self.assertEqual(oblg.zip, u'')
-
-    @unittest.skip(u'FIXME')
-    def test_emails_field(self):
-        oblg = self._create_obligee(emails=u'agency@example.com')
-        self.assertEqual(oblg.emails, u'agency@example.com')
-
-    @unittest.skip(u'FIXME')
-    def test_emails_field_default_value_if_omitted(self):
-        oblg = self._create_obligee(omit=[u'emails'])
-        self.assertEqual(oblg.emails, u'')
-
-    @unittest.skip(u'FIXME')
-    def test_emails_field_validation_with_invalid_email(self):
-        oblg = self._create_obligee(emails=u'invalid')
-        with self.assertRaisesMessage(ValidationError, u'"invalid" is not a valid email address'):
-            oblg.full_clean()
-
-    @unittest.skip(u'FIXME')
-    def test_emails_field_validation_with_normalized_email(self):
-        oblg = self._create_obligee(emails=u'"John" Smith <smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: John Smith <smith@example.com>'):
-            oblg.full_clean()
-
-    @unittest.skip(u'FIXME')
-    def test_emails_field_validation_with_valid_email(self):
-        oblg = self._create_obligee(emails=u'John Smith <smith@example.com>')
-        oblg.full_clean()
-
-    @unittest.skip(u'FIXME')
     def test_slug_field_computed_value(self):
         oblg = self._create_obligee(name=u'Agency')
         self.assertEqual(oblg.slug, u'-agency-')
@@ -152,6 +95,63 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         self.assertEqual(oblg.slug, u'-another-agency-')
         oblg = Obligee.objects.get(pk=oblg.pk)
         self.assertEqual(oblg.slug, u'-another-agency-')
+
+    @unittest.skip(u'FIXME')
+    def test_street_field(self):
+        oblg = self._create_obligee(street=u'123 Westside')
+        self.assertEqual(oblg.street, u'123 Westside')
+
+    @unittest.skip(u'FIXME')
+    def test_street_field_default_value_if_omitted(self):
+        oblg = self._create_obligee(omit=[u'street'])
+        self.assertEqual(oblg.street, u'')
+
+    @unittest.skip(u'FIXME')
+    def test_city_field(self):
+        oblg = self._create_obligee(city=u'Winterfield')
+        self.assertEqual(oblg.city, u'Winterfield')
+
+    @unittest.skip(u'FIXME')
+    def test_city_field_default_value_if_omitted(self):
+        oblg = self._create_obligee(omit=[u'city'])
+        self.assertEqual(oblg.city, u'')
+
+    @unittest.skip(u'FIXME')
+    def test_zip_field(self):
+        oblg = self._create_obligee(zip=u'12345')
+        self.assertEqual(oblg.zip, u'12345')
+
+    @unittest.skip(u'FIXME')
+    def test_zip_field_default_value_if_omitted(self):
+        oblg = self._create_obligee(omit=[u'zip'])
+        self.assertEqual(oblg.zip, u'')
+
+    @unittest.skip(u'FIXME')
+    def test_emails_field(self):
+        oblg = self._create_obligee(emails=u'agency@example.com')
+        self.assertEqual(oblg.emails, u'agency@example.com')
+
+    @unittest.skip(u'FIXME')
+    def test_emails_field_default_value_if_omitted(self):
+        oblg = self._create_obligee(omit=[u'emails'])
+        self.assertEqual(oblg.emails, u'')
+
+    @unittest.skip(u'FIXME')
+    def test_emails_field_validation_with_invalid_email(self):
+        oblg = self._create_obligee(emails=u'invalid')
+        with self.assertRaisesMessage(ValidationError, u'"invalid" is not a valid email address'):
+            oblg.full_clean()
+
+    @unittest.skip(u'FIXME')
+    def test_emails_field_validation_with_normalized_email(self):
+        oblg = self._create_obligee(emails=u'"John" Smith <smith@example.com>')
+        with self.assertRaisesMessage(ValidationError, u'Parsed as: John Smith <smith@example.com>'):
+            oblg.full_clean()
+
+    @unittest.skip(u'FIXME')
+    def test_emails_field_validation_with_valid_email(self):
+        oblg = self._create_obligee(emails=u'John Smith <smith@example.com>')
+        oblg.full_clean()
 
     @unittest.skip(u'FIXME')
     def test_status_field(self):
