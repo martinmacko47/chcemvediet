@@ -1,7 +1,5 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import unittest
-
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import User
@@ -10,7 +8,8 @@ from django.test.utils import override_settings
 
 from poleno.utils.views import require_ajax, login_required, secure_required
 
-class RequireAjaxTest(TestCase):
+
+class AjaxRequiredTest(TestCase):
     u"""
     Tests ``@require_ajax`` decorator.
     """
@@ -22,6 +21,15 @@ class RequireAjaxTest(TestCase):
         url(r'^require-ajax/$', require_ajax_view),
     ))
 
+    def setUp(self):
+        self.settings_override = override_settings(
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
+        )
+        self.settings_override.enable()
+
+    def tearDown(self):
+        self.settings_override.disable()
+
 
     def test_with_ajax(self):
         u"""
@@ -31,7 +39,6 @@ class RequireAjaxTest(TestCase):
         self.assertIs(type(response), HttpResponse)
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skip(u'FIXME')
     def test_without_ajax(self):
         u"""
         Tests that ``@require_ajax`` forbids requests without ``XMLHttpRequest`` header.
@@ -57,11 +64,11 @@ class LoginRequiredTest(TestCase):
         url(r'^login-required-with-exception/$', login_required_with_exception_view),
     ))
 
-
     def setUp(self):
         self.settings_override = override_settings(
             PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
-            )
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
+        )
         self.settings_override.enable()
 
     def tearDown(self):
@@ -76,7 +83,6 @@ class LoginRequiredTest(TestCase):
         self.assertIs(type(response), HttpResponseRedirect)
         self.assertEqual(response.status_code, 302)
 
-    @unittest.skip(u'FIXME')
     def test_anonymous_with_exception(self):
         u"""
         Tests that ``@login_required(raise_exception=True)`` forbids requests with anonymous users.
@@ -127,6 +133,15 @@ class SecureRequiredTest(TestCase):
         url(r'^secure-required-with-exception/$', secure_required_with_exception_view),
     ))
 
+    def setUp(self):
+        self.settings_override = override_settings(
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
+        )
+        self.settings_override.enable()
+
+    def tearDown(self):
+        self.settings_override.disable()
+
 
     def test_insecure_with_redirect(self):
         u"""
@@ -137,7 +152,6 @@ class SecureRequiredTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, u'https://testserver/secure-required-with-redirect/')
 
-    @unittest.skip(u'FIXME')
     def test_insecure_with_exception(self):
         u"""
         Tests that ``@secure_required(raise_exception=True)`` forbids insecure requests.

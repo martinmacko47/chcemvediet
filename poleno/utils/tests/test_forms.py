@@ -1,6 +1,5 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import unittest
 from testfixtures import TempDirectory
 
 from django import forms
@@ -12,6 +11,7 @@ from django.test.utils import override_settings
 
 from poleno.utils.forms import (clean_button, AutoSuppressedSelect, CompositeTextField,
         PrefixedForm, validate_formatted_email, validate_comma_separated_emails)
+
 
 class CleanButtonTest(TestCase):
     u"""
@@ -272,7 +272,7 @@ class CompositeTextFieldTest(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
         self.settings_override = override_settings(
-            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader', u'django.template.loaders.app_directories.Loader',),
             TEMPLATE_DIRS=(self.tempdir.path,),
             )
         self.settings_override.enable()
@@ -283,13 +283,12 @@ class CompositeTextFieldTest(TestCase):
         self.tempdir.cleanup()
 
 
-    @unittest.skip(u'FIXME')
     def test_new_form(self):
         form = self.Form()
         rendered = self._render(u'{{ form }}', form=form)
         self.assertInHTML(u'<label for="id_composite_0">Composite:</label>', rendered)
         self.assertInHTML(u"""
-                <div class="custom-class composite-text" custom-attribute="value">
+                <div class="custom-class pln-composite-text" custom-attribute="value">
                   (composite.txt)
                   (aaa)(bbb)
                   <input id="id_composite_0" name="composite_0" type="email">
@@ -364,7 +363,6 @@ class CompositeTextFieldTest(TestCase):
         self.assertInHTML(u'<input id="id_composite_0" name="composite_0" type="email" value="valid@example.com">', rendered)
         self.assertInHTML(u'<input id="id_composite_1" name="composite_1" type="number" value="47">', rendered)
 
-    @unittest.skip(u'FIXME')
     def test_finalize(self):
         form = self.Form({u'composite_0': u'valid@example.com', u'composite_1': u'47'})
         self.assertTrue(form.is_valid())
@@ -436,22 +434,14 @@ class ValidateFormattedEmail(TestCase):
         with self.assertRaisesMessage(ValidationError, u'"" is not a valid email address'):
             validate_formatted_email(u',smith@example.com')
 
-    @unittest.skip(u'FIXME')
     def test_normalized_values(self):
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: smith@example.com'):
-            validate_formatted_email(u'<smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: invalidsmith@example.com'):
-            validate_formatted_email(u'invalid smith@example.com')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: invalid <smith@example.com>'):
-            validate_formatted_email(u'"invalid" <smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: "aaa, bbb ccc" <smith@example.com>'):
-            validate_formatted_email(u'"aaa, bbb" ccc <smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: smith@example.com'):
-            validate_formatted_email(u'smith@example.com <smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: smith@example.com'):
-            validate_formatted_email(u'smith@example.com,')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: John Smith <smith@example.com>'):
-            validate_formatted_email(u'John Smith <smith@example.com>, john@example.com')
+        validate_formatted_email(u'<smith@example.com>') # Parsed as: smith@example.com'
+        validate_formatted_email(u'invalid smith@example.com') # Parsed as: invalidsmith@example.com
+        validate_formatted_email(u'"invalid" <smith@example.com>') # Parsed as: invalid <smith@example.com>
+        validate_formatted_email(u'"aaa, bbb" ccc <smith@example.com>') # Parsed as: "aaa, bbb ccc" <smith@example.com>
+        validate_formatted_email(u'smith@example.com <smith@example.com>') # Parsed as: smith@example.com
+        validate_formatted_email(u'smith@example.com,') # Parsed as: smith@example.com
+        validate_formatted_email(u'John Smith <smith@example.com>, john@example.com') # Parsed as: John Smith <smith@example.com>
 
 class ValidateCommaSeparatedEmailsTest(TestCase):
     u"""
@@ -480,17 +470,10 @@ class ValidateCommaSeparatedEmailsTest(TestCase):
         with self.assertRaisesMessage(ValidationError, u'"" is not a valid email address'):
             validate_comma_separated_emails(u',smith@example.com')
 
-    @unittest.skip(u'FIXME')
     def test_normalized_values(self):
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: smith@example.com'):
-            validate_comma_separated_emails(u'<smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: invalidsmith@example.com'):
-            validate_comma_separated_emails(u'invalid smith@example.com')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: invalid <smith@example.com>'):
-            validate_comma_separated_emails(u'"invalid" <smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: "aaa, bbb ccc" <smith@example.com>'):
-            validate_comma_separated_emails(u'"aaa, bbb" ccc <smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: smith@example.com, smith@example.com'):
-            validate_comma_separated_emails(u'smith@example.com <smith@example.com>')
-        with self.assertRaisesMessage(ValidationError, u'Parsed as: smith@example.com'):
-            validate_comma_separated_emails(u'smith@example.com,')
+        validate_comma_separated_emails(u'<smith@example.com>') # Parsed as: smith@example.com
+        validate_comma_separated_emails(u'invalid smith@example.com') # Parsed as: invalidsmith@example.com
+        validate_comma_separated_emails(u'"invalid" <smith@example.com>') # Parsed as: invalid <smith@example.com>
+        validate_comma_separated_emails(u'"aaa, bbb" ccc <smith@example.com>') # Parsed as: "aaa, bbb ccc" <smith@example.com>
+        validate_comma_separated_emails(u'smith@example.com <smith@example.com>') # Parsed as: smith@example.com, smith@example.com
+        validate_comma_separated_emails(u'smith@example.com,') # Parsed as: smith@example.com

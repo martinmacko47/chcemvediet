@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 import os
 import random
-import json
-import unittest
 from testfixtures import TempDirectory
 
 from django.conf.urls import patterns, url
 from django.http import HttpResponseNotModified, FileResponse
 from django.utils.http import urlquote, urlencode, http_date
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from poleno.utils.http import send_file_response
 from poleno.utils.misc import random_string
+
 
 class SendFileResponseTest(TestCase):
     u"""
@@ -35,8 +35,13 @@ class SendFileResponseTest(TestCase):
 
     def setUp(self):
         self.tempdir = TempDirectory()
+        self.settings_override = override_settings(
+            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
+        )
+        self.settings_override.enable()
 
     def tearDown(self):
+        self.settings_override.disable()
         self.tempdir.cleanup()
 
 
@@ -64,12 +69,10 @@ class SendFileResponseTest(TestCase):
         self._check_response(response, FileResponse, 200)
         self._check_content(response, path)
 
-    @unittest.skip(u'FIXME')
     def test_directory_raises_exception(self):
         with self.assertRaisesMessage(OSError, u'Not a regular file: /'):
             response = self._request_file(u'/')
 
-    @unittest.skip(u'FIXME')
     def test_nonexistent_file_raises_exception(self):
         with self.assertRaisesMessage(OSError, u"[Errno 2] No such file or directory: '/nonexistent.txt'"):
             response = self._request_file(u'/nonexistent.txt')
