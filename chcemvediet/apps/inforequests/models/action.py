@@ -366,7 +366,7 @@ class Action(FormatMixin, models.Model):
     @cached_property
     def can_applicant_snooze(self):
         u"""
-        Whether the applicant may snooze for 3 calendar days sinde today such that the total snooze
+        Whether the applicant may snooze for 3 calendar days since today such that the total snooze
         since the deadline date will not be more than 8 calendar days.
         """
         return (self.has_obligee_deadline_snooze_missed
