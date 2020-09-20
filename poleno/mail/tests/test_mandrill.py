@@ -321,16 +321,17 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
             for name in delete_settings:
                 delattr(settings, name)
             with override_signals(webhook_event):
-                yield
+                with patch_logger(u'django.security.SuspiciousOperation', u'error') as self.log_messages:
+                    yield
 
     def _webhook_url(self, secret_name=u'default_testing_secret_name', secret=u'default_testing_secret'):
         return u'%s?%s=%s' % (reverse(u'webhook'), secret_name, secret)
 
-    def _check_response(self, response, klass=HttpResponse, status_code=200, content=None):
+    def _check_response(self, response, klass=HttpResponse, status_code=200, error=None):
         self.assertEqual(type(response), klass)
         self.assertEqual(response.status_code, status_code)
-        if content is not None:
-            self.assertEqual(response.content, content)
+        if error is not None:
+            self.assertIn(error, self.log_messages)
 
     def test_allowed_http_methods(self):
         allowed = [u'HEAD', u'GET', u'POST']
@@ -339,7 +340,7 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
     def test_post_method_needs_signature(self):
         with self._overrides():
             response = self.client.post(self._webhook_url(), secure=True)
-        self._check_response(response, HttpResponseForbidden, 403)
+        self._check_response(response, HttpResponseBadRequest, 400, u'X-Mandrill-Signature not set')
 
     def test_non_secure_requests_forbidden(self):
         with self._overrides():
@@ -364,12 +365,12 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
     def test_webhook_secret_with_custom_name_does_not_match(self):
         with self._overrides(MANDRILL_WEBHOOK_SECRET_NAME=u'custom_name', MANDRILL_WEBHOOK_SECRET=u'value'):
             response = self.client.head(self._webhook_url(u'custom_name', u'wrong_value'), secure=True)
-        self._check_response(response, HttpResponseForbidden, 403)
+        self._check_response(response, HttpResponseBadRequest, 400, u'Secret does not match')
 
     def test_webhook_secret_with_default_name_does_not_match(self):
         with self._overrides(MANDRILL_WEBHOOK_SECRET=u'value', delete_settings=[u'MANDRILL_WEBHOOK_SECRET_NAME']):
             response = self.client.head(self._webhook_url(u'secret', u'wrong_value'), secure=True)
-        self._check_response(response, HttpResponseForbidden, 403)
+        self._check_response(response, HttpResponseBadRequest, 400, u'Secret does not match')
 
     def test_undefined_webhook_url_raises_exception_for_post_request(self):
         with self._overrides(delete_settings=[u'MANDRILL_WEBHOOK_URL']):
@@ -394,12 +395,12 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
     def test_post_request_with_missing_signature_forbidden(self):
         with self._overrides():
             response = self.client.post(self._webhook_url(), secure=True)
-        self._check_response(response, HttpResponseForbidden, 403)
+        self._check_response(response, HttpResponseBadRequest, 400, u'X-Mandrill-Signature not set')
 
     def test_post_request_with_invalid_signature_forbidden(self):
         with self._overrides():
             response = self.client.post(self._webhook_url(), secure=True, HTTP_X_MANDRILL_SIGNATURE=u'invalid')
-        self._check_response(response, HttpResponseForbidden, 403)
+        self._check_response(response, HttpResponseBadRequest, 400, u'Signature does not match')
 
     def test_post_request_with_valid_signature(self):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
@@ -409,21 +410,17 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
         self._check_response(response)
 
     def test_post_request_with_missing_data_returns_bad_request(self):
-        with patch_logger(u'django.security.SuspiciousOperation', u'error') as log_messages:
-            with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
-                response = self.client.post(self._webhook_url(), secure=True,
-                        HTTP_X_MANDRILL_SIGNATURE=u'UkKakpnkvjXLMRLs1kVknNgKXpk=')
-            self._check_response(response, HttpResponseBadRequest, 400)
-            self.assertIn(u'Request syntax error', log_messages)
+        with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
+            response = self.client.post(self._webhook_url(), secure=True,
+                    HTTP_X_MANDRILL_SIGNATURE=u'UkKakpnkvjXLMRLs1kVknNgKXpk=')
+        self._check_response(response, HttpResponseBadRequest, 400, u'Request syntax error')
 
     def test_post_request_with_invalid_data_returns_bad_request(self):
-        with patch_logger(u'django.security.SuspiciousOperation', u'error') as log_messages:
-            with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
-                response = self.client.post(self._webhook_url(), secure=True,
-                        data={u'mandrill_events': u'invalid'},
-                        HTTP_X_MANDRILL_SIGNATURE=u'Cu4i92MszJnwAhrkRXirRhGBb1o=')
-            self._check_response(response, HttpResponseBadRequest, 400)
-            self.assertIn(u'Request syntax error', log_messages)
+        with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
+            response = self.client.post(self._webhook_url(), secure=True,
+                    data={u'mandrill_events': u'invalid'},
+                    HTTP_X_MANDRILL_SIGNATURE=u'Cu4i92MszJnwAhrkRXirRhGBb1o=')
+        self._check_response(response, HttpResponseBadRequest, 400, u'Request syntax error')
 
     def test_post_request_with_valid_data_emits_webhook_events(self):
         with self._overrides(MANDRILL_WEBHOOK_URL=u'https://testhost/', MANDRILL_WEBHOOK_KEYS=[u'testkey']):
