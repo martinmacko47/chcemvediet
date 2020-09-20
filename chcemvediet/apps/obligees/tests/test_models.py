@@ -322,125 +322,6 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: obligees_obligee.status'):
             self._create_obligee(omit=[u'status'])
 
-    def test_no_default_ordering(self):
-        self.assertFalse(Obligee.objects.all().ordered)
-
-    def test_dummy_email_property(self):
-        oblg = self._create_obligee(name=u'Agency')
-        self.assertEqual(oblg.dummy_email(oblg.name, u'{name}@chcemvediet.sk'), u'agency@chcemvediet.sk')
-
-    def test_dummy_email_property_with_accent_in_name(self):
-        name=u'ÍňŤéřńÁťǏônǎĺ AGENCY Москва'
-        self.assertEqual(Obligee.dummy_email(name, u'{name}@chcemvediet.sk'), u'international-agency-moskva@chcemvediet.sk')
-
-    def test_dummy_email_property_with_too_long_name(self):
-        name = u'x' * 40
-        self.assertEqual(Obligee.dummy_email(name, u'{name}@chcemvediet.sk'), u'x' * 30 + u'@chcemvediet.sk')
-
-    def test_dummy_email_property_with_hyphens_in_name(self):
-        name = u'--International Student--Agency--  '
-        self.assertEqual(Obligee.dummy_email(name, u'{name}@chcemvediet.sk'), u'international-student-agency@chcemvediet.sk')
-
-    def test_dummy_email_property_with_multiple_placeholders(self):
-        name = u'Agency'
-        self.assertEqual(Obligee.dummy_email(name, u'{name}-{name}@chcemvediet.sk'), u'agency-agency@chcemvediet.sk')
-
-    def test_dummy_email_property_with_invalid_placeholder(self):
-        with self.assertRaisesMessage(KeyError, u'invalid'):
-            name = u'Agency'
-            Obligee.dummy_email(name, u'{invalid}@chcemvediet.sk')
-
-    def test_dummy_email_property_without_placeholder(self):
-        name = u'Agency'
-        self.assertEqual(Obligee.dummy_email(name, u'@chcemvediet.sk'), u'@chcemvediet.sk')
-
-    def test_emails_parsed_property(self):
-        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>')
-        self.assertEqual(list(oblg.emails_parsed), [(u'The Agency', u'agency@example.com')])
-
-    def test_emails_parsed_property_with_comma_in_name(self):
-        oblg = self._create_obligee(emails=u'"Agency, The" <agency@example.com>')
-        self.assertEqual(list(oblg.emails_parsed), [(u'Agency, The', u'agency@example.com')])
-
-    def test_emails_parsed_property_with_quotes_in_name(self):
-        oblg = self._create_obligee(emails=u'"The \\"Secret\\" Agency" <agency@example.com>')
-        self.assertEqual(list(oblg.emails_parsed), [(u'The "Secret" Agency', u'agency@example.com')])
-
-    def test_emails_parsed_property_with_empty_name(self):
-        oblg = self._create_obligee(emails=u'     <agency@example.com>')
-        self.assertEqual(list(oblg.emails_parsed), [(u'', u'agency@example.com')])
-
-    def test_emails_parsed_property_without_name(self):
-        oblg = self._create_obligee(emails=u'agency@example.com')
-        self.assertEqual(list(oblg.emails_parsed), [(u'', u'agency@example.com')])
-
-    def test_emails_parsed_property_with_multiple_mails(self):
-        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>, Another Mail <another@example.com>')
-        self.assertEqual(list(oblg.emails_parsed), [(u'The Agency', u'agency@example.com'), (u'Another Mail', u'another@example.com')])
-
-    def test_emails_parsed_property_with_empty_mails(self):
-        oblg = self._create_obligee(emails=u'  , The Agency <agency@example.com>,  ,   ')
-        self.assertEqual(list(oblg.emails_parsed), [(u'The Agency', u'agency@example.com')])
-
-    def test_emails_parsed_property_with_no_emails(self):
-        oblg = self._create_obligee(emails=u'')
-        self.assertEqual(list(oblg.emails_parsed), [])
-
-    def test_emails_formatted_property(self):
-        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>')
-        self.assertEqual(list(oblg.emails_formatted), [u'The Agency <agency@example.com>'])
-
-    def test_emails_formatted_property_with_comma_in_name(self):
-        oblg = self._create_obligee(emails=u'"Agency, The" <agency@example.com>')
-        self.assertEqual(list(oblg.emails_formatted), [u'"Agency, The" <agency@example.com>'])
-
-    def test_emails_formatted_property_with_quotes_in_name(self):
-        oblg = self._create_obligee(emails=u'"The \\"Secret\\" Agency" <agency@example.com>')
-        self.assertEqual(list(oblg.emails_formatted), [u'"The \\"Secret\\" Agency" <agency@example.com>'])
-
-    def test_emails_formatted_property_with_empty_name(self):
-        oblg = self._create_obligee(emails=u'     <agency@example.com>')
-        self.assertEqual(list(oblg.emails_formatted), [u'agency@example.com'])
-
-    def test_emails_formatted_property_without_name(self):
-        oblg = self._create_obligee(emails=u'agency@example.com')
-        self.assertEqual(list(oblg.emails_formatted), [u'agency@example.com'])
-
-    def test_emails_formatted_property_with_multiple_mails(self):
-        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>, Another Mail <another@example.com>')
-        self.assertEqual(list(oblg.emails_formatted), [u'The Agency <agency@example.com>', u'Another Mail <another@example.com>'])
-
-    def test_emails_formatted_property_with_empty_mails(self):
-        oblg = self._create_obligee(emails=u'  , The Agency <agency@example.com>,  ,   ')
-        self.assertEqual(list(oblg.emails_formatted), [u'The Agency <agency@example.com>'])
-
-    def test_emails_formatted_property_with_no_emails(self):
-        oblg = self._create_obligee(emails=u'')
-        self.assertEqual(list(oblg.emails_formatted), [])
-
-    def test_repr(self):
-        oblg = self._create_obligee(name=u'Agency')
-        self.assertEqual(repr(oblg), u'<Obligee: [{}] Agency>'.format(oblg.pk))
-
-    def test_pending_query_method(self):
-        oblg1 = self._create_obligee(name=u'Agency 1', status=Obligee.STATUSES.DISSOLVED)
-        oblg2 = self._create_obligee(name=u'Agency 2', status=Obligee.STATUSES.DISSOLVED)
-        oblg3 = self._create_obligee(name=u'Agency 3', status=Obligee.STATUSES.PENDING)
-        oblg4 = self._create_obligee(name=u'Agency 4', status=Obligee.STATUSES.PENDING)
-        self.assertItemsEqual(Obligee.objects.pending(), [oblg3, oblg4])
-
-    def test_order_by_pk_query_method(self):
-        oblgs = [self._create_obligee(name=u'Agency {}'.format(i)) for i in range(20)]
-        sample = random.sample(oblgs, 10)
-        result = Obligee.objects.filter(pk__in=(d.pk for d in sample)).order_by_pk().reverse()
-        self.assertEqual(list(result), sorted(sample, key=lambda d: -d.pk))
-
-    def test_order_by_name_query_method(self):
-        names = [u'aaa', u'bbb', u'ccc', u'ddd', u'eee', u'fff', u'ggg', u'hhh', u'iii', u'jjj']
-        random.shuffle(names)
-        oblgs = [self._create_obligee(name=n) for n in names]
-        self.assertEqual(list(Obligee.objects.order_by_name()), sorted(oblgs, key=lambda o: o.name))
-
     def test_historical_obligee_model_exists(self):
         oblg = self._create_obligee(name=u'Agency', street=u'Westside')
         count = HistoricalObligee.objects.filter(id=oblg.pk).count()
@@ -670,3 +551,122 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
     def test_obligeegroup_obligee_set_backward_relation_empty_by_default(self):
         obligeegroup = self._create_obligeegroup()
         self.assertItemsEqual(obligeegroup.obligee_set.all(), [])
+
+    def test_no_default_ordering(self):
+        self.assertFalse(Obligee.objects.all().ordered)
+
+    def test_dummy_email_property(self):
+        oblg = self._create_obligee(name=u'Agency')
+        self.assertEqual(oblg.dummy_email(oblg.name, u'{name}@chcemvediet.sk'), u'agency@chcemvediet.sk')
+
+    def test_dummy_email_property_with_accent_in_name(self):
+        name=u'ÍňŤéřńÁťǏônǎĺ AGENCY Москва'
+        self.assertEqual(Obligee.dummy_email(name, u'{name}@chcemvediet.sk'), u'international-agency-moskva@chcemvediet.sk')
+
+    def test_dummy_email_property_with_too_long_name(self):
+        name = u'x' * 40
+        self.assertEqual(Obligee.dummy_email(name, u'{name}@chcemvediet.sk'), u'x' * 30 + u'@chcemvediet.sk')
+
+    def test_dummy_email_property_with_hyphens_in_name(self):
+        name = u'--International Student--Agency--  '
+        self.assertEqual(Obligee.dummy_email(name, u'{name}@chcemvediet.sk'), u'international-student-agency@chcemvediet.sk')
+
+    def test_dummy_email_property_with_multiple_placeholders(self):
+        name = u'Agency'
+        self.assertEqual(Obligee.dummy_email(name, u'{name}-{name}@chcemvediet.sk'), u'agency-agency@chcemvediet.sk')
+
+    def test_dummy_email_property_with_invalid_placeholder(self):
+        with self.assertRaisesMessage(KeyError, u'invalid'):
+            name = u'Agency'
+            Obligee.dummy_email(name, u'{invalid}@chcemvediet.sk')
+
+    def test_dummy_email_property_without_placeholder(self):
+        name = u'Agency'
+        self.assertEqual(Obligee.dummy_email(name, u'@chcemvediet.sk'), u'@chcemvediet.sk')
+
+    def test_emails_parsed_property(self):
+        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>')
+        self.assertEqual(list(oblg.emails_parsed), [(u'The Agency', u'agency@example.com')])
+
+    def test_emails_parsed_property_with_comma_in_name(self):
+        oblg = self._create_obligee(emails=u'"Agency, The" <agency@example.com>')
+        self.assertEqual(list(oblg.emails_parsed), [(u'Agency, The', u'agency@example.com')])
+
+    def test_emails_parsed_property_with_quotes_in_name(self):
+        oblg = self._create_obligee(emails=u'"The \\"Secret\\" Agency" <agency@example.com>')
+        self.assertEqual(list(oblg.emails_parsed), [(u'The "Secret" Agency', u'agency@example.com')])
+
+    def test_emails_parsed_property_with_empty_name(self):
+        oblg = self._create_obligee(emails=u'     <agency@example.com>')
+        self.assertEqual(list(oblg.emails_parsed), [(u'', u'agency@example.com')])
+
+    def test_emails_parsed_property_without_name(self):
+        oblg = self._create_obligee(emails=u'agency@example.com')
+        self.assertEqual(list(oblg.emails_parsed), [(u'', u'agency@example.com')])
+
+    def test_emails_parsed_property_with_multiple_mails(self):
+        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>, Another Mail <another@example.com>')
+        self.assertEqual(list(oblg.emails_parsed), [(u'The Agency', u'agency@example.com'), (u'Another Mail', u'another@example.com')])
+
+    def test_emails_parsed_property_with_empty_mails(self):
+        oblg = self._create_obligee(emails=u'  , The Agency <agency@example.com>,  ,   ')
+        self.assertEqual(list(oblg.emails_parsed), [(u'The Agency', u'agency@example.com')])
+
+    def test_emails_parsed_property_with_no_emails(self):
+        oblg = self._create_obligee(emails=u'')
+        self.assertEqual(list(oblg.emails_parsed), [])
+
+    def test_emails_formatted_property(self):
+        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>')
+        self.assertEqual(list(oblg.emails_formatted), [u'The Agency <agency@example.com>'])
+
+    def test_emails_formatted_property_with_comma_in_name(self):
+        oblg = self._create_obligee(emails=u'"Agency, The" <agency@example.com>')
+        self.assertEqual(list(oblg.emails_formatted), [u'"Agency, The" <agency@example.com>'])
+
+    def test_emails_formatted_property_with_quotes_in_name(self):
+        oblg = self._create_obligee(emails=u'"The \\"Secret\\" Agency" <agency@example.com>')
+        self.assertEqual(list(oblg.emails_formatted), [u'"The \\"Secret\\" Agency" <agency@example.com>'])
+
+    def test_emails_formatted_property_with_empty_name(self):
+        oblg = self._create_obligee(emails=u'     <agency@example.com>')
+        self.assertEqual(list(oblg.emails_formatted), [u'agency@example.com'])
+
+    def test_emails_formatted_property_without_name(self):
+        oblg = self._create_obligee(emails=u'agency@example.com')
+        self.assertEqual(list(oblg.emails_formatted), [u'agency@example.com'])
+
+    def test_emails_formatted_property_with_multiple_mails(self):
+        oblg = self._create_obligee(emails=u'The Agency <agency@example.com>, Another Mail <another@example.com>')
+        self.assertEqual(list(oblg.emails_formatted), [u'The Agency <agency@example.com>', u'Another Mail <another@example.com>'])
+
+    def test_emails_formatted_property_with_empty_mails(self):
+        oblg = self._create_obligee(emails=u'  , The Agency <agency@example.com>,  ,   ')
+        self.assertEqual(list(oblg.emails_formatted), [u'The Agency <agency@example.com>'])
+
+    def test_emails_formatted_property_with_no_emails(self):
+        oblg = self._create_obligee(emails=u'')
+        self.assertEqual(list(oblg.emails_formatted), [])
+
+    def test_repr(self):
+        oblg = self._create_obligee(name=u'Agency')
+        self.assertEqual(repr(oblg), u'<Obligee: [{}] Agency>'.format(oblg.pk))
+
+    def test_pending_query_method(self):
+        oblg1 = self._create_obligee(name=u'Agency 1', status=Obligee.STATUSES.DISSOLVED)
+        oblg2 = self._create_obligee(name=u'Agency 2', status=Obligee.STATUSES.DISSOLVED)
+        oblg3 = self._create_obligee(name=u'Agency 3', status=Obligee.STATUSES.PENDING)
+        oblg4 = self._create_obligee(name=u'Agency 4', status=Obligee.STATUSES.PENDING)
+        self.assertItemsEqual(Obligee.objects.pending(), [oblg3, oblg4])
+
+    def test_order_by_pk_query_method(self):
+        oblgs = [self._create_obligee(name=u'Agency {}'.format(i)) for i in range(20)]
+        sample = random.sample(oblgs, 10)
+        result = Obligee.objects.filter(pk__in=(d.pk for d in sample)).order_by_pk().reverse()
+        self.assertEqual(list(result), sorted(sample, key=lambda d: -d.pk))
+
+    def test_order_by_name_query_method(self):
+        names = [u'aaa', u'bbb', u'ccc', u'ddd', u'eee', u'fff', u'ggg', u'hhh', u'iii', u'jjj']
+        random.shuffle(names)
+        oblgs = [self._create_obligee(name=n) for n in names]
+        self.assertEqual(list(Obligee.objects.order_by_name()), sorted(oblgs, key=lambda o: o.name))
