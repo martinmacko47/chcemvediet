@@ -301,15 +301,11 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
 
     urls = u'poleno.mail.transports.mandrill.urls'
 
-    def setUp(self):
-        self.settings_override = override_settings(
-            TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
-        )
-        self.settings_override.enable()
 
     @contextlib.contextmanager
     def _overrides(self, delete_settings=(), **override_settings):
         overrides = {
+                u'TEMPLATE_LOADERS': (u'django.template.loaders.filesystem.Loader',),
                 u'MANDRILL_WEBHOOK_SECRET': u'default_testing_secret',
                 u'MANDRILL_WEBHOOK_SECRET_NAME': u'default_testing_secret_name',
                 u'MANDRILL_WEBHOOK_KEYS': [u'default_testing_api_key'],
@@ -334,8 +330,9 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
             self.assertIn(error, self.log_messages)
 
     def test_allowed_http_methods(self):
-        allowed = [u'HEAD', u'GET', u'POST']
-        self.assert_allowed_http_methods(allowed, self._webhook_url())
+        with self._overrides():
+            allowed = [u'HEAD', u'GET', u'POST']
+            self.assert_allowed_http_methods(allowed, self._webhook_url())
 
     def test_post_method_needs_signature(self):
         with self._overrides():
