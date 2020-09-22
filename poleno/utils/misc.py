@@ -154,6 +154,7 @@ def guess_extension(content_type, default=u'.bin'):
     """
     override = {
             u'text/plain': u'.txt', # was: ".ksh"
+            u'text/html': u'.html', # was: ".htm"
             u'application/octet-stream': u'.bin', # was: ".obj"
             }
     if content_type in override:

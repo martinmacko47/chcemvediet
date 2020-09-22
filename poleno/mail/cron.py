@@ -78,4 +78,4 @@ def mail():
                         cron_logger.info(u'Sent email: {}'.format(message))
                     except Exception:
                         trace = unicode(traceback.format_exc(), u'utf-8')
-                        cron_logger.error(u'Seding email failed: {}\n{}'.format(message, trace))
+                        cron_logger.error(u'Sending email failed: {}\n{}'.format(message, trace))

@@ -1,13 +1,12 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import unittest
-
 from email.mime.text import MIMEText
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.test import TestCase
 
 from . import MailTestCaseMixin
 from ..models import Message, Recipient
+
 
 class EmailBackendTest(MailTestCaseMixin, TestCase):
     u"""
@@ -21,7 +20,7 @@ class EmailBackendTest(MailTestCaseMixin, TestCase):
         mail = self._call_with_defaults(constructor, kwargs, {
             u'subject': u'Default Testing Subject',
             u'body': u'Default Testing Content',
-            u'from_email': 'default_testing_from@example.com',
+            u'from_email': u'default_testing_from@example.com',
             u'to': [u'default_testing_to@example.com'],
             })
         if content_subtype is not None:
@@ -58,7 +57,7 @@ class EmailBackendTest(MailTestCaseMixin, TestCase):
         self.assertEqual(mail.instance.from_name, u'')
         self.assertEqual(mail.instance.from_mail, u'johnsmith@example.com')
 
-    def test_message_with_default_from_email_if_ommited(self):
+    def test_message_with_default_from_email_if_omitted(self):
         with self.settings(DEFAULT_FROM_EMAIL=u'Default <default@example.com>'):
             mail = self._send_email(omit=[u'from_email'])
         self.assertEqual(mail.instance.from_name, u'Default')
@@ -100,77 +99,75 @@ class EmailBackendTest(MailTestCaseMixin, TestCase):
         self.assertEqual(list(mail.instance.attachment_set.all()), [])
 
     def test_message_with_html_body(self):
-        mail = self._send_email(body=u'<p>HTML content</p>', content_subtype=u'html')
+        mail = self._send_email(body=u'<html><body>HTML content</body></html>', content_subtype=u'html')
         self.assertEqual(mail.instance.text, u'')
-        self.assertEqual(mail.instance.html, u'<p>HTML content</p>')
+        self.assertEqual(mail.instance.html, u'<html><body>HTML content</body></html>')
         self.assertEqual(list(mail.instance.attachment_set.all()), [])
 
     def test_message_with_text_body_and_html_alternative(self):
         mail = self._send_email(body=u'Text content', alternatives=[
-            (u'<p>HTML alternative</p>', u'text/html'),
+            (u'<html><body>HTML alternative</body></html>', u'text/html'),
             ])
         self.assertEqual(mail.instance.text, u'Text content')
-        self.assertEqual(mail.instance.html, u'<p>HTML alternative</p>')
+        self.assertEqual(mail.instance.html, u'<html><body>HTML alternative</body></html>')
         self.assertEqual(list(mail.instance.attachment_set.all()), [])
 
     def test_message_with_html_body_and_text_alternative(self):
-        mail = self._send_email(body=u'<p>HTML content</p>', content_subtype=u'html', alternatives=[
+        mail = self._send_email(body=u'<html><body>HTML content</body></html>', content_subtype=u'html', alternatives=[
             (u'Plain alternative', u'text/plain'),
             ])
         self.assertEqual(mail.instance.text, u'Plain alternative')
-        self.assertEqual(mail.instance.html, u'<p>HTML content</p>')
+        self.assertEqual(mail.instance.html, u'<html><body>HTML content</body></html>')
         self.assertEqual(list(mail.instance.attachment_set.all()), [])
 
-    @unittest.skip(u'FIXME')
     def test_message_with_text_body_and_multiple_alternatives(self):
         mail = self._send_email(body=u'Text content', alternatives=[
-            (u'<p>HTML alternative 1</p>', u'text/html'),
-            (u'<p>HTML alternative 2</p>', u'text/html'),
+            (u'<html><body>HTML alternative 1</body></html>', u'text/html'),
+            (u'<html><body>HTML alternative 2</body></html>', u'text/html'),
             (u'Text alternative', u'text/plain'),
             ])
         self.assertEqual(mail.instance.text, u'Text content')
-        self.assertEqual(mail.instance.html, u'<p>HTML alternative 1</p>')
+        self.assertEqual(mail.instance.html, u'<html><body>HTML alternative 1</body></html>')
         attachments = [(a.name, a.content, a.content_type) for a in mail.instance.attachment_set.all()]
         self.assertEqual(attachments, [
-            (u'message.html', u'<p>HTML alternative 2</p>', u'text/html'),
+            (u'message.html', u'<html><body>HTML alternative 2</body></html>', u'text/html'),
             (u'message.txt', u'Text alternative', u'text/plain'),
             ])
 
-    @unittest.skip(u'FIXME')
     def test_message_with_html_body_and_multiple_alternatives(self):
-        mail = self._send_email(body=u'<p>HTML content</p>', content_subtype=u'html', alternatives=[
-            (u'<p>HTML alternative</p>', u'text/html'),
+        mail = self._send_email(body=u'<html><body>HTML content</body></html>', content_subtype=u'html', alternatives=[
+            (u'<html><body>HTML alternative</body></html>', u'text/html'),
             (u'Text alternative 1', u'text/plain'),
             (u'Text alternative 2', u'text/plain'),
             ])
         self.assertEqual(mail.instance.text, u'Text alternative 1')
-        self.assertEqual(mail.instance.html, u'<p>HTML content</p>')
+        self.assertEqual(mail.instance.html, u'<html><body>HTML content</body></html>')
         attachments = [(a.name, a.content, a.content_type) for a in mail.instance.attachment_set.all()]
         self.assertEqual(attachments, [
-            (u'message.html', u'<p>HTML alternative</p>', u'text/html'),
+            (u'message.html', u'<html><body>HTML alternative</body></html>', u'text/html'),
             (u'message.txt', u'Text alternative 2', u'text/plain'),
             ])
 
-    @unittest.skip(u'FIXME')
     def test_message_with_attachments_as_tuples(self):
         mail = self._send_email(attachments=[
-            (u'filename.pdf', u'(pdf content)', u'application/pdf'),
+            (u'filename.pdf', u'%PDF-2.0', u'application/pdf'),
             (u'another.txt', u'text attachment', u'text/plain'),
             ])
         attachments = [(a.name, a.content, a.content_type) for a in mail.instance.attachment_set.all()]
         self.assertEqual(attachments, [
-            (u'filename.pdf', u'(pdf content)', u'application/pdf'),
+            (u'filename.pdf', u'%PDF-2.0', u'application/pdf'),
             (u'another.txt', u'text attachment', u'text/plain'),
             ])
 
-    @unittest.skip(u'FIXME')
-    def test_message_with_attachment_as_tuple_with_missing_filename_and_content_type(self):
+    def test_message_with_attachments_as_tuple_with_missing_filename_and_content_type(self):
         mail = self._send_email(attachments=[
+            (None, bytearray([1, 65, 2, 0]), None),
             (None, u'content', None),
             ])
         attachments = [(a.name, a.content, a.content_type) for a in mail.instance.attachment_set.all()]
         self.assertEqual(attachments, [
-            (u'attachment.bin', u'content', u'application/octet-stream'),
+            (u'attachment.bin', bytearray([1, 65, 2, 0]), u'application/octet-stream'),
+            (u'attachment.txt', u'content', u'text/plain'),
             ])
 
     def test_message_with_attachment_as_mime_object(self):
@@ -180,22 +177,21 @@ class EmailBackendTest(MailTestCaseMixin, TestCase):
             (u'attachment.txt', u'text attachment', u'text/plain'),
             ])
 
-    @unittest.skip(u'FIXME')
     def test_message_with_attachments_and_multiple_alternatives(self):
         mail = self._send_email(body=u'Text content', alternatives=[
-            (u'<p>HTML alternative 1</p>', u'text/html'),
-            (u'<p>HTML alternative 2</p>', u'text/html'),
+            (u'<html><body>HTML alternative 1</body></html>', u'text/html'),
+            (u'<html><body>HTML alternative 2</body></html>', u'text/html'),
             (u'Text alternative', u'text/plain'),
             ], attachments=[
-            (u'filename.pdf', u'(pdf content)', u'application/pdf'),
+            (u'filename.pdf', u'%PDF-2.0', u'application/pdf'),
             (u'another.txt', u'text attachment', u'text/plain'),
             ])
         self.assertEqual(mail.instance.text, u'Text content')
-        self.assertEqual(mail.instance.html, u'<p>HTML alternative 1</p>')
+        self.assertEqual(mail.instance.html, u'<html><body>HTML alternative 1</body></html>')
         attachments = [(a.name, a.content, a.content_type) for a in mail.instance.attachment_set.all()]
         self.assertEqual(attachments, [
-            (u'filename.pdf', u'(pdf content)', u'application/pdf'),
+            (u'filename.pdf', u'%PDF-2.0', u'application/pdf'),
             (u'another.txt', u'text attachment', u'text/plain'),
-            (u'message.html', u'<p>HTML alternative 2</p>', u'text/html'),
+            (u'message.html', u'<html><body>HTML alternative 2</body></html>', u'text/html'),
             (u'message.txt', u'Text alternative', u'text/plain'),
             ])

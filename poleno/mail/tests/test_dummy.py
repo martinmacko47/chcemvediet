@@ -9,6 +9,7 @@ from ..models import Message, Recipient
 from ..cron import mail as mail_cron_job
 from ..signals import message_sent, message_received
 
+
 class DummyTransportTest(MailTestCaseMixin, TestCase):
     u"""
     Tests ``DummyTransport`` mail transport class.

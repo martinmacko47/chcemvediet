@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import mock
 import datetime
-import unittest
 from textwrap import dedent
 
 from django.conf import settings
@@ -15,6 +14,7 @@ from . import MailTestCaseMixin
 from ..models import Message, Recipient
 from ..cron import mail as mail_cron_job
 from ..signals import message_sent, message_received
+
 
 class ImapTransportTest(MailTestCaseMixin, TestCase):
     u"""
@@ -266,12 +266,12 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============1111111111==--"""))
         transport = self._run_mail_cron_job(mails=[mail])
         msg = Message.objects.first()
         self.assertEqual(msg.text, u'')
-        self.assertEqual(msg.html, u'<p>HTML content</p>')
+        self.assertEqual(msg.html, u'<html><body>HTML content</body></html>')
         self.assertEqual(msg.attachment_set.count(), 0)
 
     def test_mail_with_both_text_and_html_alternatives(self):
@@ -291,16 +291,15 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============2222222222==--
                 --===============1111111111==--"""))
         transport = self._run_mail_cron_job(mails=[mail])
         msg = Message.objects.first()
         self.assertEqual(msg.text, u'Text content')
-        self.assertEqual(msg.html, u'<p>HTML content</p>')
+        self.assertEqual(msg.html, u'<html><body>HTML content</body></html>')
         self.assertEqual(msg.attachment_set.count(), 0)
 
-    @unittest.skip(u'FIXME')
     def test_mail_with_multiple_text_and_html_alternatives_stored_as_attachments(self):
         mail = self._create_mail(body=dedent(u"""\
                 --===============1111111111==
@@ -324,29 +323,28 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content 1</p>
+                <html><body>HTML content 1</body></html>
                 --===============2222222222==
                 MIME-Version: 1.0
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content 2</p>
+                <html><body>HTML content 2</body></html>
                 --===============2222222222==--
                 --===============1111111111==--"""))
         transport = self._run_mail_cron_job(mails=[mail])
         msg = Message.objects.first()
         attchs = msg.attachment_set.all()
         self.assertEqual(msg.text, u'Text content 1')
-        self.assertEqual(msg.html, u'<p>HTML content 1</p>')
+        self.assertEqual(msg.html, u'<html><body>HTML content 1</body></html>')
         self.assertEqual(len(attchs), 2)
         self.assertEqual(attchs[0].name, u'attachment.txt')
         self.assertEqual(attchs[0].content_type, u'text/plain')
         self.assertEqual(attchs[0].content, u'Text content 2')
         self.assertEqual(attchs[1].name, u'attachment.html')
         self.assertEqual(attchs[1].content_type, u'text/html')
-        self.assertEqual(attchs[1].content, u'<p>HTML content 2</p>')
+        self.assertEqual(attchs[1].content, u'<html><body>HTML content 2</body></html>')
 
-    @unittest.skip(u'FIXME')
     def test_mail_with_attachment(self):
         mail = self._create_mail(body=dedent(u"""\
                 --===============1111111111==
@@ -354,14 +352,14 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============1111111111==
                 MIME-Version: 1.0
                 Content-Type: application/pdf
                 Content-Transfer-Encoding: 7bit
                 Content-Disposition: attachment; filename="filename.pdf"
 
-                (content)
+                %PDF-2.0
                 --===============1111111111==--"""))
         transport = self._run_mail_cron_job(mails=[mail])
         msg = Message.objects.first()
@@ -369,9 +367,8 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
         self.assertEqual(len(attchs), 1)
         self.assertEqual(attchs[0].name, u'filename.pdf')
         self.assertEqual(attchs[0].content_type, u'application/pdf')
-        self.assertEqual(attchs[0].content, u'(content)')
+        self.assertEqual(attchs[0].content, u'%PDF-2.0')
 
-    @unittest.skip(u'FIXME')
     def test_mail_with_attachment_without_filename(self):
         mail = self._create_mail(body=dedent(u"""\
                 --===============1111111111==
@@ -379,13 +376,13 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============1111111111==
                 MIME-Version: 1.0
                 Content-Type: application/pdf
                 Content-Transfer-Encoding: 7bit
 
-                (attachment content)
+                %PDF-2.0
                 --===============1111111111==--"""))
         transport = self._run_mail_cron_job(mails=[mail])
         msg = Message.objects.first()
@@ -393,7 +390,7 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
         self.assertEqual(len(attchs), 1)
         self.assertEqual(attchs[0].name, u'attachment.pdf')
         self.assertEqual(attchs[0].content_type, u'application/pdf')
-        self.assertEqual(attchs[0].content, u'(attachment content)')
+        self.assertEqual(attchs[0].content, u'%PDF-2.0')
 
     def test_mail_without_text_body_but_with_text_attachment(self):
         u"""
@@ -406,7 +403,7 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
                 Content-Type: text/html; charset="utf-8"
                 Content-Transfer-Encoding: 7bit
 
-                <p>HTML content</p>
+                <html><body>HTML content</body></html>
                 --===============1111111111==
                 MIME-Version: 1.0
                 Content-Type: text/plain
@@ -419,13 +416,12 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
         msg = Message.objects.first()
         attchs = msg.attachment_set.all()
         self.assertEqual(msg.text, u'')
-        self.assertEqual(msg.html, u'<p>HTML content</p>')
+        self.assertEqual(msg.html, u'<html><body>HTML content</body></html>')
         self.assertEqual(len(attchs), 1)
         self.assertEqual(attchs[0].name, u'filename.txt')
         self.assertEqual(attchs[0].content_type, u'text/plain')
         self.assertEqual(attchs[0].content, u'(attachment content)')
 
-    @unittest.skip(u'FIXME')
     def test_mail_without_html_body_but_with_html_attachment(self):
         u"""
         Checks that "text/html" attachment is stored as an attachment even if there is no
@@ -444,7 +440,7 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
                 Content-Transfer-Encoding: 7bit
                 Content-Disposition: attachment; filename="filename.html"
 
-                (attachment content)
+                <html><body>HTML content</body></html>
                 --===============1111111111==--"""))
         transport = self._run_mail_cron_job(mails=[mail])
         msg = Message.objects.first()
@@ -454,7 +450,7 @@ class ImapTransportTest(MailTestCaseMixin, TestCase):
         self.assertEqual(len(attchs), 1)
         self.assertEqual(attchs[0].name, u'filename.html')
         self.assertEqual(attchs[0].content_type, u'text/html')
-        self.assertEqual(attchs[0].content, u'(attachment content)')
+        self.assertEqual(attchs[0].content, u'<html><body>HTML content</body></html>')
 
     def test_mail_without_content_type_charset(self):
         mail = self._create_mail(body=dedent(u"""\

@@ -11,6 +11,7 @@ from poleno.utils.date import utc_now
 
 from ..models import Message, Recipient
 
+
 class MailTestCaseMixin(TestCase):
 
     def _pre_setup(self):
@@ -38,9 +39,8 @@ class MailTestCaseMixin(TestCase):
     def _create_attachment(self, **kwargs):
         content = kwargs.pop(u'content', u'Default Testing Content')
         return self._call_with_defaults(Attachment.objects.create, kwargs, {
-            u'file': ContentFile(content, name=u'overriden-file-name.bin'),
+            u'file': ContentFile(content, name=u'overridden-file-name.bin'),
             u'name': u'default_testing_filename.txt',
-            u'content_type': u'text/plain',
             })
 
     def _create_recipient(self, **kwargs):
@@ -62,6 +62,6 @@ class MailTestCaseMixin(TestCase):
             u'received_for': u'default_testing_for_mail@example.com',
             u'subject': u'Default Testing Subject',
             u'text': u'Default Testing Text Content',
-            u'html': u'<p>Default Testing HTML Content</p>',
-            u'headers': {'X-Default-Testing-Extra-Header': 'Default Testing Value'},
+            u'html': u'<html><body>Default Testing HTML Content</body></html>',
+            u'headers': {u'X-Default-Testing-Extra-Header': u'Default Testing Value'},
             })
