@@ -301,7 +301,6 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
 
     urls = u'poleno.mail.transports.mandrill.urls'
 
-
     @contextlib.contextmanager
     def _overrides(self, delete_settings=(), **override_settings):
         overrides = {
@@ -330,8 +329,8 @@ class WebhookViewTest(MailTestCaseMixin, ViewTestCaseMixin, TestCase):
             self.assertIn(error, self.log_messages)
 
     def test_allowed_http_methods(self):
+        allowed = [u'HEAD', u'GET', u'POST']
         with self._overrides():
-            allowed = [u'HEAD', u'GET', u'POST']
             self.assert_allowed_http_methods(allowed, self._webhook_url())
 
     def test_post_method_needs_signature(self):
