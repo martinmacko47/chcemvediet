@@ -3,13 +3,13 @@
 import unittest
 
 from django import forms
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from poleno.utils.misc import squeeze
 from poleno.utils.template import render_to_string
+from poleno.utils.urls import reverse
 
 from . import ObligeesTestCaseMixin
 from ..forms import ObligeeWidget, ObligeeField
