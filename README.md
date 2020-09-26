@@ -308,26 +308,6 @@ your browser.
     'Client secret'.
 
 
-### 3.2. Facebook OAuth
-
- 1. Go to https://developers.facebook.com/apps/ and create an app.
-
- 2. Add a Product 'Facebook Login' and select platform 'Web'. Enter 'Site URL' `https://{domain}/`.
-
- 3. Go to 'Facebook Login' / 'Settings' and add 'Valid OAuth Redirect URIs':
-
-    	https://{domain}/accounts/facebook/login/callback/
-    	https://{domain}/sk/accounts/facebook/login/callback/
-    	https://{domain}/en/accounts/facebook/login/callback/
-
-    Where `{domain}` is your production domain or `127.0.0.1:8000` if in local development mode.
-    'Site URL' in form `127.0.0.1:8000` is invalid use `localhost:8000` instead.
-
- 5. Run the configuration script `setup.py` and enter given 'App ID' and 'App Secret'.
-
-To use Facebook Login on localhost, you need to use [https connection](#15-viewing-the-site-using-https). 
-
-
 ## 4. Google custom search engine key
 
  1. Sign into [Control Panel](https://cse.google.com/create/new) using your Google Account.

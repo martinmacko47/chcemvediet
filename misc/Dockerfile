@@ -142,10 +142,6 @@ RUN \
     "y" \
     # Admin password
     "nbusr123" \
-    # Facebook OAuth Client ID (default)
-    "" \
-    # Facebook OAuth Secret (default)
-    "" \
     # Google OAuth Client ID (default)
     "" \
     # Google OAuth Secret (default)

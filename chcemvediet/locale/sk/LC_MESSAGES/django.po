@@ -1317,9 +1317,6 @@ msgstr "Registrácia pozastavená"
 msgid "account:signup_closed:text"
 msgstr "Ospravedlňujeme sa, registrácia je momentálne pozastavená."
 
-msgid "account:social_buttons:facebook"
-msgstr "Prihlásiť pomocou Facebooku"
-
 msgid "account:social_buttons:google"
 msgstr "Prihlásiť pomocou Googlu"
 
