@@ -42,7 +42,6 @@ INSTALLED_APPS = (
     u'allauth',
     u'allauth.account',
     u'allauth.socialaccount',
-    u'allauth.socialaccount.providers.facebook',
     u'allauth.socialaccount.providers.google',
     # Other 3part apps
     u'adminplus',

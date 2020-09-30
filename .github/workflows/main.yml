@@ -52,10 +52,6 @@ jobs:
           "y"
           # Admin password
           "admin"
-          # Facebook OAuth Client ID (default)
-          ""
-          # Facebook OAuth Secret (default)
-          ""
           # Google OAuth Client ID (default)
           ""
           # Google OAuth Secret (default)
