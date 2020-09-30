@@ -238,9 +238,9 @@ class TemplatetagsViewTest(TestCase):
     def test_change_lang_tag(self):
         u"""
         Tests ``change_lang`` template tag by requesting a view using a template with this tag.
-        Checking that it generates corrent links to the same view in different languages.
+        Checking that it generates correct links to the same view in different languages.
         """
-        lang = ((u'de', u'Deutsch'), ('en', u'English'), ('fr', u'Francais'))
+        lang = ((u'de', u'Deutsch'), (u'en', u'English'), (u'fr', u'Francais'))
         with self.settings(LANGUAGES=lang): # Fix active languages
             r1 = self.client.get(u'/en/language/')
             r2 = self.client.get(u'/de/language/')
