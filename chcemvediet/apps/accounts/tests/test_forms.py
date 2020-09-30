@@ -1,5 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import lxml.html
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -35,11 +36,48 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
         response = self.client.get(reverse(u'account_signup'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, u'account/signup.html')
-        self.assertInHTML(u'<input class="form-control" id="id_first_name" maxlength="30" name="first_name" placeholder="Meno (krstné)" type="text">', unicode(response.content, encoding=u'utf-8'))
-        self.assertInHTML(u'<input class="form-control" id="id_last_name" maxlength="30" name="last_name" placeholder="Priezvisko" type="text">', response.content)
-        self.assertInHTML(u'<input class="form-control" id="id_street" maxlength="100" name="street" placeholder="Ulica" type="text">', response.content)
-        self.assertInHTML(u'<input class="form-control" id="id_city" maxlength="30" name="city" placeholder="Mesto" type="text">', response.content)
-        self.assertInHTML(u'<input class="form-control" id="id_zip" maxlength="5" name="zip" placeholder="PSČ" type="text">', unicode(response.content, encoding=u'utf-8'))
+        elements = {
+                u'id_first_name': {
+                        u'class': u'form-control',
+                        u'maxlength': u'30',
+                        u'name': u'first_name',
+                        u'placeholder': u'[^"]*',
+                        u'type': u'text',
+                        },
+                u'id_last_name': {
+                        u'class': u'form-control',
+                        u'maxlength': u'30',
+                        u'name': u'last_name',
+                        u'placeholder': u'[^"]*',
+                        u'type': u'text',
+                        },
+                u'id_street': {
+                        u'class': u'form-control',
+                        u'maxlength': u'100',
+                        u'name': u'street',
+                        u'placeholder': u'[^"]*',
+                        u'type': u'text',
+                        },
+                u'id_city': {
+                        u'class': u'form-control',
+                        u'maxlength': u'30',
+                        u'name': u'city',
+                        u'placeholder': u'[^"]*',
+                        u'type': u'text',
+                        },
+                u'id_zip': {
+                        u'class': u'form-control',
+                        u'maxlength': u'5',
+                        u'name': u'zip',
+                        u'placeholder': u'[^"]*',
+                        u'type': u'text',
+                        },
+                }
+        html = lxml.html.fromstring(unicode(response.content, encoding=u'utf-8'))
+        for element_id in elements:
+            element = html.get_element_by_id(element_id)
+            for attrib in elements[element_id]:
+                self.assertRegexpMatches(element.attrib[attrib], u'^{}$'.format(elements[element_id][attrib]))
 
     def test_post_signup_form_with_valid_data_creates_user_and_his_profile(self):
         data = self._create_account_signup_data(
