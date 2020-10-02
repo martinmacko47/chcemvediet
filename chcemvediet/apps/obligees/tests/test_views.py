@@ -60,6 +60,7 @@ class IndexViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertEqual(list(response.context[u'obligee_page']), oblgs[:25])
 
     def test_paginator_with_no_obligees(self):
+        Obligee.objects.all().delete()
         response = self.client.get(reverse(u'obligees:index'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 1 of 1>')

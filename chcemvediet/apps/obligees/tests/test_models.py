@@ -5,7 +5,7 @@ import random
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 from . import ObligeesTestCaseMixin
 from ..models import Obligee, HistoricalObligee
@@ -139,18 +139,18 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
 
     def test_gender_field(self):
         tests = (
-                (u'Test Name 1', Obligee.GENDERS.MASCULINE, _(u'obligees:Obligee:gender:MASCULINE')),
-                (u'Test Name 2', Obligee.GENDERS.FEMININE, _(u'obligees:Obligee:gender:FEMININE')),
-                (u'Test Name 3', Obligee.GENDERS.NEUTER, _(u'obligees:Obligee:gender:NEUTER')),
-                (u'Test Name 4', Obligee.GENDERS.PLURALE, _(u'obligees:Obligee:gender:PLURALE')),
+                (Obligee.GENDERS.MASCULINE, _(u'obligees:Obligee:gender:MASCULINE')),
+                (Obligee.GENDERS.FEMININE, _(u'obligees:Obligee:gender:FEMININE')),
+                (Obligee.GENDERS.NEUTER, _(u'obligees:Obligee:gender:NEUTER')),
+                (Obligee.GENDERS.PLURALE, _(u'obligees:Obligee:gender:PLURALE')),
                 )
         # Make sure we are testing all obligee genders
-        tested_genders = [a for n, a, i in tests]
+        tested_genders = [a for a, __ in tests]
         defined_genders = Obligee.GENDERS._inverse.keys()
         self.assertItemsEqual(tested_genders, defined_genders)
 
-        for name, gender, expected_display in tests:
-            oblg = self._create_obligee(name=name, gender=gender)
+        for i, (gender, expected_display) in enumerate(tests):
+            oblg = self._create_obligee(name=u'Test {}'.format(i), gender=gender)
             self.assertEqual(oblg.gender, gender)
             self.assertEqual(oblg.get_gender_display(), expected_display)
 
@@ -191,7 +191,7 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         self.assertEqual(oblg.zip, u'')
 
     def test_iczsj_field(self):
-        neighbourhood = self._create_geounit(u'12345')
+        neighbourhood = self._create_neighbourhood(id=u'12345', name=u'12345')
         oblg = self._create_obligee(iczsj=neighbourhood)
         self.assertEqual(oblg.iczsj, neighbourhood)
 
@@ -260,18 +260,18 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
 
     def test_type_field(self):
         tests = (
-                (u'Test Name 1', Obligee.TYPES.SECTION_1, _(u'obligees:Obligee:type:SECTION_1')),
-                (u'Test Name 2', Obligee.TYPES.SECTION_2, _(u'obligees:Obligee:type:SECTION_2')),
-                (u'Test Name 3', Obligee.TYPES.SECTION_3, _(u'obligees:Obligee:type:SECTION_3')),
-                (u'Test Name 4', Obligee.TYPES.SECTION_4, _(u'obligees:Obligee:type:SECTION_4')),
+                (Obligee.TYPES.SECTION_1, _(u'obligees:Obligee:type:SECTION_1')),
+                (Obligee.TYPES.SECTION_2, _(u'obligees:Obligee:type:SECTION_2')),
+                (Obligee.TYPES.SECTION_3, _(u'obligees:Obligee:type:SECTION_3')),
+                (Obligee.TYPES.SECTION_4, _(u'obligees:Obligee:type:SECTION_4')),
                 )
         # Make sure we are testing all defined obligee types
-        tested_types = [a for n, a, i in tests]
+        tested_types = [a for a, __ in tests]
         defined_types = Obligee.TYPES._inverse.keys()
         self.assertItemsEqual(tested_types, defined_types)
 
-        for name, type, expected_display in tests:
-            oblg = self._create_obligee(name=name, type=type)
+        for i, (type, expected_display) in enumerate(tests):
+            oblg = self._create_obligee(name=u'Test {}'.format(i), type=type)
             self.assertEqual(oblg.type, type)
             self.assertEqual(oblg.get_type_display(), expected_display)
 
@@ -297,18 +297,22 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
 
     def test_status_field(self):
         tests = (
-                (u'Test Name 1', Obligee.STATUSES.PENDING, _(u'obligees:Obligee:status:PENDING')),
-                (u'Test Name 2', Obligee.STATUSES.DISSOLVED, _(u'obligees:Obligee:status:DISSOLVED')),
+                (Obligee.STATUSES.PENDING, _(u'obligees:Obligee:status:PENDING')),
+                (Obligee.STATUSES.DISSOLVED, _(u'obligees:Obligee:status:DISSOLVED')),
                 )
         # Make sure we are testing all defined obligee statuses
-        tested_statuses = [a for n, a, i in tests]
+        tested_statuses = [a for a, __ in tests]
         defined_statuses = Obligee.STATUSES._inverse.keys()
         self.assertItemsEqual(tested_statuses, defined_statuses)
 
-        for name, status, expected_display in tests:
-            oblg = self._create_obligee(name=name, status=status)
+        for i, (status, expected_display) in enumerate(tests):
+            oblg = self._create_obligee(name=u'Test {}'.format(i), status=status)
             self.assertEqual(oblg.status, status)
             self.assertEqual(oblg.get_status_display(), expected_display)
+
+    def test_status_field_may_not_be_omitted(self):
+        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: obligees_obligee.status'):
+            self._create_obligee(omit=[u'status'])
 
     def test_notes_field(self):
         oblg = self._create_obligee(notes=u'Notes about agency.')
@@ -317,10 +321,6 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
     def test_notes_field_default_value_if_omitted(self):
         oblg = self._create_obligee(omit=[u'notes'])
         self.assertEqual(oblg.notes, u'')
-
-    def test_status_field_may_not_be_omitted(self):
-        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: obligees_obligee.status'):
-            self._create_obligee(omit=[u'status'])
 
     def test_historical_obligee_model_exists(self):
         oblg = self._create_obligee(name=u'Agency', street=u'Westside')
@@ -419,8 +419,8 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         self.assertEqual([h.zip for h in history], [u'99999', u'12345'])
 
     def test_history_records_changes_to_iczsj_field(self):
-        neighbourhood1 = self._create_geounit(id=u'12312')
-        neighbourhood2 = self._create_geounit(id=u'12345')
+        neighbourhood1 = self._create_neighbourhood(id=u'12312', name=u'12312')
+        neighbourhood2 = self._create_neighbourhood(id=u'12345', name=u'12345')
         oblg = self._create_obligee(iczsj=neighbourhood1)
         oblg.iczsj = neighbourhood2
         oblg.save()
@@ -447,6 +447,29 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         oblg.save()
         history = oblg.history.all()
         self.assertEqual([h.longitude for h in history], [13.8321, -85.03111111111112])
+
+    def test_history_does_not_record_changes_to_tags_field(self):
+        oblg = self._create_obligee()
+        obligeetag1 = self._create_obligeetag(key=u'Key 1', name=u'ObligeeTag 1')
+        obligeetag2 = self._create_obligeetag(key=u'Key 2', name=u'ObligeeTag 2')
+        oblg.tags.add(obligeetag1)
+        oblg.tags.add(obligeetag2)
+        history = oblg.history.all()
+        self.assertEqual(history.count(), 1)
+        with self.assertRaisesMessage(AttributeError, u"'HistoricalObligee' object has no attribute 'tags'"):
+            __ = history[0].tags
+
+
+    def test_history_does_not_record_changes_to_groups_field(self):
+        oblg = self._create_obligee()
+        obligeegroup1 = self._create_obligeegroup(key=u'Key 1', name=u'ObligeeGroup 1')
+        obligeegroup2 = self._create_obligeegroup(key=u'Key 2', name=u'ObligeeGroup 2')
+        oblg.groups.add(obligeegroup1)
+        oblg.groups.add(obligeegroup2)
+        history = oblg.history.all()
+        self.assertEqual(history.count(), 1)
+        with self.assertRaisesMessage(AttributeError, u"'HistoricalObligee' object has no attribute 'groups'"):
+            __ = history[0].groups
 
     def test_history_records_changes_to_type_field(self):
         oblg = self._create_obligee(type=Obligee.TYPES.SECTION_1)
@@ -502,7 +525,7 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         self.assertEqual([(h.name, h.street, h.slug, h.status) for h in history], expected_history)
 
     def test_obligeealias_set_relation(self):
-        oblg = self._create_obligee(name=u'Agency')
+        oblg = self._create_obligee()
         obligeealias = self._create_obligeealias(obligee=oblg)
         self.assertItemsEqual(oblg.obligeealias_set.all(), [obligeealias])
 
@@ -657,7 +680,7 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         oblg2 = self._create_obligee(name=u'Agency 2', status=Obligee.STATUSES.DISSOLVED)
         oblg3 = self._create_obligee(name=u'Agency 3', status=Obligee.STATUSES.PENDING)
         oblg4 = self._create_obligee(name=u'Agency 4', status=Obligee.STATUSES.PENDING)
-        self.assertItemsEqual(Obligee.objects.pending(), [oblg3, oblg4])
+        self.assertItemsEqual(Obligee.objects.filter(name__startswith=u'Agency').pending(), [oblg3, oblg4])
 
     def test_order_by_pk_query_method(self):
         oblgs = [self._create_obligee(name=u'Agency {}'.format(i)) for i in range(20)]
@@ -669,4 +692,4 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         names = [u'aaa', u'bbb', u'ccc', u'ddd', u'eee', u'fff', u'ggg', u'hhh', u'iii', u'jjj']
         random.shuffle(names)
         oblgs = [self._create_obligee(name=n) for n in names]
-        self.assertEqual(list(Obligee.objects.order_by_name()), sorted(oblgs, key=lambda o: o.name))
+        self.assertEqual(list(Obligee.objects.filter(name__in=names).order_by_name()), sorted(oblgs, key=lambda o: o.name))
