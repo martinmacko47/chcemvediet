@@ -19,3 +19,17 @@ class HomepageViewTest(ViewTestCaseMixin, TestCase):
         response = self.client.get(reverse(u'homepage'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, u'main/homepage/main.html')
+
+class SearchViewTest(ViewTestCaseMixin, TestCase):
+    u"""
+    Tests ``search()`` view registered as "search".
+    """
+
+    def test_allowed_http_methods(self):
+        allowed = [u'HEAD', u'GET']
+        self.assert_allowed_http_methods(allowed, reverse(u'search'))
+
+    def test_search(self):
+        response = self.client.get(reverse(u'search'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, u'main/search/search.html')
