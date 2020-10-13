@@ -1,40 +1,35 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import unittest
-
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from poleno.utils.test import ViewTestCaseMixin
 
-class IndexViewTest(ViewTestCaseMixin, TestCase):
+
+class HomepageViewTest(ViewTestCaseMixin, TestCase):
     u"""
-    Tests ``index()`` view registered as "index".
+    Tests ``homepage()`` view registered as "homepage".
     """
 
-    @unittest.skip(u'FIXME')
     def test_allowed_http_methods(self):
         allowed = [u'HEAD', u'GET']
-        self.assert_allowed_http_methods(allowed, reverse(u'index'))
+        self.assert_allowed_http_methods(allowed, reverse(u'homepage'))
 
-    @unittest.skip(u'FIXME')
-    def test_index(self):
-        response = self.client.get(reverse(u'index'))
+    def test_homepage(self):
+        response = self.client.get(reverse(u'homepage'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, u'main/pages/index.en.html')
+        self.assertTemplateUsed(response, u'main/homepage/main.html')
 
-class AboutViewTest(ViewTestCaseMixin, TestCase):
+class SearchViewTest(ViewTestCaseMixin, TestCase):
     u"""
-    Tests ``about()`` view registered as "about".
+    Tests ``search()`` view registered as "search".
     """
 
-    @unittest.skip(u'FIXME')
     def test_allowed_http_methods(self):
         allowed = [u'HEAD', u'GET']
-        self.assert_allowed_http_methods(allowed, reverse(u'about'))
+        self.assert_allowed_http_methods(allowed, reverse(u'search'))
 
-    @unittest.skip(u'FIXME')
-    def test_about(self):
-        response = self.client.get(reverse(u'about'))
+    def test_search(self):
+        response = self.client.get(reverse(u'search'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, u'main/pages/about.en.html')
+        self.assertTemplateUsed(response, u'main/search/search.html')

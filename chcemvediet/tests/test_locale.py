@@ -6,6 +6,7 @@ from django.test import TestCase
 from poleno.utils.date import local_datetime_from_local, naive_date
 from poleno.utils.translation import translation
 
+
 class LocaleEnTest(TestCase):
     u"""
     Tests ``settings.DATE_INPUT_FORMATS`` and ``settings.DATETIME_INPUT_FORMATS`` for "en" locale.

@@ -5,6 +5,7 @@ from django.test import TestCase
 from poleno.workdays import workdays
 from poleno.utils.date import naive_date
 
+
 class HolidaysTest(TestCase):
     u"""
     Tests ``holidays.HOLIDAYS`` holidays configuration. Checks calculated numbers of workdays

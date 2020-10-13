@@ -10,6 +10,7 @@ from poleno.utils.date import utc_datetime_from_local
 
 from ..cron import clear_expired_sessions
 
+
 class ClearExpiredSessionsCronjobTest(TestCase):
     u"""
     Tests ``chcemvediet.cron.clear_expired_sessions`` cron job.
