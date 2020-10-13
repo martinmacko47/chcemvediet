@@ -1,18 +1,17 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import itertools
 import logging
-import string
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.template import Context, Template
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
 
-from poleno.utils.misc import random_string
-
 from ..apps.geounits.models import Region, District, Municipality, Neighbourhood
 from ..apps.inforequests.models import Branch, Inforequest, InforequestDraft
-from ..apps.obligees.models import Obligee
+from ..apps.obligees.models import Obligee, ObligeeTag, ObligeeGroup, ObligeeAlias
 
 
 class CustomTestRunner(DiscoverRunner):
@@ -35,13 +34,14 @@ class ChcemvedietTestCaseMixin(TestCase):
 
     def _pre_setup(self):
         super(ChcemvedietTestCaseMixin, self)._pre_setup()
+        self.counter = itertools.count()
         self.user = self._create_user()
-        self.region = self._create_region(id=u'SK00000', name=u'SK00000')
-        self.district = self._create_district(id=u'SK00000', name=u'SK00000')
-        self.municipality = self._create_municipality(id=u'SK00000', name=u'SK00000')
-        self.neighbourhood = self._create_neighbourhood(id=u'SK00000', name=u'SK00000')
+        self.region = self._create_region()
+        self.district = self._create_district()
+        self.municipality = self._create_municipality()
+        self.neighbourhood = self._create_neighbourhood()
         self.inforequest = self._create_inforequest()
-        self.obligee = self._create_obligee(name=u'ChcemvedietTestCase Obligee')
+        self.obligee = self._create_obligee()
 
 
     def _call_with_defaults(self, func, kwargs, defaults):
@@ -76,14 +76,14 @@ class ChcemvedietTestCaseMixin(TestCase):
         return user
 
     def _create_region(self, **kwargs):
-        name = random_string(2, string.ascii_uppercase) + random_string(5, string.digits)
+        name = u'SK{:05d}'.format(self.counter.next())
         return self._call_with_defaults(Region.objects.create, kwargs, {
                 u'id': name,
                 u'name': name,
                 })
 
     def _create_district(self, **kwargs):
-        name = random_string(2, string.ascii_uppercase) + random_string(5, string.digits)
+        name = u'SK{:05d}'.format(self.counter.next())
         return self._call_with_defaults(District.objects.create, kwargs, {
                 u'id': name,
                 u'name': name,
@@ -91,7 +91,7 @@ class ChcemvedietTestCaseMixin(TestCase):
                 })
 
     def _create_municipality(self, **kwargs):
-        name = random_string(2, string.ascii_uppercase) + random_string(5, string.digits)
+        name = u'SK{:05d}'.format(self.counter.next())
         return self._call_with_defaults(Municipality.objects.create, kwargs, {
                 u'id': name,
                 u'name': name,
@@ -100,7 +100,7 @@ class ChcemvedietTestCaseMixin(TestCase):
                 })
 
     def _create_neighbourhood(self, **kwargs):
-        name = random_string(2, string.ascii_uppercase) + random_string(5, string.digits)
+        name = u'SK{:05d}'.format(self.counter.next())
         return self._call_with_defaults(Neighbourhood.objects.create, kwargs, {
                 u'id': name,
                 u'name': name,
@@ -112,7 +112,7 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _create_obligee(self, **kwargs):
         return self._call_with_defaults(Obligee.objects.create, kwargs, {
                 u'official_name': u'Default Testing Official Name',
-                u'name': u'Default Testing Name',
+                u'name': u'Default Testing Name {:5d}'.format(self.counter.next()),
                 u'name_genitive': u'Default Testing Name genitive',
                 u'name_dative': u'Default Testing Name dative',
                 u'name_accusative': u'Default Testing Name accusative',
@@ -134,6 +134,27 @@ class ChcemvedietTestCaseMixin(TestCase):
                 u'notes': u'Default testing notes.',
                 })
 
+    def _create_obligeetag(self, **kwargs):
+        return self._call_with_defaults(ObligeeTag.objects.create, kwargs, {
+                u'key': u'Default Testing Key',
+                u'name': u'Default Testing Name',
+                })
+
+    def _create_obligeegroup(self, **kwargs):
+        return self._call_with_defaults(ObligeeGroup.objects.create, kwargs, {
+                u'key': u'Default Testing Key',
+                u'name': u'Default Testing Name',
+                u'description': u'Default Testing Description',
+                })
+
+    def _create_obligeealias(self, **kwargs):
+        return self._call_with_defaults(ObligeeAlias.objects.create, kwargs, {
+                u'obligee': self.obligee,
+                u'name': u'Default Testing Name',
+                u'description': u'Default testing description.',
+                u'notes': u'Default testing notes.',
+                })
+
     def _create_branch(self, **kwargs):
         return self._call_with_defaults(Branch.objects.create, kwargs, {
             u'inforequest': self.inforequest,
@@ -151,3 +172,6 @@ class ChcemvedietTestCaseMixin(TestCase):
                 u'subject': [u'Default Testing Subject'],
                 u'content': [u'Default Testing Content'],
                 })
+
+    def _render(self, template, **context):
+        return Template(template).render(Context(context))

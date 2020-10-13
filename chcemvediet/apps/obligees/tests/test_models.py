@@ -7,11 +7,12 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import ugettext as _
 
-from . import ObligeesTestCaseMixin
+from chcemvediet.tests import ChcemvedietTestCaseMixin
+
 from ..models import Obligee, HistoricalObligee
 
 
-class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
+class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
     u"""
     Tests ``Obligee`` and ``HistoricalObligee`` models.
     """
@@ -457,7 +458,7 @@ class ObligeeModelTest(ObligeesTestCaseMixin, TestCase):
         history = oblg.history.all()
         self.assertEqual(history.count(), 1)
         with self.assertRaisesMessage(AttributeError, u"'HistoricalObligee' object has no attribute 'tags'"):
-            __ = history[0].tags
+            history[0].tags
 
 
     def test_history_does_not_record_changes_to_groups_field(self):
