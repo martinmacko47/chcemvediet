@@ -5,7 +5,7 @@ import random
 from functools import partial
 
 from django.template.defaultfilters import stringfilter
-from django.core.urlresolvers import resolve
+from django.core.urlresolvers import resolve, Resolver404
 from django.conf import settings
 from django.contrib.webdesign.lorem_ipsum import paragraphs
 from django.contrib.contenttypes.models import ContentType
@@ -326,7 +326,7 @@ def capture(content, context, variable):
 @register.simple_tag(takes_context=True)
 def change_lang(context, lang=None):
     u"""
-    Get active page's url with laguage changed to the specified language.
+    Get active page's url with language changed to the specified language.
 
     Example:
         {% change_lang 'en' %}
@@ -334,16 +334,19 @@ def change_lang(context, lang=None):
     Source: https://djangosnippets.org/snippets/2875/
     """
     path = context[u'request'].path
-    url_parts = resolve(path)
-    view_name = url_parts.view_name
-    kwargs = url_parts.kwargs
+    try:
+        url_parts = resolve(path)
+        view_name = url_parts.view_name
+        kwargs = url_parts.kwargs
 
-    # Ask the view what to show after changing language.
-    if hasattr(url_parts.func, u'change_lang'):
-        view_name, kwargs = url_parts.func.change_lang(lang, **kwargs)
+        # Ask the view what to show after changing language.
+        if hasattr(url_parts.func, u'change_lang'):
+            view_name, kwargs = url_parts.func.change_lang(lang, **kwargs)
 
-    with translation(lang):
-        url = reverse(view_name, kwargs=kwargs)
+        with translation(lang):
+            url = reverse(view_name, kwargs=kwargs)
+    except Resolver404:
+        url = path
 
     query = context[u'request'].GET.urlencode()
     url = url + u'?' + query if query else url
@@ -371,7 +374,7 @@ ASSETS_TYPES = { # {{{
 @register.simple_tag
 def assets(types, external=False, local=False):
     u"""
-    Render links to local and external assets defined in settins.ASSETS.
+    Render links to local and external assets defined in settings.ASSETS.
 
     Example:
         {% assets "js" external=True %}
