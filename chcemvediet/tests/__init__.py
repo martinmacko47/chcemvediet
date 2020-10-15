@@ -112,7 +112,7 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _create_obligee(self, **kwargs):
         return self._call_with_defaults(Obligee.objects.create, kwargs, {
                 u'official_name': u'Default Testing Official Name',
-                u'name': u'Default Testing Name {:5d}'.format(self.counter.next()),
+                u'name': u'Default Testing Name {}'.format(self.counter.next()),
                 u'name_genitive': u'Default Testing Name genitive',
                 u'name_dative': u'Default Testing Name dative',
                 u'name_accusative': u'Default Testing Name accusative',
@@ -134,20 +134,20 @@ class ChcemvedietTestCaseMixin(TestCase):
                 u'notes': u'Default testing notes.',
                 })
 
-    def _create_obligeetag(self, **kwargs):
+    def _create_obligee_tag(self, **kwargs):
         return self._call_with_defaults(ObligeeTag.objects.create, kwargs, {
                 u'key': u'Default Testing Key',
                 u'name': u'Default Testing Name',
                 })
 
-    def _create_obligeegroup(self, **kwargs):
+    def _create_obligee_group(self, **kwargs):
         return self._call_with_defaults(ObligeeGroup.objects.create, kwargs, {
                 u'key': u'Default Testing Key',
                 u'name': u'Default Testing Name',
                 u'description': u'Default Testing Description',
                 })
 
-    def _create_obligeealias(self, **kwargs):
+    def _create_obligee_alias(self, **kwargs):
         return self._call_with_defaults(ObligeeAlias.objects.create, kwargs, {
                 u'obligee': self.obligee,
                 u'name': u'Default Testing Name',

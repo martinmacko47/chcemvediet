@@ -239,8 +239,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_tags_relation(self):
         oblg = self._create_obligee()
-        obligeetag1 = self._create_obligeetag(key=u'Key 1', name=u'ObligeeTag 1')
-        obligeetag2 = self._create_obligeetag(key=u'Key 2', name=u'ObligeeTag 2')
+        obligeetag1 = self._create_obligee_tag(key=u'Key 1', name=u'ObligeeTag 1')
+        obligeetag2 = self._create_obligee_tag(key=u'Key 2', name=u'ObligeeTag 2')
         oblg.tags.add(obligeetag1, obligeetag2)
         self.assertItemsEqual(oblg.tags.all(), [obligeetag1, obligeetag2])
 
@@ -250,8 +250,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_groups_relation(self):
         oblg = self._create_obligee()
-        obligeegroup1 = self._create_obligeegroup(key=u'Key 1', name=u'ObligeeGroup 1')
-        obligeegroup2 = self._create_obligeegroup(key=u'Key 2', name=u'ObligeeGroup 2')
+        obligeegroup1 = self._create_obligee_group(key=u'Key 1', name=u'ObligeeGroup 1')
+        obligeegroup2 = self._create_obligee_group(key=u'Key 2', name=u'ObligeeGroup 2')
         oblg.groups.add(obligeegroup1, obligeegroup2)
         self.assertItemsEqual(oblg.groups.all(), [obligeegroup1, obligeegroup2])
 
@@ -451,8 +451,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_history_does_not_record_changes_to_tags_field(self):
         oblg = self._create_obligee()
-        obligeetag1 = self._create_obligeetag(key=u'Key 1', name=u'ObligeeTag 1')
-        obligeetag2 = self._create_obligeetag(key=u'Key 2', name=u'ObligeeTag 2')
+        obligeetag1 = self._create_obligee_tag(key=u'Key 1', name=u'ObligeeTag 1')
+        obligeetag2 = self._create_obligee_tag(key=u'Key 2', name=u'ObligeeTag 2')
         oblg.tags.add(obligeetag1)
         oblg.tags.add(obligeetag2)
         history = oblg.history.all()
@@ -463,14 +463,14 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_history_does_not_record_changes_to_groups_field(self):
         oblg = self._create_obligee()
-        obligeegroup1 = self._create_obligeegroup(key=u'Key 1', name=u'ObligeeGroup 1')
-        obligeegroup2 = self._create_obligeegroup(key=u'Key 2', name=u'ObligeeGroup 2')
+        obligeegroup1 = self._create_obligee_group(key=u'Key 1', name=u'ObligeeGroup 1')
+        obligeegroup2 = self._create_obligee_group(key=u'Key 2', name=u'ObligeeGroup 2')
         oblg.groups.add(obligeegroup1)
         oblg.groups.add(obligeegroup2)
         history = oblg.history.all()
         self.assertEqual(history.count(), 1)
         with self.assertRaisesMessage(AttributeError, u"'HistoricalObligee' object has no attribute 'groups'"):
-            __ = history[0].groups
+            history[0].groups
 
     def test_history_records_changes_to_type_field(self):
         oblg = self._create_obligee(type=Obligee.TYPES.SECTION_1)
@@ -527,7 +527,7 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_obligeealias_set_relation(self):
         oblg = self._create_obligee()
-        obligeealias = self._create_obligeealias(obligee=oblg)
+        obligeealias = self._create_obligee_alias(obligee=oblg)
         self.assertItemsEqual(oblg.obligeealias_set.all(), [obligeealias])
 
     def test_obligeealias_set_relation_empty_by_default(self):
@@ -553,27 +553,27 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
         self.assertItemsEqual(oblg.inforequestdraft_set.all(), [])
 
     def test_obligeetag_obligee_set_backward_relation(self):
-        obligeetag = self._create_obligeetag()
-        oblg1 = self._create_obligee(name=u'Obligee1')
-        oblg2 = self._create_obligee(name=u'Obligee2')
+        obligeetag = self._create_obligee_tag()
+        oblg1 = self._create_obligee(name=u'Obligee 1')
+        oblg2 = self._create_obligee(name=u'Obligee 2')
         oblg1.tags.add(obligeetag)
         oblg2.tags.add(obligeetag)
         self.assertItemsEqual(obligeetag.obligee_set.all(), [oblg1, oblg2])
 
     def test_obligeetag_obligee_set_backward_relation_empty_by_default(self):
-        obligeetag = self._create_obligeetag()
+        obligeetag = self._create_obligee_tag()
         self.assertItemsEqual(obligeetag.obligee_set.all(), [])
 
     def test_obligeegroup_obligee_set_backward_relation(self):
-        obligeegroup = self._create_obligeegroup()
-        oblg1 = self._create_obligee(name=u'Obligee1')
-        oblg2 = self._create_obligee(name=u'Obligee2')
+        obligeegroup = self._create_obligee_group()
+        oblg1 = self._create_obligee(name=u'Obligee 1')
+        oblg2 = self._create_obligee(name=u'Obligee 2')
         oblg1.groups.add(obligeegroup)
         oblg2.groups.add(obligeegroup)
         self.assertItemsEqual(obligeegroup.obligee_set.all(), [oblg1, oblg2])
 
     def test_obligeegroup_obligee_set_backward_relation_empty_by_default(self):
-        obligeegroup = self._create_obligeegroup()
+        obligeegroup = self._create_obligee_group()
         self.assertItemsEqual(obligeegroup.obligee_set.all(), [])
 
     def test_no_default_ordering(self):
