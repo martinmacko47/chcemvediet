@@ -150,8 +150,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
         defined_genders = Obligee.GENDERS._inverse.keys()
         self.assertItemsEqual(tested_genders, defined_genders)
 
-        for i, (gender, expected_display) in enumerate(tests):
-            oblg = self._create_obligee(name=u'Test {}'.format(i), gender=gender)
+        for gender, expected_display in tests:
+            oblg = self._create_obligee(gender=gender)
             self.assertEqual(oblg.gender, gender)
             self.assertEqual(oblg.get_gender_display(), expected_display)
 
@@ -192,7 +192,7 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
         self.assertEqual(oblg.zip, u'')
 
     def test_iczsj_field(self):
-        neighbourhood = self._create_neighbourhood(id=u'12345', name=u'12345')
+        neighbourhood = self._create_neighbourhood()
         oblg = self._create_obligee(iczsj=neighbourhood)
         self.assertEqual(oblg.iczsj, neighbourhood)
 
@@ -239,10 +239,10 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_tags_relation(self):
         oblg = self._create_obligee()
-        obligeetag1 = self._create_obligee_tag(key=u'Key 1', name=u'ObligeeTag 1')
-        obligeetag2 = self._create_obligee_tag(key=u'Key 2', name=u'ObligeeTag 2')
-        oblg.tags.add(obligeetag1, obligeetag2)
-        self.assertItemsEqual(oblg.tags.all(), [obligeetag1, obligeetag2])
+        tag1 = self._create_obligee_tag(key=u'Key 1', name=u'Tag 1')
+        tag2 = self._create_obligee_tag(key=u'Key 2', name=u'Tag 2')
+        oblg.tags.add(tag1, tag2)
+        self.assertItemsEqual(oblg.tags.all(), [tag1, tag2])
 
     def test_tags_relation_empty_by_default(self):
         oblg = self._create_obligee()
@@ -250,10 +250,10 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_groups_relation(self):
         oblg = self._create_obligee()
-        obligeegroup1 = self._create_obligee_group(key=u'Key 1', name=u'ObligeeGroup 1')
-        obligeegroup2 = self._create_obligee_group(key=u'Key 2', name=u'ObligeeGroup 2')
-        oblg.groups.add(obligeegroup1, obligeegroup2)
-        self.assertItemsEqual(oblg.groups.all(), [obligeegroup1, obligeegroup2])
+        group1 = self._create_obligee_group(key=u'Key 1', name=u'Group 1')
+        group2 = self._create_obligee_group(key=u'Key 2', name=u'Group 2')
+        oblg.groups.add(group1, group2)
+        self.assertItemsEqual(oblg.groups.all(), [group1, group2])
 
     def test_groups_relation_empty_by_default(self):
         oblg = self._create_obligee()
@@ -271,8 +271,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
         defined_types = Obligee.TYPES._inverse.keys()
         self.assertItemsEqual(tested_types, defined_types)
 
-        for i, (type, expected_display) in enumerate(tests):
-            oblg = self._create_obligee(name=u'Test {}'.format(i), type=type)
+        for type, expected_display  in tests:
+            oblg = self._create_obligee(type=type)
             self.assertEqual(oblg.type, type)
             self.assertEqual(oblg.get_type_display(), expected_display)
 
@@ -306,8 +306,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
         defined_statuses = Obligee.STATUSES._inverse.keys()
         self.assertItemsEqual(tested_statuses, defined_statuses)
 
-        for i, (status, expected_display) in enumerate(tests):
-            oblg = self._create_obligee(name=u'Test {}'.format(i), status=status)
+        for status, expected_display in tests:
+            oblg = self._create_obligee(status=status)
             self.assertEqual(oblg.status, status)
             self.assertEqual(oblg.get_status_display(), expected_display)
 
@@ -420,8 +420,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
         self.assertEqual([h.zip for h in history], [u'99999', u'12345'])
 
     def test_history_records_changes_to_iczsj_field(self):
-        neighbourhood1 = self._create_neighbourhood(id=u'12312', name=u'12312')
-        neighbourhood2 = self._create_neighbourhood(id=u'12345', name=u'12345')
+        neighbourhood1 = self._create_neighbourhood(id=u'12312')
+        neighbourhood2 = self._create_neighbourhood(id=u'12345')
         oblg = self._create_obligee(iczsj=neighbourhood1)
         oblg.iczsj = neighbourhood2
         oblg.save()
@@ -451,10 +451,10 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_history_does_not_record_changes_to_tags_field(self):
         oblg = self._create_obligee()
-        obligeetag1 = self._create_obligee_tag(key=u'Key 1', name=u'ObligeeTag 1')
-        obligeetag2 = self._create_obligee_tag(key=u'Key 2', name=u'ObligeeTag 2')
-        oblg.tags.add(obligeetag1)
-        oblg.tags.add(obligeetag2)
+        tag1 = self._create_obligee_tag(key=u'Key 1', name=u'Tag 1')
+        tag2 = self._create_obligee_tag(key=u'Key 2', name=u'Tag 2')
+        oblg.tags.add(tag1)
+        oblg.tags.add(tag2)
         history = oblg.history.all()
         self.assertEqual(history.count(), 1)
         with self.assertRaisesMessage(AttributeError, u"'HistoricalObligee' object has no attribute 'tags'"):
@@ -463,10 +463,10 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_history_does_not_record_changes_to_groups_field(self):
         oblg = self._create_obligee()
-        obligeegroup1 = self._create_obligee_group(key=u'Key 1', name=u'ObligeeGroup 1')
-        obligeegroup2 = self._create_obligee_group(key=u'Key 2', name=u'ObligeeGroup 2')
-        oblg.groups.add(obligeegroup1)
-        oblg.groups.add(obligeegroup2)
+        group1 = self._create_obligee_group(key=u'Key 1', name=u'Group 1')
+        group2 = self._create_obligee_group(key=u'Key 2', name=u'Group 2')
+        oblg.groups.add(group1)
+        oblg.groups.add(group2)
         history = oblg.history.all()
         self.assertEqual(history.count(), 1)
         with self.assertRaisesMessage(AttributeError, u"'HistoricalObligee' object has no attribute 'groups'"):
@@ -545,36 +545,36 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_inforequestdraft_set_relation(self):
         oblg = self._create_obligee()
-        inforequestdraft = self._create_inforequest_draft(obligee=oblg)
-        self.assertItemsEqual(oblg.inforequestdraft_set.all(), [inforequestdraft])
+        draft = self._create_inforequest_draft(obligee=oblg)
+        self.assertItemsEqual(oblg.inforequestdraft_set.all(), [draft])
 
     def test_inforequestdraft_set_relation_empty_by_default(self):
         oblg = self._create_obligee()
         self.assertItemsEqual(oblg.inforequestdraft_set.all(), [])
 
     def test_obligeetag_obligee_set_backward_relation(self):
-        obligeetag = self._create_obligee_tag()
-        oblg1 = self._create_obligee(name=u'Obligee 1')
-        oblg2 = self._create_obligee(name=u'Obligee 2')
-        oblg1.tags.add(obligeetag)
-        oblg2.tags.add(obligeetag)
-        self.assertItemsEqual(obligeetag.obligee_set.all(), [oblg1, oblg2])
+        tag = self._create_obligee_tag()
+        oblg1 = self._create_obligee()
+        oblg2 = self._create_obligee()
+        oblg1.tags.add(tag)
+        oblg2.tags.add(tag)
+        self.assertItemsEqual(tag.obligee_set.all(), [oblg1, oblg2])
 
     def test_obligeetag_obligee_set_backward_relation_empty_by_default(self):
-        obligeetag = self._create_obligee_tag()
-        self.assertItemsEqual(obligeetag.obligee_set.all(), [])
+        tag = self._create_obligee_tag()
+        self.assertItemsEqual(tag.obligee_set.all(), [])
 
     def test_obligeegroup_obligee_set_backward_relation(self):
-        obligeegroup = self._create_obligee_group()
-        oblg1 = self._create_obligee(name=u'Obligee 1')
-        oblg2 = self._create_obligee(name=u'Obligee 2')
-        oblg1.groups.add(obligeegroup)
-        oblg2.groups.add(obligeegroup)
-        self.assertItemsEqual(obligeegroup.obligee_set.all(), [oblg1, oblg2])
+        group = self._create_obligee_group()
+        oblg1 = self._create_obligee()
+        oblg2 = self._create_obligee()
+        oblg1.groups.add(group)
+        oblg2.groups.add(group)
+        self.assertItemsEqual(group.obligee_set.all(), [oblg1, oblg2])
 
     def test_obligeegroup_obligee_set_backward_relation_empty_by_default(self):
-        obligeegroup = self._create_obligee_group()
-        self.assertItemsEqual(obligeegroup.obligee_set.all(), [])
+        group = self._create_obligee_group()
+        self.assertItemsEqual(group.obligee_set.all(), [])
 
     def test_no_default_ordering(self):
         self.assertFalse(Obligee.objects.all().ordered)
@@ -684,7 +684,7 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
         self.assertItemsEqual(Obligee.objects.filter(name__startswith=u'Agency').pending(), [oblg3, oblg4])
 
     def test_order_by_pk_query_method(self):
-        oblgs = [self._create_obligee(name=u'Agency {}'.format(i)) for i in range(20)]
+        oblgs = [self._create_obligee() for __ in range(20)]
         sample = random.sample(oblgs, 10)
         result = Obligee.objects.filter(pk__in=(d.pk for d in sample)).order_by_pk().reverse()
         self.assertEqual(list(result), sorted(sample, key=lambda d: -d.pk))
