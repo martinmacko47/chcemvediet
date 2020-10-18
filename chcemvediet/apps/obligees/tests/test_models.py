@@ -527,8 +527,8 @@ class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
 
     def test_obligeealias_set_relation(self):
         oblg = self._create_obligee()
-        obligeealias = self._create_obligee_alias(obligee=oblg)
-        self.assertItemsEqual(oblg.obligeealias_set.all(), [obligeealias])
+        alias = self._create_obligee_alias(obligee=oblg)
+        self.assertItemsEqual(oblg.obligeealias_set.all(), [alias])
 
     def test_obligeealias_set_relation_empty_by_default(self):
         oblg = self._create_obligee()
