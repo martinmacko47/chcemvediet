@@ -7,10 +7,12 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from . import ObligeesTestCaseMixin
+from chcemvediet.tests import ChcemvedietTestCaseMixin
+
 from ..forms import ObligeeWidget, ObligeeField
 
-class ObligeeFieldWithTextInputWidgetTest(ObligeesTestCaseMixin, TestCase):
+
+class ObligeeFieldWithTextInputWidgetTest(ChcemvedietTestCaseMixin, TestCase):
     u"""
     Tests ``ObligeeField`` with ``TextInput`` widget.
     """
@@ -135,7 +137,7 @@ class ObligeeFieldWithTextInputWidgetTest(ObligeesTestCaseMixin, TestCase):
             with self.assertRaises(ValidationError):
                 field.clean(u'invalid')
 
-class ObligeeFieldWithObligeeWidgetWidget(ObligeesTestCaseMixin, TestCase):
+class ObligeeFieldWithObligeeWidgetWidget(ChcemvedietTestCaseMixin, TestCase):
     u"""
     Tests ``ObligeeField`` with ``ObligeeWidget`` widget.
     """
