@@ -8,13 +8,13 @@ from django.test import TestCase
 
 from poleno.utils.test import ViewTestCaseMixin
 from poleno.utils.urls import reverse
+from chcemvediet.tests import ChcemvedietTestCaseMixin
 
-from . import ObligeesTestCaseMixin
 from ..constants import OBLIGEES_PER_PAGE
 from ..models import Obligee
 
 
-class IndexViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
+class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
     u"""
     Tests ``index()`` view registered as "obligees:index".
     """
@@ -62,7 +62,7 @@ class IndexViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 1 of 1>')
         self.assertEqual(list(response.context[u'obligee_page']), [])
 
-class AutocompleteViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
+class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
     u"""
     Tests ``autocomplete()`` view registered as "obligees:autocomplete".
     """
@@ -72,7 +72,8 @@ class AutocompleteViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assert_allowed_http_methods(allowed, reverse(u'obligees:autocomplete'))
 
     def test_autocomplete_returns_json_with_correct_structure(self):
-        neighbourhood1 = self._create_geounit(u'11122')
+        Obligee.objects.all().delete()
+        neighbourhood1 = self._create_neighbourhood()
         oblg1 = self._create_obligee(
                 official_name=u'Agency Official',
                 name=u'Agency',
@@ -96,12 +97,12 @@ class AutocompleteViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
                 status=Obligee.STATUSES.PENDING,
                 notes=u'Notes about agency.',
                 )
-        obligeetag1 = self._create_obligeetag(key=u'ObligeeTag 1', name=u'ObligeeTag 1 name')
-        obligeetag2 = self._create_obligeetag(key=u'ObligeeTag 2', name=u'ObligeeTag 2 name')
-        obligeegroup = self._create_obligeegroup(key=u'ObligeeGroup 1', name=u'ObligeeGroup 1 name')
-        oblg1.tags.add(obligeetag1, obligeetag2)
-        oblg1.groups.add(obligeegroup)
-        neighbourhood2 = self._create_geounit(u'11133')
+        tag1 = self._create_obligee_tag(key=u'Key 1', name=u'Tag 1')
+        tag2 = self._create_obligee_tag(key=u'Key 2', name=u'Tag 2')
+        group = self._create_obligee_group(key=u'Key 1', name=u'Group 1')
+        oblg1.tags.add(tag1, tag2)
+        oblg1.groups.add(group)
+        neighbourhood2 = self._create_neighbourhood()
         oblg2 = self._create_obligee(
             official_name=u'Ministry Official',
             name=u'Ministry',
@@ -151,8 +152,8 @@ class AutocompleteViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
                     u'emails': u'agency@a.com',
                     u'latitude': 13.48,
                     u'longitude': -78.159,
-                    u'tags': [obligeetag1.pk, obligeetag2.pk],
-                    u'groups': [obligeegroup.pk],
+                    u'tags': [tag1.pk, tag2.pk],
+                    u'groups': [group.pk],
                     u'type': Obligee.TYPES.SECTION_1,
                     u'official_description': u'Agency\'s official description.',
                     u'simple_description': u'Agency\'s simple description.',
@@ -230,6 +231,7 @@ class AutocompleteViewTest(ObligeesTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertItemsEqual(found, [u'aaa', u'aaaaaaa', u'aaaxxxx', u'xxxxaaa', u'xxxxaaaxxxx', u'xxx aaa', u'xxx aaax xxx'])
 
     def test_autocomplete_without_term_returns_everything(self):
+        Obligee.objects.all().delete()
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
         oblgs = [self._create_obligee(name=n) for n in names]
         response = self.client.get(reverse(u'obligees:autocomplete'))

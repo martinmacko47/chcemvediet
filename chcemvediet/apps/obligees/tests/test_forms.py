@@ -11,10 +11,12 @@ from poleno.utils.misc import squeeze
 from poleno.utils.template import render_to_string
 from poleno.utils.urls import reverse
 
-from . import ObligeesTestCaseMixin
+from chcemvediet.tests import ChcemvedietTestCaseMixin
+
 from ..forms import ObligeeWidget, ObligeeField
 
-class ObligeeFieldWithTextInputWidgetTest(ObligeesTestCaseMixin, TestCase):
+
+class ObligeeFieldWithTextInputWidgetTest(ChcemvedietTestCaseMixin, TestCase):
     u"""
     Tests ``ObligeeField`` with ``TextInput`` widget.
     """
@@ -121,7 +123,7 @@ class ObligeeFieldWithTextInputWidgetTest(ObligeesTestCaseMixin, TestCase):
                 <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="invalid">
                 """.format(url=reverse(u'obligees:autocomplete')), rendered)
 
-class ObligeeFieldWithObligeeWidgetWidget(ObligeesTestCaseMixin, TestCase):
+class ObligeeFieldWithObligeeWidgetWidget(ChcemvedietTestCaseMixin, TestCase):
     u"""
     Tests ``ObligeeField`` with ``ObligeeWidget`` widget.
     """
