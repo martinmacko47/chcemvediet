@@ -9,7 +9,7 @@ import filecmp
 import zipfile
 import requests
 
-FONTELLO_HOST = u'http://fontello.com'
+FONTELLO_HOST = u'https://fontello.com'
 WORKING_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_DIR = os.path.join(WORKING_DIR, u'_tmp')
 OUTPUT_DIR = os.path.join(WORKING_DIR, u'output')
