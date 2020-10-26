@@ -29,34 +29,39 @@ class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertTemplateUsed(response, u'obligees/index.html')
 
     def test_paginator_with_no_page_number_shows_first_page(self):
-        oblgs = [self._create_obligee(name=u'Agency_{:03d}'.format(i+1)) for i in range(2*OBLIGEES_PER_PAGE+1)]
+        Obligee.objects.all().delete()
+        oblgs = [self._create_obligee() for _ in range(2*OBLIGEES_PER_PAGE+1)]
         response = self.client.get(reverse(u'obligees:index'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 1 of 3>')
         self.assertEqual(list(response.context[u'obligee_page']), oblgs[:OBLIGEES_PER_PAGE])
 
     def test_paginator_with_valid_page_number_shows_requested_page(self):
-        oblgs = [self._create_obligee(name=u'Agency_{:03d}'.format(i+1)) for i in range(2*OBLIGEES_PER_PAGE+1)]
+        Obligee.objects.all().delete()
+        oblgs = [self._create_obligee() for _ in range(2*OBLIGEES_PER_PAGE+1)]
         response = self.client.get(reverse(u'obligees:index') + u'?page=2')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 2 of 3>')
         self.assertEqual(list(response.context[u'obligee_page']), oblgs[25:50])
 
     def test_paginator_with_too_high_page_number_shows_last_page(self):
-        oblgs = [self._create_obligee(name=u'Agency_{:03d}'.format(i+1)) for i in range(2*OBLIGEES_PER_PAGE+1)]
+        Obligee.objects.all().delete()
+        oblgs = [self._create_obligee() for _ in range(2*OBLIGEES_PER_PAGE+1)]
         response = self.client.get(reverse(u'obligees:index') + u'?page=47')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 3 of 3>')
         self.assertEqual(list(response.context[u'obligee_page']), oblgs[50:])
 
     def test_paginator_with_invalid_page_number_shows_first_page(self):
-        oblgs = [self._create_obligee(name=u'Agency_{:03d}'.format(i+1)) for i in range(2*OBLIGEES_PER_PAGE+1)]
+        Obligee.objects.all().delete()
+        oblgs = [self._create_obligee() for _ in range(2*OBLIGEES_PER_PAGE+1)]
         response = self.client.get(reverse(u'obligees:index') + u'?page=invalid')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 1 of 3>')
         self.assertEqual(list(response.context[u'obligee_page']), oblgs[:25])
 
     def test_paginator_with_no_obligees(self):
+        Obligee.objects.all().delete()
         response = self.client.get(reverse(u'obligees:index'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 1 of 1>')
@@ -72,7 +77,6 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
         self.assert_allowed_http_methods(allowed, reverse(u'obligees:autocomplete'))
 
     def test_autocomplete_returns_json_with_correct_structure(self):
-        Obligee.objects.all().delete()
         neighbourhood1 = self._create_neighbourhood()
         oblg1 = self._create_obligee(
                 official_name=u'Agency Official',
@@ -131,8 +135,8 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response, JsonResponse)
         data = json.loads(response.content)
-        self.assertEqual(data, [
-                {
+        self.assertIsInstance(data, list)
+        self.assertIn({
                 u'label': u'Agency',
                 u'obligee': {
                     u'id': oblg1.pk,
@@ -160,9 +164,8 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
                     u'slug': u'agency',
                     u'status': Obligee.STATUSES.PENDING,
                     u'notes': u'Notes about agency.',
-                    },
-                },
-                {
+                    }}, data)
+        self.assertIn({
                 u'label': u'Ministry',
                 u'obligee': {
                     u'id': oblg2.pk,
@@ -190,9 +193,7 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
                     u'slug': u'ministry',
                     u'status': Obligee.STATUSES.PENDING,
                     u'notes': u'Notes about ministry.',
-                    },
-                },
-            ])
+                }}, data)
 
     def test_autocomplete_is_case_insensitive(self):
         names = [u'aaa 1', u'AAA 2', u'AaA 3', u'ddd 1', u'Ddd 2', u'eee']
@@ -252,8 +253,8 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
         self.assertItemsEqual(found, [u'aaa 1', u'aaa 2'])
 
     def test_autocomplete_returns_at_most_50_obligees(self):
-        oblgs = [self._create_obligee(name=u'aaa_{:03d}'.format(i)) for i in range(75)]
-        response = self.client.get(reverse(u'obligees:autocomplete') + u'?term=aaa')
+        oblgs = [self._create_obligee() for _ in range(75)]
+        response = self.client.get(reverse(u'obligees:autocomplete'))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(len(data), 50)

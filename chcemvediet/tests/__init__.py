@@ -112,7 +112,7 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _create_obligee(self, **kwargs):
         return self._call_with_defaults(Obligee.objects.create, kwargs, {
                 u'official_name': u'Default Testing Official Name',
-                u'name': u'Default Testing Name {}'.format(self.counter.next()),
+                u'name': u'Default Testing Name {:03d}'.format(self.counter.next()),
                 u'name_genitive': u'Default Testing Name genitive',
                 u'name_dative': u'Default Testing Name dative',
                 u'name_accusative': u'Default Testing Name accusative',
