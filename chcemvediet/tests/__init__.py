@@ -42,7 +42,8 @@ class ChcemvedietTestCaseMixin(TestCase):
         self.neighbourhood = self._create_neighbourhood()
         self.inforequest = self._create_inforequest()
         self.obligee = self._create_obligee()
-
+        self.tag = self._create_obligee_tag()
+        self.group = self._create_obligee_group()
 
     def _call_with_defaults(self, func, kwargs, defaults):
         omit = kwargs.pop(u'omit', [])

@@ -42,7 +42,7 @@ class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
         response = self.client.get(reverse(u'obligees:index') + u'?page=2')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 2 of 3>')
-        self.assertEqual(list(response.context[u'obligee_page']), oblgs[25:50])
+        self.assertEqual(list(response.context[u'obligee_page']), oblgs[OBLIGEES_PER_PAGE:2*OBLIGEES_PER_PAGE])
 
     def test_paginator_with_too_high_page_number_shows_last_page(self):
         Obligee.objects.all().delete()
@@ -50,7 +50,7 @@ class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
         response = self.client.get(reverse(u'obligees:index') + u'?page=47')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 3 of 3>')
-        self.assertEqual(list(response.context[u'obligee_page']), oblgs[50:])
+        self.assertEqual(list(response.context[u'obligee_page']), oblgs[2*OBLIGEES_PER_PAGE:])
 
     def test_paginator_with_invalid_page_number_shows_first_page(self):
         Obligee.objects.all().delete()
@@ -58,7 +58,7 @@ class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
         response = self.client.get(reverse(u'obligees:index') + u'?page=invalid')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 1 of 3>')
-        self.assertEqual(list(response.context[u'obligee_page']), oblgs[:25])
+        self.assertEqual(list(response.context[u'obligee_page']), oblgs[:OBLIGEES_PER_PAGE])
 
     def test_paginator_with_no_obligees(self):
         Obligee.objects.all().delete()
@@ -77,7 +77,6 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
         self.assert_allowed_http_methods(allowed, reverse(u'obligees:autocomplete'))
 
     def test_autocomplete_returns_json_with_correct_structure(self):
-        neighbourhood1 = self._create_neighbourhood()
         oblg1 = self._create_obligee(
                 official_name=u'Agency Official',
                 name=u'Agency',
@@ -91,7 +90,7 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
                 street=u'Westend',
                 city=u'Winterfield',
                 zip=u'12345',
-                iczsj=neighbourhood1,
+                iczsj=self.neighbourhood,
                 emails=u'agency@a.com',
                 latitude=13.48,
                 longitude=-78.159,
@@ -101,12 +100,8 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
                 status=Obligee.STATUSES.PENDING,
                 notes=u'Notes about agency.',
                 )
-        tag1 = self._create_obligee_tag(key=u'Key 1', name=u'Tag 1')
-        tag2 = self._create_obligee_tag(key=u'Key 2', name=u'Tag 2')
-        group = self._create_obligee_group(key=u'Key 1', name=u'Group 1')
-        oblg1.tags.add(tag1, tag2)
-        oblg1.groups.add(group)
-        neighbourhood2 = self._create_neighbourhood()
+        oblg1.tags.add(self.tag)
+        oblg1.groups.add(self.group)
         oblg2 = self._create_obligee(
             official_name=u'Ministry Official',
             name=u'Ministry',
@@ -120,7 +115,7 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
             street=u'Eastend',
             city=u'Springfield',
             zip=u'12345',
-            iczsj=neighbourhood2,
+            iczsj=self.neighbourhood,
             emails=u'ministry@a.com',
             latitude=22.12,
             longitude=3.672,
@@ -152,12 +147,12 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
                     u'street': u'Westend',
                     u'city': u'Winterfield',
                     u'zip': u'12345',
-                    u'iczsj': neighbourhood1.id,
+                    u'iczsj': self.neighbourhood.id,
                     u'emails': u'agency@a.com',
                     u'latitude': 13.48,
                     u'longitude': -78.159,
-                    u'tags': [tag1.pk, tag2.pk],
-                    u'groups': [group.pk],
+                    u'tags': [self.tag.pk],
+                    u'groups': [self.group.pk],
                     u'type': Obligee.TYPES.SECTION_1,
                     u'official_description': u'Agency\'s official description.',
                     u'simple_description': u'Agency\'s simple description.',
@@ -181,7 +176,7 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
                     u'street': u'Eastend',
                     u'city': u'Springfield',
                     u'zip': u'12345',
-                    u'iczsj': neighbourhood2.id,
+                    u'iczsj': self.neighbourhood.id,
                     u'emails': u'ministry@a.com',
                     u'latitude': 22.12,
                     u'longitude': 3.672,
