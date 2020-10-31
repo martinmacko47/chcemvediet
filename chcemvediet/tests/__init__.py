@@ -136,15 +136,17 @@ class ChcemvedietTestCaseMixin(TestCase):
                 })
 
     def _create_obligee_tag(self, **kwargs):
+        tag = u'{:03d}'.format(self.counter.next())
         return self._call_with_defaults(ObligeeTag.objects.create, kwargs, {
-                u'key': u'Default Testing Key',
-                u'name': u'Default Testing Name',
+                u'key': u'Default Testing Key {}'.format(tag),
+                u'name': u'Default Testing Name {}'.format(tag),
                 })
 
     def _create_obligee_group(self, **kwargs):
+        tag = u'{:03d}'.format(self.counter.next())
         return self._call_with_defaults(ObligeeGroup.objects.create, kwargs, {
-                u'key': u'Default Testing Key',
-                u'name': u'Default Testing Name',
+                u'key': u'Default Testing Key {}'.format(tag),
+                u'name': u'Default Testing Name {}'.format(tag),
                 u'description': u'Default Testing Description',
                 })
 
