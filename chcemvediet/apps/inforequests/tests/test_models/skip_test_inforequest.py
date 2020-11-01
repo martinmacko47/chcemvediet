@@ -4,7 +4,6 @@ import datetime
 import random
 import mock
 
-from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -14,9 +13,11 @@ from poleno.timewarp import timewarp
 from poleno.mail.models import Message
 from poleno.utils.date import local_datetime_from_local, local_datetime_from_utc, utc_now, naive_date
 from poleno.utils.test import created_instances
+from poleno.utils.urls import reverse
 
 from .. import InforequestsTestCaseMixin
 from ...models import Inforequest, InforequestEmail, Branch, Action, ActionDraft
+
 
 class InforequestTest(InforequestsTestCaseMixin, TestCase):
     u"""

@@ -3,15 +3,16 @@
 import json
 import datetime
 
-from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 
 from poleno.attachments.models import Attachment
 from poleno.utils.date import utc_now
 from poleno.utils.test import created_instances
+from poleno.utils.urls import reverse
 
 from . import CustomTestCase
+
 
 class UploadAttachmentViewTest(CustomTestCase):
     u"""

@@ -1,7 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import NoReverseMatch
-from django.utils.html import format_html, format_html_join
+from django.utils.html import format_html
 from django.contrib import admin
 
 from poleno.utils.urls import reverse

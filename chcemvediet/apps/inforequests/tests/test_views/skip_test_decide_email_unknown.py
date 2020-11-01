@@ -2,16 +2,17 @@
 # -*- coding: utf-8 -*-
 import json
 
-from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 
 from poleno.utils.misc import Bunch
 from poleno.utils.test import patch_with_exception
+from poleno.utils.urls import reverse
 
 from ...models import InforequestEmail
 from . import CustomTestCase
 from .common_tests import OwnedNotClosedInforequestArgTests, OldestUndecitedEmailArgTests
 from .common_tests import CommonDecoratorsTests
+
 
 class DecideEmailUnknownViewTest(
         CommonDecoratorsTests,

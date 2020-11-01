@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from poleno.utils.test import ViewTestCaseMixin
+from poleno.utils.urls import reverse
 
 from .. import InforequestsTestCaseMixin
 

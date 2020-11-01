@@ -1,8 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse
-
 from poleno.utils.misc import Bunch
+from poleno.utils.urls import reverse
 
 from . import CustomTestCase
 from ... import forms
@@ -11,6 +10,7 @@ from .common_tests import CommonDecoratorsTests, CanAddActionTests, OwnedNotClos
 from .common_tests import AddSmailAndNewActionCommonTests
 from .fields_tests import DraftBranchFieldTests, DraftEffectiveDateFieldTests, DraftSubjectContentAttachmentsFieldsTests
 from .fields_tests import DraftDeadlineFieldTests, DraftAdvancedToFieldsTests, DraftDisclosureLevelFieldTests, DraftRefusalReasonFieldTests
+
 
 class AddSmailTests(
         CommonDecoratorsTests,
