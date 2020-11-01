@@ -67,10 +67,10 @@ class MessageModelTest(MailTestCaseMixin, TestCase):
         self.assertEqual(msg.received_for, u'')
 
     def test_subject_text_and_html_fields_with_explicit_values(self):
-        msg = self._create_message(subject=u'Subject', text=u'Text', html=u'<b>HTML</b>')
+        msg = self._create_message(subject=u'Subject', text=u'Text', html=u'<html><body>HTML content</body></html>')
         self.assertEqual(msg.subject, u'Subject')
         self.assertEqual(msg.text, u'Text')
-        self.assertEqual(msg.html, u'<b>HTML</b>')
+        self.assertEqual(msg.html, u'<html><body>HTML content</body></html>')
 
     def test_subject_text_and_html_fields_with_default_values_if_omitted(self):
         msg = self._create_message(omit=[u'subject', u'text', u'html'])
