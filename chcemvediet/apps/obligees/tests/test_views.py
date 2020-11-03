@@ -217,8 +217,8 @@ class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase
         found = [d[u'obligee'][u'name'] for d in data]
         self.assertItemsEqual(found, [u'aaa bbb ccc'])
 
-    def test_autocomplete_matches_obligee_name_prefixes(self):
-        names = [u'aa', u'aaa', u'aaaaaaa', u'aaaxxxx', u'xxxxaaa', u'xxxxaaaxxxx', u'xxx aaa', u'xxx aaax xxx']
+    def test_autocomplete_matches_obligee_name_substrings(self):
+        names = [u'aa', u'a aa', u'aaa', u'aaaaaaa', u'aaaxxxx', u'xxxxaaa', u'xxxxaaaxxxx', u'xxx aaa', u'xxx aaax xxx', u'xxx']
         oblgs = [self._create_obligee(name=n) for n in names]
         response = self.client.get(reverse(u'obligees:autocomplete') + u'?term=aaa')
         self.assertEqual(response.status_code, 200)

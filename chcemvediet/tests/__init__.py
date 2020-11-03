@@ -53,19 +53,16 @@ class ChcemvedietTestCaseMixin(TestCase):
         return func(**defaults)
 
     def _create_user(self, **kwargs):
-        try:
-            tag = u'{}'.format(User.objects.latest(u'pk').pk + 1)
-        except User.DoesNotExist:
-            tag = u'1'
+        nr = u'{:03d}'.format(self.counter.next())
         street = kwargs.pop(u'street', u'Default User Street')
         city = kwargs.pop(u'city', u'Default User City')
         zip = kwargs.pop(u'zip', u'00000')
         email_verified = kwargs.pop(u'email_verified', True)
         user = self._call_with_defaults(User.objects.create_user, kwargs, {
-                u'username': u'default_testing_username_{}'.format(tag),
+                u'username': u'default_testing_username_{}'.format(nr),
                 u'first_name': u'Default Testing First Name',
                 u'last_name': u'Default Testing Last Name',
-                u'email': u'default_testing_mail_{}@a.com'.format(tag),
+                u'email': u'default_testing_mail_{}@a.com'.format(nr),
                 u'password': u'default_testing_secret',
                 })
         user.profile.street = street
@@ -136,17 +133,17 @@ class ChcemvedietTestCaseMixin(TestCase):
                 })
 
     def _create_obligee_tag(self, **kwargs):
-        tag = u'{:03d}'.format(self.counter.next())
+        nr = u'{:03d}'.format(self.counter.next())
         return self._call_with_defaults(ObligeeTag.objects.create, kwargs, {
-                u'key': u'Default Testing Key {}'.format(tag),
-                u'name': u'Default Testing Name {}'.format(tag),
+                u'key': u'Default Testing Key {}'.format(nr),
+                u'name': u'Default Testing Name {}'.format(nr),
                 })
 
     def _create_obligee_group(self, **kwargs):
-        tag = u'{:03d}'.format(self.counter.next())
+        nr = u'{:03d}'.format(self.counter.next())
         return self._call_with_defaults(ObligeeGroup.objects.create, kwargs, {
-                u'key': u'Default Testing Key {}'.format(tag),
-                u'name': u'Default Testing Name {}'.format(tag),
+                u'key': u'Default Testing Key {}'.format(nr),
+                u'name': u'Default Testing Name {}'.format(nr),
                 u'description': u'Default Testing Description',
                 })
 
