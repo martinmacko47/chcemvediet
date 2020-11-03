@@ -47,15 +47,15 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
         widget = html.find(u'.//div[@id="id_obligee"][@class="chv-obligee-widget"]')
         inputs = widget.find(u'div[@class="chv-obligee-widget-inputs"]')
         input = inputs.find(u'div[@class="chv-obligee-widget-input"]')
-        form_control = input.find(u'.//input'
-                u'[@class="form-control pln-autocomplete"]'
-                u'[@data-autocomplete-url="{url}"]'
-                u'[@name="obligee"]'
-                u'[@data-name="obligee"]'
-                u'[@type="text"]'
-                u'[@value=""]'.format(url=reverse(u'obligees:autocomplete')))
-        self.assertIsNotNone(form_control)
-        details = input.find(u'.//div[@class="chv-obligee-widget-details chv-obligee-widget-hide"]')
+        form_control = input.find(u'.//input[@class="form-control pln-autocomplete"]')
+        self.assertEqual(form_control.attrib[u'data-autocomplete-url'], reverse(u'obligees:autocomplete'))
+        self.assertEqual(form_control.attrib[u'name'], u'obligee')
+        self.assertEqual(form_control.attrib[u'data-name'], u'obligee')
+        self.assertEqual(form_control.attrib[u'type'], u'text')
+        self.assertEqual(form_control.attrib[u'value'], u'')
+        details = input.find_class(u'chv-obligee-widget-details')[0]
+        self.assertEqual(details.tag, u'div')
+        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertIsNone(street.text)
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
@@ -71,25 +71,18 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
         form = self.FormWithWidgetAttrs()
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        widget = html.find(u'.//div'
-                u'[@id="id_obligee"]'
-                u'[@class="chv-obligee-widget custom-class"]'
-                u'[@custom-attribute="value"]')
-        self.assertIsNotNone(widget)
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        self.assertIn(u'chv-obligee-widget', widget.attrib[u'class'])
+        self.assertIn(u'custom-class', widget.attrib[u'class'])
+        self.assertEqual(widget.attrib[u'custom-attribute'], u'value')
 
     def test_new_form_with_custom_input_class_and_attributes(self):
         form = self.FormWithInputAttrs()
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find(u'.//input'
-                u'[@class="custom-class pln-autocomplete form-control"]'
-                u'[@data-autocomplete-url="{url}"]'
-                u'[@name="obligee"]'
-                u'[@data-name="obligee"]'
-                u'[@type="text"]'
-                u'[@value=""]'
-                u'[@custom-attribute="value"]'.format(url=reverse(u'obligees:autocomplete')))
-        self.assertIsNotNone(form_control)
+        form_control = html.find_class(u'pln-autocomplete form-control')[0]
+        self.assertIn(u'custom-class', form_control.attrib[u'class'])
+        self.assertEqual(form_control.attrib[u'custom-attribute'], u'value')
 
     def test_new_form_with_initial_value_as_obligee_instance(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
@@ -97,15 +90,10 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
         form = self.Form(initial={u'obligee': oblgs[2]})
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find(u'.//input'
-                u'[@class="form-control pln-autocomplete"]'
-                u'[@data-autocomplete-url="{url}"]'
-                u'[@name="obligee"]'
-                u'[@data-name="obligee"]'
-                u'[@type="text"]'
-                u'[@value="ccc"]'.format(url=reverse(u'obligees:autocomplete')))
-        self.assertIsNotNone(form_control)
-        details = html.find(u'.//div[@class="chv-obligee-widget-details "]')
+        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
+        self.assertEqual(form_control.attrib[u'value'], u'ccc')
+        details = html.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertEqual(street.text, u'ccc street')
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
@@ -121,15 +109,10 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
         form = self.Form(initial={u'obligee': u'ccc'})
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find(u'.//input'
-                                 u'[@class="form-control pln-autocomplete"]'
-                                 u'[@data-autocomplete-url="{url}"]'
-                                 u'[@name="obligee"]'
-                                 u'[@data-name="obligee"]'
-                                 u'[@type="text"]'
-                                 u'[@value="ccc"]'.format(url=reverse(u'obligees:autocomplete')))
-        self.assertIsNotNone(form_control)
-        details = html.find(u'.//div[@class="chv-obligee-widget-details "]')
+        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
+        self.assertEqual(form_control.attrib[u'value'], u'ccc')
+        details = html.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertEqual(street.text, u'ccc street')
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
@@ -145,7 +128,9 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
         self.assertEqual(form.errors[u'obligee'], [u'This field is required.'])
 
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<ul class="errorlist"><li>This field is required.</li></ul>', rendered)
+        html = lxml.html.fromstring(rendered)
+        error = html.find(u'.//ul[@class="errorlist"]/li')
+        self.assertEqual(error.text, u'This field is required.')
 
     def test_submitted_with_empty_value_but_not_required(self):
         form = self.Form({u'obligee': u''})
@@ -167,15 +152,10 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
 
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find(u'.//input'
-                u'[@class="form-control pln-autocomplete"]'
-                u'[@data-autocomplete-url="{url}"]'
-                u'[@name="obligee"]'
-                u'[@data-name="obligee"]'
-                u'[@type="text"]'
-                u'[@value="bbb"]'.format(url=reverse(u'obligees:autocomplete')))
-        self.assertIsNotNone(form_control)
-        details = html.find(u'.//div[@class="chv-obligee-widget-details "]')
+        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
+        self.assertEqual(form_control.attrib[u'value'], u'bbb')
+        details = html.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertEqual(street.text, u'bbb street')
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
@@ -194,17 +174,12 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
 
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        error_message = html.find(u'.//ul[@class="errorlist"]/li')
-        self.assertEqual(error_message.text, _(u'obligees:ObligeeField:error:invalid_obligee'))
-        form_control = html.find(u'.//input'
-                u'[@class="form-control pln-autocomplete"]'
-                u'[@data-autocomplete-url="{url}"]'
-                u'[@name="obligee"]'
-                u'[@data-name="obligee"]'
-                u'[@type="text"]'
-                u'[@value="invalid"]'.format(url=reverse(u'obligees:autocomplete')))
-        self.assertIsNotNone(form_control)
-        details = html.find(u'.//div[@class="chv-obligee-widget-details chv-obligee-widget-hide"]')
+        error = html.find(u'.//ul[@class="errorlist"]/li')
+        self.assertEqual(error.text, _(u'obligees:ObligeeField:error:invalid_obligee'))
+        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
+        self.assertEqual(form_control.attrib[u'value'], u'invalid')
+        details = html.find_class(u'chv-obligee-widget-details')[0]
+        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertIsNone(street.text)
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
