@@ -279,7 +279,7 @@ class SubjectContentAttachmentsFieldsTests(FieldsTests):
         self._login_user()
         scenario = self._create_scenario()
         attachment1 = self._create_attachment(generic_object=self._get_session(), name=u'filename.txt', content=u'content', content_type=u'text/plain')
-        attachment2 = self._create_attachment(generic_object=self._get_session(), name=u'filename.html', content=u'<p>content</p>', content_type=u'text/html')
+        attachment2 = self._create_attachment(generic_object=self._get_session(), name=u'filename.html', content=u'<html><body>HTML content</body></html>', content_type=u'text/html')
         data = self._create_post_data(branch=scenario.branch, subject=u'Subject', content=u'Content', attachments=u'%s,%s' % (attachment1.pk, attachment2.pk))
         url = self._create_url(scenario)
 
@@ -293,7 +293,7 @@ class SubjectContentAttachmentsFieldsTests(FieldsTests):
         attachments = [(a.name, a.content, a.content_type) for a in action.attachment_set.all()]
         self.assertItemsEqual(attachments, [
             (u'filename.txt', u'content', u'text/plain'),
-            (u'filename.html', u'<p>content</p>', u'text/html'),
+            (u'filename.html', u'<html><body>HTML content</body></html>', u'text/html'),
             ])
 
     def test_subject_field_is_required(self):

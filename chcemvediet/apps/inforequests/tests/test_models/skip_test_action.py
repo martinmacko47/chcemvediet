@@ -596,7 +596,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         branch = self._create_branch(inforequest=inforequest)
         action = self._create_action(branch=branch)
         attachment1 = self._create_attachment(generic_object=action, name=u'filename.txt', content=u'Content', content_type=u'text/plain')
-        attachment2 = self._create_attachment(generic_object=action, name=u'filename.html', content=u'<p>Content</p>', content_type=u'text/html')
+        attachment2 = self._create_attachment(generic_object=action, name=u'filename.html', content=u'<html><body>HTML content</body></html>', content_type=u'text/html')
 
         with created_instances(Message.objects) as message_set:
             action.send_by_email()
@@ -605,7 +605,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         result = ((a.name, a.content, a.content_type) for a in email.attachment_set.all())
         self.assertItemsEqual(result, [
             (u'filename.txt', u'Content', u'text/plain'),
-            (u'filename.html', u'<p>Content</p>', u'text/html'),
+            (u'filename.html', u'<html><body>HTML content</body></html>', u'text/html'),
             ])
 
     def test_repr(self):

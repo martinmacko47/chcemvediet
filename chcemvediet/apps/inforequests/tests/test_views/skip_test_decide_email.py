@@ -83,7 +83,7 @@ class DecideEmailTests(
     def test_post_with_valid_data_creates_action_instance(self):
         scenario = self._create_scenario(email_args=dict(subject=u'Subject', text=u'Content', processed=utc_datetime_from_local(u'2010-10-05 00:33:00')))
         attachment1 = self._create_attachment(generic_object=scenario.email, name=u'filename.txt', content=u'content', content_type=u'text/plain')
-        attachment2 = self._create_attachment(generic_object=scenario.email, name=u'filename.html', content=u'<p>content</p>', content_type=u'text/html')
+        attachment2 = self._create_attachment(generic_object=scenario.email, name=u'filename.html', content=u'<html><body>HTML content</body></html>', content_type=u'text/html')
         data = self._create_post_data(branch=scenario.branch)
         url = self._create_url(scenario)
 
@@ -101,7 +101,7 @@ class DecideEmailTests(
         attachments = [(a.name, a.content, a.content_type) for a in action.attachment_set.all()]
         self.assertItemsEqual(attachments, [
             (u'filename.txt', u'content', u'text/plain'),
-            (u'filename.html', u'<p>content</p>', u'text/html'),
+            (u'filename.html', u'<html><body>HTML content</body></html>', u'text/html'),
             ])
 
         scenario.rel = InforequestEmail.objects.get(pk=scenario.rel.pk)
@@ -110,7 +110,7 @@ class DecideEmailTests(
     def test_post_with_valid_data_does_not_create_action_instance_if_exception_raised(self):
         scenario = self._create_scenario(email_args=dict(subject=u'Subject', text=u'Content', processed=utc_datetime_from_local(u'2010-10-05 00:33:00')))
         attachment1 = self._create_attachment(generic_object=scenario.email, name=u'filename.txt', content=u'content', content_type=u'text/plain')
-        attachment2 = self._create_attachment(generic_object=scenario.email, name=u'filename.html', content=u'<p>content</p>', content_type=u'text/html')
+        attachment2 = self._create_attachment(generic_object=scenario.email, name=u'filename.html', content=u'<html><body>HTML content</body></html>', content_type=u'text/html')
         data = self._create_post_data(branch=scenario.branch)
         url = self._create_url(scenario)
 

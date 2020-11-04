@@ -29,16 +29,16 @@ class RenderMailTest(TestCase):
 
         self.tempdir.write(u'first_subject.txt', u'\n\n\t\t\r\r\t\tSubject       with\t\t lots \t  \n\n\t\r\r\n of whitespace\n\n    \n\n  \t')
         self.tempdir.write(u'first_message.txt', u'   \n\n  \t\n\tFirst message text with leading and trailing whitespace   \n     \n\n  \n  ')
-        self.tempdir.write(u'first_message.html', u'   \n\n  \t  <p>\nFirst message HTML with leading and trailing whitespace\n</p>\n\n\n\n   ')
+        self.tempdir.write(u'first_message.html', u'   \n\n  \t  <html><body>\nFirst message HTML with leading and trailing whitespace\n</body></html>\n\n\n\n   ')
         self.tempdir.write(u'second_subject.txt', u'Second subject\n')
         self.tempdir.write(u'second_message.txt', u'Second message with only text\n')
         self.tempdir.write(u'third_subject.txt', u'Third subject\n')
-        self.tempdir.write(u'third_message.html', u'<p>Third message with only HTML</p>\n')
+        self.tempdir.write(u'third_message.html', u'<html><body>Third message with only HTML</body></html>\n')
         self.tempdir.write(u'fourth_subject.txt', u'Fourth message with no body\n')
         self.tempdir.write(u'fifth_message.txt', u'Fifth message with no subject\n')
         self.tempdir.write(u'sixth_subject.txt', u'Subject with dictionary: {{ variable }}\n')
         self.tempdir.write(u'sixth_message.txt', u'Text message with dictionary: {{ variable }}\n')
-        self.tempdir.write(u'sixth_message.html', u'<p>HTML message with dictionary: {{ variable }}</p>\n')
+        self.tempdir.write(u'sixth_message.html', u'<html><body>HTML message with dictionary: {{ variable }}</body></html>\n')
 
     def tearDown(self):
         self.settings_override.disable()
@@ -59,7 +59,7 @@ class RenderMailTest(TestCase):
         alternatives = self._get_alternatives(msg)
         self.assertEqual(alternatives, [
             (u'text/plain', u'First message text with leading and trailing whitespace'),
-            (u'text/html', u'<p>\nFirst message HTML with leading and trailing whitespace\n</p>'),
+            (u'text/html', u'<html><body>\nFirst message HTML with leading and trailing whitespace\n</body></html>'),
             ])
 
     def test_message_with_text_only(self):
@@ -77,7 +77,7 @@ class RenderMailTest(TestCase):
         msg = render_mail(u'third')
         alternatives = self._get_alternatives(msg)
         self.assertEqual(alternatives, [
-            (u'text/html', u'<p>Third message with only HTML</p>'),
+            (u'text/html', u'<html><body>Third message with only HTML</body></html>'),
             ])
 
     def test_message_with_missing_templates(self):
@@ -131,7 +131,7 @@ class RenderMailTest(TestCase):
             u'to': [u'first@dest.com', u'second@dest.com'],
             u'cc': [u'John Shmith <john@dest.com>'],
             u'bcc': [u'example@example.com'],
-            u'headers': {'Reply-To': 'another@example.com'},
+            u'headers': {u'Reply-To': u'another@example.com'},
             u'attachments': [(u'filename', u'content', u'application/octet-stream')],
             }
 
@@ -154,5 +154,5 @@ class RenderMailTest(TestCase):
         self.assertEqual(msg.subject, u'[example.com] Subject with dictionary: 47')
         self.assertEqual(alternatives, [
             (u'text/plain', u'Text message with dictionary: 47'),
-            (u'text/html', u'<p>HTML message with dictionary: 47</p>'),
+            (u'text/html', u'<html><body>HTML message with dictionary: 47</body></html>'),
             ])
