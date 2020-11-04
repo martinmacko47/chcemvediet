@@ -1,20 +1,20 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import unittest
-
+import lxml.html
 from django import forms
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
+from poleno.utils.urls import reverse
 from chcemvediet.tests import ChcemvedietTestCaseMixin
 
 from ..forms import ObligeeWidget, ObligeeField
 
 
-class ObligeeFieldWithTextInputWidgetTest(ChcemvedietTestCaseMixin, TestCase):
+class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
     u"""
-    Tests ``ObligeeField`` with ``TextInput`` widget.
+    Tests ``ObligeeField`` field with ``ObligeeWidget`` widget.
     """
 
     class Form(forms.Form):
@@ -22,63 +22,124 @@ class ObligeeFieldWithTextInputWidgetTest(ChcemvedietTestCaseMixin, TestCase):
 
     class FormWithWidgetAttrs(forms.Form):
         obligee = ObligeeField(
-                widget=forms.TextInput(attrs={
+                widget=ObligeeWidget(attrs={
+                    u'class': u'custom-class',
+                    u'custom-attribute': u'value',
+                    }),
+                )
+
+    class FormWithInputAttrs(forms.Form):
+        obligee = ObligeeField(
+                widget=ObligeeWidget(input_attrs={
                     u'class': u'custom-class',
                     u'custom-attribute': u'value',
                     }),
                 )
 
 
-    @unittest.skip(u'FIXME')
     def test_new_form(self):
         form = self.Form()
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<label for="id_obligee">Obligee:</label>', rendered)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
-    def test_new_form_with_custom_widget_class_attributes(self):
+        label = html.find(u'.//label[@for="id_obligee"]')
+        self.assertEqual(label.text, u'Obligee:')
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        self.assertIn(u'chv-obligee-widget', widget.attrib[u'class'].split())
+
+        input = widget.find(u'.//input')
+        self.assertIn(u'form-control', input.attrib[u'class'].split())
+        self.assertIn(u'pln-autocomplete', input.attrib[u'class'].split())
+        self.assertEqual(input.attrib[u'type'], u'text')
+        self.assertEqual(input.attrib[u'name'], u'obligee')
+        self.assertEqual(input.attrib[u'value'], u'')
+        self.assertEqual(input.attrib[u'data-autocomplete-url'], reverse(u'obligees:autocomplete'))
+        self.assertEqual(input.attrib[u'data-name'], u'obligee')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertEqual(details.tag, u'div')
+        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
+    def test_new_form_with_custom_widget_class_and_attributes(self):
         form = self.FormWithWidgetAttrs()
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="custom-class autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" custom-attribute="value">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        self.assertIn(u'chv-obligee-widget', widget.attrib[u'class'].split())
+        self.assertIn(u'custom-class', widget.attrib[u'class'].split())
+        self.assertEqual(widget.attrib[u'custom-attribute'], u'value')
+
+    def test_new_form_with_custom_input_class_and_attributes(self):
+        form = self.FormWithInputAttrs()
+        rendered = self._render(u'{{ form }}', form=form)
+        html = lxml.html.fromstring(rendered)
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertIn(u'custom-class', input.attrib[u'class'].split())
+        self.assertEqual(input.attrib[u'custom-attribute'], u'value')
+
     def test_new_form_with_initial_value_as_obligee_instance(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
-        oblgs = [self._create_obligee(name=n) for n in names]
+        oblgs = [self._create_obligee(name=n, street=u'{} street'.format(n), city=u'{} city'.format(n), zip=u'12345', emails=u'{}@a.com'.format(n)) for n in names]
+
         form = self.Form(initial={u'obligee': oblgs[2]})
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="ccc">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'ccc')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
+        street = details.find(u'span[@class="chv-obligee-widget-street"]')
+        self.assertEqual(street.text, u'ccc street')
+        zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
+        self.assertEqual(zip.text, u'12345')
+        city = details.find(u'span[@class="chv-obligee-widget-city"]')
+        self.assertEqual(city.text, u'ccc city')
+        email = details.find(u'span[@class="chv-obligee-widget-email"]')
+        self.assertEqual(email.text, u'ccc@a.com')
+
     def test_new_form_with_initial_value_as_obligee_name(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
-        oblgs = [self._create_obligee(name=n) for n in names]
+        oblgs = [self._create_obligee(name=n, street=u'{} street'.format(n), city=u'{} city'.format(n), zip=u'12345', emails=u'{}@a.com'.format(n)) for n in names]
+
         form = self.Form(initial={u'obligee': u'ccc'})
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="ccc">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'ccc')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
+        street = details.find(u'span[@class="chv-obligee-widget-street"]')
+        self.assertEqual(street.text, u'ccc street')
+        zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
+        self.assertEqual(zip.text, u'12345')
+        city = details.find(u'span[@class="chv-obligee-widget-city"]')
+        self.assertEqual(city.text, u'ccc city')
+        email = details.find(u'span[@class="chv-obligee-widget-email"]')
+        self.assertEqual(email.text, u'ccc@a.com')
+
     def test_submitted_with_empty_value_but_required(self):
         form = self.Form({u'obligee': u''})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors[u'obligee'], [u'This field is required.'])
 
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<ul class="errorlist"><li>This field is required.</li></ul>', rendered)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
+        error = html.find(u'.//ul[@class="errorlist"]/li')
+        self.assertEqual(error.text, u'This field is required.')
+
     def test_submitted_with_empty_value_but_not_required(self):
         form = self.Form({u'obligee': u''})
         form.fields[u'obligee'].required = False
@@ -86,38 +147,59 @@ class ObligeeFieldWithTextInputWidgetTest(ChcemvedietTestCaseMixin, TestCase):
         self.assertIsNone(form.cleaned_data[u'obligee'])
 
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
+        errorlist = html.find(u'.//ul[@class="errorlist"]')
+        self.assertIsNone(errorlist)
+
     def test_submitted_with_valid_obligee_name(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
-        oblgs = [self._create_obligee(name=n) for n in names]
+        oblgs = [self._create_obligee(name=n, street=u'{} street'.format(n), city=u'{} city'.format(n), zip=u'12345', emails=u'{}@a.com'.format(n)) for n in names]
+
         form = self.Form({u'obligee': u'bbb'})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data[u'obligee'], oblgs[1])
 
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="bbb">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'bbb')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
+        street = details.find(u'span[@class="chv-obligee-widget-street"]')
+        self.assertEqual(street.text, u'bbb street')
+        zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
+        self.assertEqual(zip.text, u'12345')
+        city = details.find(u'span[@class="chv-obligee-widget-city"]')
+        self.assertEqual(city.text, u'bbb city')
+        email = details.find(u'span[@class="chv-obligee-widget-email"]')
+        self.assertEqual(email.text, u'bbb@a.com')
+
     def test_submitted_with_nonexisting_obligee_name(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
         oblgs = [self._create_obligee(name=n) for n in names]
+
         form = self.Form({u'obligee': u'invalid'})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors[u'obligee'], [u'Invalid obligee name. Select one form the menu.'])
+        self.assertEqual(form.errors[u'obligee'], [_(u'obligees:ObligeeField:error:invalid_obligee')])
 
         rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<ul class="errorlist"><li>Invalid obligee name. Select one form the menu.</li></ul>', rendered)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="invalid">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
+        html = lxml.html.fromstring(rendered)
 
-    @unittest.skip(u'FIXME')
+        error = html.find(u'.//ul[@class="errorlist"]/li')
+        self.assertEqual(error.text, _(u'obligees:ObligeeField:error:invalid_obligee'))
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'invalid')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
     def test_to_python_is_cached(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
         oblgs = [self._create_obligee(name=n) for n in names]
@@ -136,138 +218,3 @@ class ObligeeFieldWithTextInputWidgetTest(ChcemvedietTestCaseMixin, TestCase):
         with self.assertNumQueries(0):
             with self.assertRaises(ValidationError):
                 field.clean(u'invalid')
-
-class ObligeeFieldWithObligeeWidgetWidget(ChcemvedietTestCaseMixin, TestCase):
-    u"""
-    Tests ``ObligeeField`` with ``ObligeeWidget`` widget.
-    """
-
-    class Form(forms.Form):
-        obligee = ObligeeField(
-                widget=ObligeeWidget(),
-                )
-
-    class FormWithWidgetAttrs(forms.Form):
-        obligee = ObligeeField(
-                widget=ObligeeWidget(attrs={
-                    u'class': u'custom-class',
-                    u'custom-attribute': u'value',
-                    }),
-                )
-
-
-    @unittest.skip(u'FIXME')
-    def test_new_form(self):
-        form = self.Form()
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<label for="id_obligee">Obligee:</label>', rendered)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
-        self.assertInHTML(u"""
-                <div class="obligee_widget_details obligee_widget_hide">
-                  <span class="obligee_widget_street"></span><br>
-                  <span class="obligee_widget_zip"></span> <span class="obligee_widget_city"></span><br>
-                  E-mail: <span class="obligee_widget_email"></span>
-                </div>
-                """, rendered)
-
-    @unittest.skip(u'FIXME')
-    def test_new_form_with_custom_widget_class_and_attributes(self):
-        form = self.FormWithWidgetAttrs()
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete custom-class" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" custom-attribute="value">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
-
-    @unittest.skip(u'FIXME')
-    def test_new_form_with_initial_value_as_obligee_instance(self):
-        names = [u'aaa', u'bbb', u'ccc', u'ddd']
-        oblgs = [self._create_obligee(name=n, street=u'%s street' % n, city=u'%s city' % n, zip=u'12345', emails=u'%s@a.com' % n) for n in names]
-        form = self.Form(initial={u'obligee': oblgs[2]})
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="ccc">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
-        self.assertInHTML(u"""
-                <div class="obligee_widget_details ">
-                  <span class="obligee_widget_street">ccc street</span><br>
-                  <span class="obligee_widget_zip">12345</span> <span class="obligee_widget_city">ccc city</span><br>
-                  E-mail: <span class="obligee_widget_email">ccc@a.com</span>
-                </div>
-                """, rendered)
-
-    @unittest.skip(u'FIXME')
-    def test_new_form_with_initial_value_as_obligee_name(self):
-        names = [u'aaa', u'bbb', u'ccc', u'ddd']
-        oblgs = [self._create_obligee(name=n, street=u'%s street' % n, city=u'%s city' % n, zip=u'12345', emails=u'%s@a.com' % n) for n in names]
-        form = self.Form(initial={u'obligee': u'ccc'})
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="ccc">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
-        self.assertInHTML(u"""
-                <div class="obligee_widget_details ">
-                  <span class="obligee_widget_street">ccc street</span><br>
-                  <span class="obligee_widget_zip">12345</span> <span class="obligee_widget_city">ccc city</span><br>
-                  E-mail: <span class="obligee_widget_email">ccc@a.com</span>
-                </div>
-                """, rendered)
-
-    def test_submitted_with_empty_value_but_required(self):
-        form = self.Form({u'obligee': u''})
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors[u'obligee'], [u'This field is required.'])
-
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<ul class="errorlist"><li>This field is required.</li></ul>', rendered)
-
-    def test_submitted_with_empty_value_but_not_required(self):
-        form = self.Form({u'obligee': u''})
-        form.fields[u'obligee'].required = False
-        self.assertTrue(form.is_valid())
-        self.assertIsNone(form.cleaned_data[u'obligee'])
-
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<ul class="errorlist"><li>This field is required.</li></ul>', rendered, count=0)
-
-    @unittest.skip(u'FIXME')
-    def test_submitted_with_valid_obligee_name(self):
-        names = [u'aaa', u'bbb', u'ccc', u'ddd']
-        oblgs = [self._create_obligee(name=n, street=u'%s street' % n, city=u'%s city' % n, zip=u'12345', emails=u'%s@a.com' % n) for n in names]
-        form = self.Form({u'obligee': u'bbb'})
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data[u'obligee'], oblgs[1])
-
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="bbb">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
-        self.assertInHTML(u"""
-                <div class="obligee_widget_details ">
-                  <span class="obligee_widget_street">bbb street</span><br>
-                  <span class="obligee_widget_zip">12345</span> <span class="obligee_widget_city">bbb city</span><br>
-                  E-mail: <span class="obligee_widget_email">bbb@a.com</span>
-                </div>
-                """, rendered)
-
-    @unittest.skip(u'FIXME')
-    def test_submitted_with_nonexisting_obligee_name(self):
-        names = [u'aaa', u'bbb', u'ccc', u'ddd']
-        oblgs = [self._create_obligee(name=n) for n in names]
-        form = self.Form({u'obligee': u'invalid'})
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors[u'obligee'], [u'Invalid obligee name. Select one form the menu.'])
-
-        rendered = self._render(u'{{ form }}', form=form)
-        self.assertInHTML(u'<ul class="errorlist"><li>Invalid obligee name. Select one form the menu.</li></ul>', rendered)
-        self.assertInHTML(u"""
-                <input class="autocomplete" data-autocomplete-url="{url}" id="id_obligee" name="obligee" type="text" value="invalid">
-                """.format(url=reverse(u'obligees:autocomplete')), rendered)
-        self.assertInHTML(u"""
-                <div class="obligee_widget_details obligee_widget_hide">
-                  <span class="obligee_widget_street"></span><br>
-                  <span class="obligee_widget_zip"></span> <span class="obligee_widget_city"></span><br>
-                  E-mail: <span class="obligee_widget_email"></span>
-                </div>
-                """, rendered)
