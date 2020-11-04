@@ -44,56 +44,58 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
 
         label = html.find(u'.//label[@for="id_obligee"]')
         self.assertEqual(label.text, u'Obligee:')
-        widget = html.find(u'.//div[@id="id_obligee"][@class="chv-obligee-widget"]')
-        inputs = widget.find(u'div[@class="chv-obligee-widget-inputs"]')
-        input = inputs.find(u'div[@class="chv-obligee-widget-input"]')
-        form_control = input.find(u'.//input[@class="form-control pln-autocomplete"]')
-        self.assertEqual(form_control.attrib[u'data-autocomplete-url'], reverse(u'obligees:autocomplete'))
-        self.assertEqual(form_control.attrib[u'name'], u'obligee')
-        self.assertEqual(form_control.attrib[u'data-name'], u'obligee')
-        self.assertEqual(form_control.attrib[u'type'], u'text')
-        self.assertEqual(form_control.attrib[u'value'], u'')
-        details = input.find_class(u'chv-obligee-widget-details')[0]
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        self.assertIn(u'chv-obligee-widget', widget.attrib[u'class'].split())
+
+        input = widget.find(u'.//input')
+        self.assertIn(u'form-control', input.attrib[u'class'].split())
+        self.assertIn(u'pln-autocomplete', input.attrib[u'class'].split())
+        self.assertEqual(input.attrib[u'type'], u'text')
+        self.assertEqual(input.attrib[u'name'], u'obligee')
+        self.assertEqual(input.attrib[u'value'], u'')
+        self.assertEqual(input.attrib[u'data-autocomplete-url'], reverse(u'obligees:autocomplete'))
+        self.assertEqual(input.attrib[u'data-name'], u'obligee')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
         self.assertEqual(details.tag, u'div')
-        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
-        street = details.find(u'span[@class="chv-obligee-widget-street"]')
-        self.assertIsNone(street.text)
-        zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
-        self.assertIsNone(zip.text)
-        city = details.find(u'span[@class="chv-obligee-widget-city"]')
-        self.assertIsNone(city.text)
-        email = details.find(u'span[@class="chv-obligee-widget-email"]')
-        self.assertIsNone(email.text)
-        no_email = details.find(u'span[@class="chv-obligee-widget-no-email"]')
-        self.assertIsNotNone(no_email)
+        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
 
     def test_new_form_with_custom_widget_class_and_attributes(self):
         form = self.FormWithWidgetAttrs()
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
+
         widget = html.find(u'.//div[@id="id_obligee"]')
-        self.assertIn(u'chv-obligee-widget', widget.attrib[u'class'])
-        self.assertIn(u'custom-class', widget.attrib[u'class'])
+        self.assertIn(u'chv-obligee-widget', widget.attrib[u'class'].split())
+        self.assertIn(u'custom-class', widget.attrib[u'class'].split())
         self.assertEqual(widget.attrib[u'custom-attribute'], u'value')
 
     def test_new_form_with_custom_input_class_and_attributes(self):
         form = self.FormWithInputAttrs()
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find_class(u'pln-autocomplete form-control')[0]
-        self.assertIn(u'custom-class', form_control.attrib[u'class'])
-        self.assertEqual(form_control.attrib[u'custom-attribute'], u'value')
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertIn(u'custom-class', input.attrib[u'class'].split())
+        self.assertEqual(input.attrib[u'custom-attribute'], u'value')
 
     def test_new_form_with_initial_value_as_obligee_instance(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
         oblgs = [self._create_obligee(name=n, street=u'{} street'.format(n), city=u'{} city'.format(n), zip=u'12345', emails=u'{}@a.com'.format(n)) for n in names]
+
         form = self.Form(initial={u'obligee': oblgs[2]})
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
-        self.assertEqual(form_control.attrib[u'value'], u'ccc')
-        details = html.find_class(u'chv-obligee-widget-details')[0]
-        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'ccc')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertEqual(street.text, u'ccc street')
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
@@ -106,13 +108,18 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
     def test_new_form_with_initial_value_as_obligee_name(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
         oblgs = [self._create_obligee(name=n, street=u'{} street'.format(n), city=u'{} city'.format(n), zip=u'12345', emails=u'{}@a.com'.format(n)) for n in names]
+
         form = self.Form(initial={u'obligee': u'ccc'})
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
-        self.assertEqual(form_control.attrib[u'value'], u'ccc')
-        details = html.find_class(u'chv-obligee-widget-details')[0]
-        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'ccc')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertEqual(street.text, u'ccc street')
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
@@ -129,6 +136,7 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
 
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
+
         error = html.find(u'.//ul[@class="errorlist"]/li')
         self.assertEqual(error.text, u'This field is required.')
 
@@ -140,22 +148,28 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
 
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
+
         errorlist = html.find(u'.//ul[@class="errorlist"]')
         self.assertIsNone(errorlist)
 
     def test_submitted_with_valid_obligee_name(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
         oblgs = [self._create_obligee(name=n, street=u'{} street'.format(n), city=u'{} city'.format(n), zip=u'12345', emails=u'{}@a.com'.format(n)) for n in names]
+
         form = self.Form({u'obligee': u'bbb'})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data[u'obligee'], oblgs[1])
 
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
-        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
-        self.assertEqual(form_control.attrib[u'value'], u'bbb')
-        details = html.find_class(u'chv-obligee-widget-details')[0]
-        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'bbb')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertNotIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
+
         street = details.find(u'span[@class="chv-obligee-widget-street"]')
         self.assertEqual(street.text, u'bbb street')
         zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
@@ -168,26 +182,23 @@ class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
     def test_submitted_with_nonexisting_obligee_name(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
         oblgs = [self._create_obligee(name=n) for n in names]
+
         form = self.Form({u'obligee': u'invalid'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors[u'obligee'], [_(u'obligees:ObligeeField:error:invalid_obligee')])
 
         rendered = self._render(u'{{ form }}', form=form)
         html = lxml.html.fromstring(rendered)
+
         error = html.find(u'.//ul[@class="errorlist"]/li')
         self.assertEqual(error.text, _(u'obligees:ObligeeField:error:invalid_obligee'))
-        form_control = html.find(u'.//input[@class="form-control pln-autocomplete"]')
-        self.assertEqual(form_control.attrib[u'value'], u'invalid')
-        details = html.find_class(u'chv-obligee-widget-details')[0]
-        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'])
-        street = details.find(u'span[@class="chv-obligee-widget-street"]')
-        self.assertIsNone(street.text)
-        zip = details.find(u'span[@class="chv-obligee-widget-zip"]')
-        self.assertIsNone(zip.text)
-        city = details.find(u'span[@class="chv-obligee-widget-city"]')
-        self.assertIsNone(city.text)
-        email = details.find(u'span[@class="chv-obligee-widget-email"]')
-        self.assertIsNone(email.text)
+
+        widget = html.find(u'.//div[@id="id_obligee"]')
+        input = widget.find(u'.//input')
+        self.assertEqual(input.attrib[u'value'], u'invalid')
+
+        details = widget.find_class(u'chv-obligee-widget-details')[0]
+        self.assertIn(u'chv-obligee-widget-hide', details.attrib[u'class'].split())
 
     def test_to_python_is_cached(self):
         names = [u'aaa', u'bbb', u'ccc', u'ddd']
