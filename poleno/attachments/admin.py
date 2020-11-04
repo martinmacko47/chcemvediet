@@ -1,17 +1,15 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-from django.conf.urls import patterns, url
 from django.contrib import admin
 
 from poleno.utils.misc import decorate, filesize
-from poleno.utils.admin import admin_obj_format
+from poleno.utils.admin import admin_obj_format, DownloadAdminMixin
 
-from .views import download
 from .models import Attachment
 
 
 @admin.register(Attachment, site=admin.site)
-class AttachmentAdmin(admin.ModelAdmin):
+class AttachmentAdmin(DownloadAdminMixin, admin.ModelAdmin):
     date_hierarchy = u'created'
     list_display = [
             u'id',
@@ -64,15 +62,3 @@ class AttachmentAdmin(admin.ModelAdmin):
         queryset = super(AttachmentAdmin, self).get_queryset(request)
         queryset = queryset.prefetch_related(u'generic_object')
         return queryset
-
-    def download_view(self, request, attachment_pk):
-        attachment = Attachment.objects.get_or_404(pk=attachment_pk)
-        return download(request, attachment)
-
-    def get_urls(self):
-        info = self.model._meta.app_label, self.model._meta.model_name
-        download_view = self.admin_site.admin_view(self.download_view)
-        urls = patterns('',
-                url(r'^(.+)/download/$', download_view, name=u'{}_{}_download'.format(*info)),
-                )
-        return urls + super(AttachmentAdmin, self).get_urls()
