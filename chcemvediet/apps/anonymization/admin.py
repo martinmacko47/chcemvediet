@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
+from poleno.attachments.admin import DownloadAdminMixin
 from poleno.utils.misc import decorate, filesize
-from poleno.utils.admin import admin_obj_format, DownloadAdminMixin
+from poleno.utils.admin import admin_obj_format
 
 from .models import (AttachmentNormalization, AttachmentRecognition, AttachmentAnonymization,
                      AttachmentFinalization)
