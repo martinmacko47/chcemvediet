@@ -253,3 +253,176 @@ class TemplatetagsViewTest(TestCase):
             self.assertEqual(r1.content, u'(/en/language/)(/de/language/)(/fr/language/)')
             self.assertEqual(r2.content, u'(/en/language/)(/de/language/)(/fr/language/)')
             self.assertEqual(r3.content, u'(/en/language/)(/de/language/)(/fr/language/)')
+
+class AmendTemplatetagTest(TestCase):
+    u"""
+    Tests ``amend`` and ``append`` template tags.
+    """
+
+    def _render(self, template, **context):
+        return Template(template).render(Context(context))
+
+
+    def test_prepend_tag(self):
+        rendered = self._render(
+                u'{% load amend prepend from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>aaa</li>'
+                u'    <li>bbb</li>'
+                u'  </ul>'
+                u'  {% prepend path=".//ul" %}<li>xxx</li>{% endprepend %}'
+                u'  {% prepend path=".//li" %}!{% endprepend %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>!xxx</li>'
+                u'  <li>!aaa</li>'
+                u'  <li>!bbb</li>'
+                u'</ul>'
+                u'')
+
+    def test_append_tag(self):
+        rendered = self._render(
+                u'{% load amend append from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>aaa</li>'
+                u'    <li>bbb</li>'
+                u'  </ul>'
+                u'  {% append path=".//ul" %}<li>xxx</li>{% endappend %}'
+                u'  {% append path=".//li" %}!{% endappend %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>aaa!</li>'
+                u'  <li>bbb!</li>'
+                u'  <li>xxx!</li>'
+                u'</ul>'
+                u'')
+
+    def test_before_tag(self):
+        rendered = self._render(
+                u'{% load amend before from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>aaa</li>'
+                u'    <li>bbb</li>'
+                u'    <li>ccc</li>'
+                u'  </ul>'
+                u'  {% before path=".//li[2]" %}<li>xxx</li>{% endbefore %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>aaa</li>'
+                u'  <li>xxx</li>'
+                u'  <li>bbb</li>'
+                u'  <li>ccc</li>'
+                u'</ul>'
+                u'')
+
+    def test_after_tag(self):
+        rendered = self._render(
+                u'{% load amend after from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>aaa</li>'
+                u'    <li>bbb</li>'
+                u'    <li>ccc</li>'
+                u'  </ul>'
+                u'  {% after path=".//li[2]" %}<li>xxx</li>{% endafter %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>aaa</li>'
+                u'  <li>bbb</li>'
+                u'  <li>xxx</li>'
+                u'  <li>ccc</li>'
+                u'</ul>'
+                u'')
+
+    def test_delete_tag(self):
+        rendered = self._render(
+                u'{% load amend delete from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>aaa</li>'
+                u'    <li>bbb</li>'
+                u'    <li>ccc</li>'
+                u'  </ul>'
+                u'  {% delete path=".//li[2]" %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>aaa</li>'
+                u'  <li>ccc</li>'
+                u'</ul>'
+                u'')
+
+    def test_amend_tag_on_plain_text(self):
+        rendered = self._render(
+                u'{% load amend prepend append from poleno.amend %}'
+                u'{% amend %}'
+                u'  aaa bbb ccc'
+                u'  {% prepend path="." %}xxx{% endprepend %}'
+                u'  {% append path="." %}yyy{% endappend %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered, u'xxx aaa bbb ccc yyy')
+
+    def test_amend_tag_on_multiple_tags(self):
+        rendered = self._render(
+                u'{% load amend prepend append from poleno.amend %}'
+                u'{% amend %}'
+                u'  <p>aaa</p>'
+                u'  <p>bbb</p>'
+                u'  <p>ccc</p>'
+                u'  {% prepend path="." %}<p>xxx</p>{% endprepend %}'
+                u'  {% append path="." %}<p>yyy</p>{% endappend %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<p>xxx</p>'
+                u'<p>aaa</p>'
+                u'<p>bbb</p>'
+                u'<p>ccc</p>'
+                u'<p>yyy</p>'
+                u'')
+
+    def test_multiple_amend_tags(self):
+        rendered = self._render(
+                u'{% load amend prepend append from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>aaa</li>'
+                u'    <li>bbb</li>'
+                u'  </ul>'
+                u'  {% prepend path=".//ul" %}<li>xxx</li>{% endprepend %}'
+                u'  {% prepend path=".//li" %}!{% endprepend %}'
+                u'{% endamend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>aaa</li>'
+                u'    <li>bbb</li>'
+                u'  </ul>'
+                u'  {% append path=".//ul" %}<li>xxx</li>{% endappend %}'
+                u'  {% append path=".//li" %}!{% endappend %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>!xxx</li>'
+                u'  <li>!aaa</li>'
+                u'  <li>!bbb</li>'
+                u'</ul>'
+                u'<ul>'
+                u'  <li>aaa!</li>'
+                u'  <li>bbb!</li>'
+                u'  <li>xxx!</li>'
+                u'</ul>'
+                u'')
