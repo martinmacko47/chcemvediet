@@ -4,15 +4,15 @@ import json
 import mock
 import contextlib
 
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.test import TestCase
-from django.test.utils import override_settings, patch_logger
+from django.test.utils import patch_logger
 
 from poleno.utils.misc import Bunch
 from poleno.utils.test import override_signals, created_instances, patch_with_exception, ViewTestCaseMixin
+from poleno.utils.urls import reverse
 
 from . import MailTestCaseMixin
 from ..models import Message, Recipient

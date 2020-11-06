@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from poleno.utils.urls import reverse
+
 from ..timewarp import timewarp
+
 
 class TimewarpAdminTest(TestCase):
     u"""

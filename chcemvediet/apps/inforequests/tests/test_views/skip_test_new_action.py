@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 import json
 
-from django.core.urlresolvers import reverse
-
 from poleno.timewarp import timewarp
 from poleno.mail.models import Message
 from poleno.utils.date import local_datetime_from_local, naive_date
 from poleno.utils.misc import Bunch
 from poleno.utils.test import created_instances
+from poleno.utils.urls import reverse
 
 from . import CustomTestCase
 from ... import forms
@@ -16,6 +15,7 @@ from ...models import Action
 from .common_tests import CommonDecoratorsTests, CanAddActionTests, OwnedNotClosedInforequestArgTests
 from .common_tests import AddSmailAndNewActionCommonTests
 from .fields_tests import DraftBranchFieldTests, DraftSubjectContentAttachmentsFieldsTests
+
 
 class NewActionTests(
         CommonDecoratorsTests,

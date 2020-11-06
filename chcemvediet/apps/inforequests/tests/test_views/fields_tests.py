@@ -3,14 +3,14 @@
 import re
 import json
 
-from django.core.urlresolvers import reverse
-
 from poleno.timewarp import timewarp
 from poleno.utils.date import local_datetime_from_local, local_today, naive_date
 from poleno.utils.test import created_instances
+from poleno.utils.urls import reverse
 
 from . import AbstractTests
 from ...models import Action, ActionDraft
+
 
 class FieldsTests(AbstractTests):
     form_class = None

@@ -6,7 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 
 from poleno.attachments.forms import AttachmentsField
-from poleno.workdays import workdays
 from poleno.utils.models import after_saved
 from poleno.utils.urls import reverse
 from poleno.utils.forms import CompositeTextField, PrefixedForm

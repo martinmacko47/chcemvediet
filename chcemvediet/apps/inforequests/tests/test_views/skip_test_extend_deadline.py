@@ -3,13 +3,13 @@
 import json
 import mock
 
-from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 
 from poleno.timewarp import timewarp
 from poleno.utils.date import local_datetime_from_local
 from poleno.utils.misc import Bunch
 from poleno.utils.test import patch_with_exception
+from poleno.utils.urls import reverse
 
 from ...forms import ExtendDeadlineForm
 from ...models import Action

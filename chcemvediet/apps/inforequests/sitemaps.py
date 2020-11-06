@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
 from django.contrib.sitemaps import Sitemap
 from django.db.models import Max
 from django.utils.http import urlencode

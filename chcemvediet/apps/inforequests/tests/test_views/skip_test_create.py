@@ -3,16 +3,16 @@
 import re
 import mock
 
-from django.core.urlresolvers import reverse
-from django.utils.encoding import force_text
 from django.test import TestCase
 
 from poleno.mail.models import Message
 from poleno.utils.test import created_instances, patch_with_exception, ViewTestCaseMixin
+from poleno.utils.urls import reverse
 
 from .. import InforequestsTestCaseMixin
 from ... import forms
 from ...models import InforequestDraft, Inforequest, Action
+
 
 class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
     u"""
