@@ -16,8 +16,7 @@ from poleno.mail.models import Message, Recipient
 from poleno.utils.date import local_today, utc_now
 
 from ..apps.geounits.models import Region, District, Municipality, Neighbourhood
-from ..apps.inforequests.models import (Branch, Inforequest, InforequestEmail, InforequestDraft,
-        Action)
+from ..apps.inforequests.models import Branch, Inforequest, InforequestEmail, InforequestDraft, Action
 from ..apps.obligees.models import Obligee, ObligeeTag, ObligeeGroup, ObligeeAlias
 
 
