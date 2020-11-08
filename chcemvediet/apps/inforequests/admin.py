@@ -1,11 +1,14 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import datetime
+
 from django.contrib import admin
 from django.contrib.admin.utils import NestedObjects
 from django.db import router
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
 
+from poleno.utils.date import local_today
 from poleno.utils.misc import decorate, squeeze
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
                                 ReadOnlyAdminInlineMixin, NoBulkDeleteAdminMixin)
@@ -370,6 +373,7 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
     inlines = [
             BranchInline,
             ]
+    delete_confirmation_template = u'inforequests/admin/action_delete_confirmation.html'
 
     def get_queryset(self, request):
         queryset = super(ActionAdmin, self).get_queryset(request)
@@ -397,3 +401,11 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
                 may cause logical errors in the inforequest history.
                 """)))
         return super(ActionAdmin, self).render_delete_form(request, context)
+
+    def delete_model(self, request, obj):
+        if request.POST:
+            if request.POST.get(u'snooze'):
+                previous = obj.previous_action
+                previous.snooze = local_today() + datetime.timedelta(days=7)
+                previous.save(update_fields=[u'snooze'])
+        return super(ActionAdmin, self).delete_model(request, obj)

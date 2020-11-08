@@ -1,0 +1,13 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load amend prepend from poleno.amend %}
+
+{% block content %}
+  {% amend %}
+    {{ block.super }}
+    {% if object.type == object.TYPES.EXPIRATION or object.type == object.TYPES.APPEAL_EXPIRATION %}
+      {% prepend path=".//form" %}
+        <label><input name="snooze" type="checkbox" />Extend snooze of previous action.</label>
+      {% endprepend %}
+    {% endif %}
+  {% endamend %}
+{% endblock %}
