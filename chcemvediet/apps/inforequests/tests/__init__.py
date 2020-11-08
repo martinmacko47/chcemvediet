@@ -4,25 +4,22 @@ import mock
 import contextlib
 from testfixtures import TempDirectory
 
-from django.core.files.base import ContentFile
 from django.db import connection
-from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.contrib.sessions.models import Session
 from django.test import TestCase
 from django.test.utils import override_settings, CaptureQueriesContext
 
 from poleno.timewarp import timewarp
-from poleno.attachments.models import Attachment
 from poleno.mail.models import Message, Recipient
-from poleno.utils.date import utc_now, local_today
 from chcemvediet.apps.obligees.models import Obligee
+from chcemvediet.tests import ChcemvedietTestCaseMixin
 
-from ..models import InforequestDraft, Inforequest, InforequestEmail, Branch, Action, ActionDraft
+from ..models import Inforequest, InforequestEmail, Branch, Action
 
-class InforequestsTestCaseMixin(TestCase):
+
+class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin, TestCase):
 
     @contextlib.contextmanager
     def assertQueriesDuringRender(self, *patterns, **kwargs):
@@ -90,104 +87,6 @@ class InforequestsTestCaseMixin(TestCase):
         timewarp.reset()
         super(InforequestsTestCaseMixin, self)._post_teardown()
 
-
-    def _call_with_defaults(self, func, kwargs, defaults):
-        omit = kwargs.pop(u'omit', [])
-        defaults.update(kwargs)
-        for key in omit:
-            defaults.pop(key, None)
-        return func(**defaults)
-
-    def _create_user(self, **kwargs):
-        try:
-            tag = u'%s' % (User.objects.latest('pk').pk + 1)
-        except User.DoesNotExist:
-            tag = u'1'
-        street = kwargs.pop(u'street', u'Default User Street')
-        city = kwargs.pop(u'city', u'Default User City')
-        zip = kwargs.pop(u'zip', u'00000')
-        email_verified = kwargs.pop(u'email_verified', True)
-        user = self._call_with_defaults(User.objects.create_user, kwargs, {
-                u'username': 'default_testing_username_%s' % tag,
-                u'first_name': 'Default Testing First Name',
-                u'last_name': 'Default Testing Last Name',
-                u'email': 'default_testing_mail_%s@a.com' % tag,
-                u'password': 'default_testing_secret',
-                })
-        user.profile.street = street
-        user.profile.city = city
-        user.profile.zip = zip
-        user.profile.save()
-        if email_verified:
-            user.emailaddress_set.create(email=user.email, verified=True)
-        return user
-
-    def _login_user(self, user=None, password=u'default_testing_secret'):
-        if user is None:
-            user = self.user1
-        self.client.login(username=user.username, password=password)
-
-    def _logout_user(self):
-        self.client.logout()
-
-    def _get_session(self):
-        if hasattr(self.client.session, u'session_key'):
-            return Session.objects.get(session_key=self.client.session.session_key)
-        return None
-
-    def _create_obligee(self, **kwargs):
-        return self._call_with_defaults(Obligee.objects.create, kwargs, {
-                u'name': u'Default Testing Name',
-                u'street': u'Default Testing Street',
-                u'city': u'Default Testing City',
-                u'zip': u'00000',
-                u'emails': u'default_testing_mail@example.com',
-                u'status': Obligee.STATUSES.PENDING,
-                })
-
-    def _create_attachment(self, **kwargs):
-        content = kwargs.pop(u'content', u'Default Testing Content')
-        return self._call_with_defaults(Attachment.objects.create, kwargs, {
-                u'generic_object': self._get_session(),
-                u'file': ContentFile(content, name=u'filename.txt'),
-                u'name': u'filename.txt',
-                u'content_type': u'text/plain',
-                })
-
-    def _create_recipient(self, **kwargs):
-        return self._call_with_defaults(Recipient.objects.create, kwargs, {
-            u'name': u'Default Testing Name',
-            u'mail': u'default_testing_mail@example.com',
-            u'type': Recipient.TYPES.TO,
-            u'status': Recipient.STATUSES.INBOUND,
-            u'status_details': u'',
-            u'remote_id': u'',
-            })
-
-    def _create_message(self, **kwargs):
-        return self._call_with_defaults(Message.objects.create, kwargs, {
-            u'type': Message.TYPES.OUTBOUND,
-            u'processed': utc_now(),
-            u'from_name': u'Default Testing From Name',
-            u'from_mail': u'default_testing_from_mail@example.com',
-            u'received_for': u'default_testing_for_mail@example.com',
-            u'subject': u'Default Testing Subject',
-            u'text': u'Default Testing Text Content',
-            u'html': u'<html><body>Default Testing HTML Content</body></html>',
-            })
-
-    def _create_inforequest_draft(self, **kwargs):
-        return self._call_with_defaults(InforequestDraft.objects.create, kwargs, {
-                u'applicant': self.user1,
-                u'obligee': self.obligee1,
-                u'subject': [u'Default Testing Subject'],
-                u'content': [u'Default Testing Content'],
-                })
-
-    def _create_inforequest(self, **kwargs):
-        return self._call_with_defaults(Inforequest.objects.create, kwargs, {
-                u'applicant': self.user1,
-                })
 
     def _create_inforequest_scenario__action(self, inforequest, branch, args):
         action_name = args.pop(0)
@@ -280,45 +179,3 @@ class InforequestsTestCaseMixin(TestCase):
         inforequest = Inforequest.objects.create(applicant=applicant, **extra)
         branch, actions = self._create_inforequest_scenario__branch(inforequest, obligee, None, u'request', args)
         return inforequest, branch, actions
-
-    def _create_inforequest_email(self, **kwargs):
-        create = object()
-
-        relargs = {
-                u'inforequest': kwargs.pop(u'inforequest', None),
-                u'type': kwargs.pop(u'reltype', InforequestEmail.TYPES.UNDECIDED),
-                u'email': kwargs.pop(u'email', create),
-                }
-
-        omit = kwargs.get(u'omit', [])
-        for kwarg, relarg in ((u'inforequest', u'inforequest'), (u'reltype', u'type'), (u'email', u'email')):
-            if kwarg in omit:
-                relargs.pop(relarg)
-                omit.remove(kwarg)
-
-        if relargs.get(u'email') is create:
-            relargs[u'email'] = self._create_message(**kwargs)
-
-        rel = InforequestEmail.objects.create(**relargs)
-        email = relargs.get(u'email')
-        return email, rel
-
-    def _create_branch(self, **kwargs):
-        return self._call_with_defaults(Branch.objects.create, kwargs, {
-                u'obligee': self.obligee1,
-                })
-
-    def _create_action(self, **kwargs):
-        return self._call_with_defaults(Action.objects.create, kwargs, {
-                u'type': Action.TYPES.REQUEST,
-                u'subject': u'Default Testing Subject',
-                u'content': u'Default Testing Content',
-                u'effective_date': local_today(),
-                })
-
-    def _create_action_draft(self, **kwargs):
-        return self._call_with_defaults(ActionDraft.objects.create, kwargs, {
-                u'type': ActionDraft.TYPES.REQUEST,
-                u'subject': u'Default Testing Subject',
-                u'content': u'Default Testing Content',
-                })
