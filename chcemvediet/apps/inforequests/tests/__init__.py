@@ -106,7 +106,7 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin, TestCase):
                 else:
                     default_mail_type = Message.TYPES.INBOUND
                     default_rel_type = InforequestEmail.TYPES.OBLIGEE_ACTION
-                    default_from_name, default_from_mail = next(branch.obligee.emails_parsed)
+                    default_from_name, default_from_mail = next(iter(branch.obligee.emails_parsed))
                     default_recipients = [{u'mail': inforequest.applicant.email}]
                     default_recipient_status = Recipient.STATUSES.INBOUND
 

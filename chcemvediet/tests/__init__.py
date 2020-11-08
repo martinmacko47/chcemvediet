@@ -254,13 +254,22 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _create_action(self, **kwargs):
         return self._call_with_defaults(Action.objects.create, kwargs, {
                 u'branch': self.branch,
-                u'email': self.message,
+                u'email': None,
                 u'type': Action.TYPES.REQUEST,
                 u'subject': u'Default Testing Subject',
                 u'content': u'Default Testing Content',
-                u'legal_date': local_today(),
+                u'content_type': Action.CONTENT_TYPES.PLAIN_TEXT,
+                u'file_number': u'',
+                u'created': utc_now(),
+                u'sent_date': local_today(),
                 u'delivered_date': local_today(),
-                })
+                u'legal_date': local_today(),
+                u'extension': None,
+                u'snooze': None,
+                u'disclosure_level': None,
+                u'refusal_reason': None,
+                u'last_deadline_reminder': None,
+        })
 
     def _render(self, template, **context):
         return Template(template).render(Context(context))
