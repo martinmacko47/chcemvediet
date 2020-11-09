@@ -32,8 +32,8 @@ def _combine_parts(parent, parts):
 @register.simple_pair_tag(takes_context=True)
 def amend(content, context):
     u"""
-    Edit a snippet of HTML by parsing it, manipulating its element tree and exporting it back to string.
-    Usefull to make changes in opaque template snippets from external libraries.
+    Edit a snippet of HTML by parsing it, manipulating its element tree and exporting it back to
+    string. Usefull to make changes in opaque template snippets from external libraries.
 
     Example:
         {% amend %}
@@ -56,8 +56,8 @@ def amend(content, context):
 @register.simple_pair_tag(takes_context=True)
 def prepend(content, context, path):
     u"""
-    Select elements specified by XPath and insert `content` as child elements at the beginning of each of them. If
-    the element begins with a text, the content in inserted before the text.
+    Select elements specified by XPath and insert `content` as child elements at the beginning of
+    each of them. If the element begins with a text, the content in inserted before the text.
 
     Example:
         {% amend %}
@@ -93,8 +93,8 @@ def prepend(content, context, path):
 @register.simple_pair_tag(takes_context=True)
 def append(content, context, path):
     u"""
-    Select elements specified by XPath and insert `content` as child elements at the eand of each of them. If the
-    element ends with a text, the content in inserted after the text.
+    Select elements specified by XPath and insert `content` as child elements at the eand of each of
+    them. If the element ends with a text, the content in inserted after the text.
 
     Example:
         {% amend %}
@@ -130,8 +130,8 @@ def append(content, context, path):
 @register.simple_pair_tag(takes_context=True)
 def before(content, context, path):
     u"""
-    Select elements specified by XPath and insert `content` as sibling elements before each of them. If the element
-    has a text before it, the content in inserted between the text and the element.
+    Select elements specified by XPath and insert `content` as sibling elements before each of them.
+    If the element has a text before it, the content in inserted between the text and the element.
 
     Example:
         {% amend %}
@@ -162,7 +162,8 @@ def before(content, context, path):
             index = parent.index(element)
             parent_parts = _flatten_parts(parent)
             subtree_parts = _flatten_parts(subtree)
-            _combine_parts(parent, parent_parts[0:2*index+1] + subtree_parts + parent_parts[2*index+1:])
+            _combine_parts(parent,
+                    parent_parts[0:2*index+1] + subtree_parts + parent_parts[2*index+1:])
         return fragment
 
     context[u'_amend'].append(action)
@@ -171,8 +172,8 @@ def before(content, context, path):
 @register.simple_pair_tag(takes_context=True)
 def after(content, context, path):
     u"""
-    Select elements specified by XPath and insert `content` as sibling elements after each of them. If the element
-    has a text after it, the content in inserted between the element and the text.
+    Select elements specified by XPath and insert `content` as sibling elements after each of them.
+    If the element has a text after it, the content in inserted between the element and the text.
 
     Example:
         {% amend %}
@@ -203,7 +204,8 @@ def after(content, context, path):
             index = parent.index(element)
             parent_parts = _flatten_parts(parent)
             subtree_parts = _flatten_parts(subtree)
-            _combine_parts(parent, parent_parts[0:2*index+2] + subtree_parts + parent_parts[2*index+2:])
+            _combine_parts(parent,
+                    parent_parts[0:2*index+2] + subtree_parts + parent_parts[2*index+2:])
         return fragment
 
     context[u'_amend'].append(action)
@@ -212,8 +214,8 @@ def after(content, context, path):
 @register.simple_tag(takes_context=True)
 def delete(context, path):
     u"""
-    Select elements specified by XPath and delete them together with their child elements. Any texts before and
-    after deleted elements is preserved.
+    Select elements specified by XPath and delete them together with their child elements. Any texts
+    before and after deleted elements is preserved.
 
     Example:
         {% amend %}
