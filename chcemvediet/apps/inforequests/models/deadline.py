@@ -61,7 +61,7 @@ class Deadline(FormatMixin, object):
 
     @cached_property
     def workdays_passed(self):
-        return self.workdays_passed(self._today)
+        return self.workdays_passed_at(self._today)
 
     def workdays_passed_at(self, at):
         return workdays.between(self.base_date, at)
@@ -152,12 +152,11 @@ class Deadline(FormatMixin, object):
     def is_snooze_missed_at(self, at):
         return self.snooze_date < at
 
-
     def __unicode__(self):
         return u'{} {} for {} since {}{}'.format(
                 self.value,
                 u'CD' if self.is_in_calendar_days else u'WD',
-                u'Applicant' if self.is_obligee_deadline else u'Obligee',
+                u'Applicant' if self.is_applicant_deadline else u'Obligee',
                 self.base_date,
                 u' +{0} CD'.format(self.snooze_in_calendar_days)
                     if self.snooze_date != self.deadline_date else u'',
