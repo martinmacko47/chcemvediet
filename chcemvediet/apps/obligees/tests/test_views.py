@@ -4,7 +4,6 @@ import random
 import json
 
 from django.http import JsonResponse
-from django.test import TestCase
 
 from poleno.utils.test import ViewTestCaseMixin
 from poleno.utils.urls import reverse
@@ -14,7 +13,7 @@ from ..constants import OBLIGEES_PER_PAGE
 from ..models import Obligee
 
 
-class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
+class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin):
     u"""
     Tests ``index()`` view registered as "obligees:index".
     """
@@ -67,7 +66,7 @@ class IndexViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertEqual(repr(response.context[u'obligee_page']), u'<Page 1 of 1>')
         self.assertEqual(list(response.context[u'obligee_page']), [])
 
-class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin, TestCase):
+class AutocompleteViewTest(ChcemvedietTestCaseMixin, ViewTestCaseMixin):
     u"""
     Tests ``autocomplete()`` view registered as "obligees:autocomplete".
     """

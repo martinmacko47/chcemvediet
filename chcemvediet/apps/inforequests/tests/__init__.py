@@ -8,7 +8,6 @@ from django.db import connection
 from django.template.loader import render_to_string
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.test.utils import override_settings, CaptureQueriesContext
 
 from poleno.timewarp import timewarp
@@ -19,7 +18,7 @@ from chcemvediet.tests import ChcemvedietTestCaseMixin
 from ..models import Inforequest, InforequestEmail, Branch, Action
 
 
-class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin, TestCase):
+class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
 
     @contextlib.contextmanager
     def assertQueriesDuringRender(self, *patterns, **kwargs):
@@ -77,9 +76,9 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin, TestCase):
 
         self.user1 = self._create_user()
         self.user2 = self._create_user()
-        self.obligee1 = self._create_obligee(name=u'Default Testing Name 1')
-        self.obligee2 = self._create_obligee(name=u'Default Testing Name 2')
-        self.obligee3 = self._create_obligee(name=u'Default Testing Name 3')
+        self.obligee1 = self._create_obligee()
+        self.obligee2 = self._create_obligee()
+        self.obligee3 = self._create_obligee()
 
     def _post_teardown(self):
         self.settings_override.disable()
@@ -106,7 +105,7 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin, TestCase):
                 else:
                     default_mail_type = Message.TYPES.INBOUND
                     default_rel_type = InforequestEmail.TYPES.OBLIGEE_ACTION
-                    default_from_name, default_from_mail = next(iter(branch.obligee.emails_parsed))
+                    default_from_name, default_from_mail = branch.obligee.emails_parsed[0]
                     default_recipients = [{u'mail': inforequest.applicant.email}]
                     default_recipient_status = Recipient.STATUSES.INBOUND
 

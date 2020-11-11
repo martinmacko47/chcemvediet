@@ -56,19 +56,6 @@ class ChcemvedietTestCaseMixin(TestCase):
         self.action = self._create_action()
 
 
-    def _login_user(self, user=None, password=u'default_testing_secret'):
-        if user is None:
-            user = self.user
-        self.client.login(username=user.username, password=password)
-
-    def _logout_user(self):
-        self.client.logout()
-
-    def _get_session(self):
-        if hasattr(self.client.session, u'session_key'):
-            return Session.objects.get(session_key=self.client.session.session_key)
-        return None
-
     def _call_with_defaults(self, func, kwargs, defaults):
         omit = kwargs.pop(u'omit', [])
         defaults.update(kwargs)
@@ -96,6 +83,50 @@ class ChcemvedietTestCaseMixin(TestCase):
         if email_verified:
             user.emailaddress_set.create(email=user.email, verified=True)
         return user
+
+    def _login_user(self, user=None, password=u'default_testing_secret'):
+        if user is None:
+            user = self.user
+        self.client.login(username=user.username, password=password)
+
+    def _logout_user(self):
+        self.client.logout()
+
+    def _get_session(self):
+        if hasattr(self.client.session, u'session_key'):
+            return Session.objects.get(session_key=self.client.session.session_key)
+        return None
+
+    def _create_attachment(self, **kwargs):
+        content = kwargs.pop(u'content', u'Default Testing Content')
+        return self._call_with_defaults(Attachment.objects.create, kwargs, {
+                u'generic_object': self._get_session(),
+                u'file': ContentFile(content, name=u'filename.txt'),
+                u'name': u'filename.txt',
+                })
+
+    def _create_message(self, **kwargs):
+        return self._call_with_defaults(Message.objects.create, kwargs, {
+            u'type': Message.TYPES.OUTBOUND,
+            u'processed': utc_now(),
+            u'from_name': u'Default Testing From Name',
+            u'from_mail': u'default_testing_from_mail@example.com',
+            u'received_for': u'default_testing_for_mail@example.com',
+            u'subject': u'Default Testing Subject',
+            u'text': u'Default Testing Text Content',
+            u'html': u'<html><body>Default Testing HTML Content</body></html>',
+            })
+
+    def _create_recipient(self, **kwargs):
+        return self._call_with_defaults(Recipient.objects.create, kwargs, {
+            u'message': self.message,
+            u'name': u'Default Testing Name',
+            u'mail': u'default_testing_mail@example.com',
+            u'type': Recipient.TYPES.TO,
+            u'status': Recipient.STATUSES.UNDEFINED,
+            u'status_details': u'',
+            u'remote_id': u'',
+            })
 
     def _create_region(self, **kwargs):
         name = u'SK{:05d}'.format(self.counter.next())
@@ -178,38 +209,6 @@ class ChcemvedietTestCaseMixin(TestCase):
                 u'description': u'Default testing description.',
                 u'notes': u'Default testing notes.',
                 })
-
-    def _create_attachment(self, **kwargs):
-        content = kwargs.pop(u'content', u'Default Testing Content')
-        return self._call_with_defaults(Attachment.objects.create, kwargs, {
-                u'generic_object': self._get_session(),
-                u'file': ContentFile(content, name=u'filename.txt'),
-                u'name': u'filename.txt',
-                u'content_type': u'text/plain',
-                })
-
-    def _create_message(self, **kwargs):
-        return self._call_with_defaults(Message.objects.create, kwargs, {
-            u'type': Message.TYPES.OUTBOUND,
-            u'processed': utc_now(),
-            u'from_name': u'Default Testing From Name',
-            u'from_mail': u'default_testing_from_mail@example.com',
-            u'received_for': u'default_testing_for_mail@example.com',
-            u'subject': u'Default Testing Subject',
-            u'text': u'Default Testing Text Content',
-            u'html': u'<html><body>Default Testing HTML Content</body></html>',
-            })
-
-    def _create_recipient(self, **kwargs):
-        return self._call_with_defaults(Recipient.objects.create, kwargs, {
-            u'message': self.message,
-            u'name': u'Default Testing Name',
-            u'mail': u'default_testing_mail@example.com',
-            u'type': Recipient.TYPES.TO,
-            u'status': Recipient.STATUSES.INBOUND,
-            u'status_details': u'',
-            u'remote_id': u'',
-            })
 
     def _create_inforequest_draft(self, **kwargs):
         return self._call_with_defaults(InforequestDraft.objects.create, kwargs, {
