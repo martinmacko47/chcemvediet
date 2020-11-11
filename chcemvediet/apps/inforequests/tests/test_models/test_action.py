@@ -29,8 +29,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
     """
 
     def test_branch_field(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
+        branch = self._create_branch()
         action = self._create_action(branch=branch)
         self.assertEqual(action.branch, branch)
 
@@ -39,16 +38,12 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             self._create_action(omit=[u'branch'])
 
     def test_email_field(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         email = self._create_message()
-        action = self._create_action(branch=branch, email=email)
+        action = self._create_action(email=email)
         self.assertEqual(action.email, email)
 
     def test_email_field_default_value_if_omitted(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, omit=[u'email'])
+        action = self._create_action(omit=[u'email'])
         self.assertIsNone(action.email)
 
     def test_type_field(self):
@@ -74,30 +69,22 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_action_types = Action.TYPES._inverse.keys()
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         for action_type, expected_display in tests:
-            action = self._create_action(branch=branch, type=action_type)
+            action = self._create_action(type=action_type)
             self.assertEqual(action.type, action_type)
             self.assertEqual(action.get_type_display(), expected_display)
 
     def test_type_field_may_not_be_null(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_action.type'):
-            self._create_action(branch=branch, omit=[u'type'])
+            self._create_action(omit=[u'type'])
 
     def test_subject_and_content_fields(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, subject=u'Subject', content=u'Content')
+        action = self._create_action(subject=u'Subject', content=u'Content')
         self.assertEqual(action.subject, u'Subject')
         self.assertEqual(action.content, u'Content')
 
     def test_subject_and_content_fields_default_values_if_omitted(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, omit=[u'subject', u'content'])
+        action = self._create_action(omit=[u'subject', u'content'])
         self.assertEqual(action.subject, u'')
         self.assertEqual(action.content, u'')
 
@@ -121,17 +108,13 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(action.content_type, Action.CONTENT_TYPES.PLAIN_TEXT)
 
     def test_attachment_set_relation(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch)
+        action = self._create_action()
         attachment1 = self._create_attachment(generic_object=action)
         attachment2 = self._create_attachment(generic_object=action)
         self.assertItemsEqual(action.attachment_set.all(), [attachment1, attachment2])
 
     def test_attachment_set_relation_empty_by_default(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch)
+        action = self._create_action()
         self.assertItemsEqual(action.attachment_set.all(), [])
 
     def test_file_number_field(self):
@@ -170,16 +153,12 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertIsNone(action.delivered_date)
 
     def test_legal_date_field(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, legal_date=naive_date(u'2010-10-05'))
+        action = self._create_action(legal_date=naive_date(u'2010-10-05'))
         self.assertEqual(action.legal_date, naive_date(u'2010-10-05'))
 
     def test_legal_date_field_may_not_be_null(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_action.legal_date'):
-            self._create_action(branch=branch, omit=[u'legal_date'])
+            self._create_action(omit=[u'legal_date'])
 
     def test_snooze_field(self):
         date = naive_date(u'2010-10-05')
@@ -217,17 +196,13 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_action_types = Action.TYPES._inverse.keys()
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         for action_type, expected_deadline, extra_args in tests:
-            previous = self._create_action(branch=branch, type=Action.TYPES.REQUEST, delivered_date=delivered_date)  # Deadline for CONFIRMATION, EXTENSION
-            action = self._create_action(branch=branch, type=action_type, delivered_date=delivered_date, legal_date=legal_date, **extra_args)
+            previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=delivered_date)  # Deadline for CONFIRMATION, EXTENSION
+            action = self._create_action(type=action_type, delivered_date=delivered_date, legal_date=legal_date, **extra_args)
             self.assertEqual(repr(action.deadline), repr(expected_deadline))
 
     def test_deadline_field_is_not_changed_if_saving_existing_instance(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch)
+        action = self._create_action()
         deadline = action.deadline
         action.subject = u'Changed'
         action.save()
@@ -235,15 +210,11 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(repr(action.deadline), repr(deadline))
 
     def test_extension_field(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, extension=3)
+        action = self._create_action(extension=3)
         self.assertEqual(action.extension, 3)
 
     def test_extension_field_default_value_if_omitted(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, omit=[u'extension'])
+        action = self._create_action(omit=[u'extension'])
         self.assertIsNone(action.extension)
 
     def test_disclosure_level_field(self):
@@ -257,17 +228,13 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_disclosure_levels = Action.DISCLOSURE_LEVELS._inverse.keys()
         self.assertItemsEqual(tested_disclosure_levels, defined_disclosure_levels)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         for disclosure_level, expected_display in tests:
-            action = self._create_action(branch=branch, disclosure_level=disclosure_level)
+            action = self._create_action(disclosure_level=disclosure_level)
             self.assertEqual(action.disclosure_level, disclosure_level)
             self.assertEqual(action.get_disclosure_level_display(), expected_display)
 
     def test_disclosure_level_field_default_value_if_omitted(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, omit=[u'disclosure_level'])
+        action = self._create_action(omit=[u'disclosure_level'])
         self.assertIsNone(action.disclosure_level)
 
     def test_refusal_reason_field(self):
@@ -286,30 +253,22 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_refusal_reasons = Action.REFUSAL_REASONS._inverse.keys()
         self.assertItemsEqual(tested_refusal_reasons, defined_refusal_reasons)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         for refusal_reason, expected_display in tests:
-            action = self._create_action(branch=branch, refusal_reason=refusal_reason)
+            action = self._create_action(refusal_reason=refusal_reason)
             self.assertEqual(action.refusal_reason, [refusal_reason])
             self.assertEqual(action.get_refusal_reason_display(), expected_display)
 
     def test_refusal_reason_field_default_value_if_omitted(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, omit=[u'refusal_reason'])
+        action = self._create_action(omit=[u'refusal_reason'])
         self.assertIsNone(action.refusal_reason)
 
     def test_last_deadline_reminder_field(self):
         dt = local_datetime_from_local(u'2014-10-05 10:33:00')
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, last_deadline_reminder=dt)
+        action = self._create_action(last_deadline_reminder=dt)
         self.assertEqual(action.last_deadline_reminder, dt)
 
     def test_last_deadline_reminder_field_default_value_if_omitted(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch, omit=[u'last_deadline_reminder'])
+        action = self._create_action(omit=[u'last_deadline_reminder'])
         self.assertIsNone(action.last_deadline_reminder)
 
     def test_advanced_to_set_relation(self):
@@ -321,15 +280,12 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertItemsEqual(result, [p1, p2, p3, p4])
 
     def test_advanced_to_set_relation_empty_by_default(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch)
+        action = self._create_action()
         result = action.advanced_to_set.all()
         self.assertItemsEqual(result, [])
 
     def test_branch_action_set_backward_relation(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
+        branch = self._create_branch()
         action1 = self._create_action(branch=branch)
         action2 = self._create_action(branch=branch)
         result = branch.action_set.all()
@@ -354,8 +310,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertFalse(Action.objects.all().ordered)
 
     def test_prefetch_attachments_staticmethod(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
+        branch = self._create_branch()
         action = self._create_action(branch=branch)
         attachment1 = self._create_attachment(generic_object=action)
         attachment2 = self._create_attachment(generic_object=action)
@@ -377,9 +332,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             self.assertEqual(branch.actions[0].attachments[0].moo, 47)
 
     def test_attachments_property(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch)
+        action = self._create_action()
         attachment1 = self._create_attachment(generic_object=action)
         attachment2 = self._create_attachment(generic_object=action)
 
@@ -442,10 +395,8 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_action_types = Action.TYPES._inverse.keys()
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         for action_type, is_applicant, is_obligee, is_implicit in tests:
-            action = self._create_action(branch=branch, type=action_type)
+            action = self._create_action(type=action_type)
             self.assertEqual(action.is_applicant_action, is_applicant)
             self.assertEqual(action.is_obligee_action, is_obligee)
             self.assertEqual(action.is_implicit_action, is_implicit)
@@ -475,9 +426,8 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             self.assertEqual(action.deadline.workdays_remaining_at(local_today()), 3)
 
     def test_deadline_workdays_remaining_property_and_deadline_workdays_remaining_at_method_with_extension(self):
-        branch = self._create_branch()
-        previous = self._create_action(branch=branch, type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
-        with self._test_deadline_missed_aux(branch=branch, type=Action.TYPES.EXTENSION, extension=4) as action:
+        previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
+        with self._test_deadline_missed_aux(type=Action.TYPES.EXTENSION, extension=4) as action:
             self.assertEqual(action.deadline.workdays_remaining, 7)
             self.assertEqual(action.deadline.workdays_remaining_at(local_today()), 7)
 
@@ -497,16 +447,14 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             self.assertTrue(action.deadline.is_deadline_missed_at(local_today()))
 
     def test_deadline_missed_property_and_deadline_missed_at_method_with_extended_missed_deadline(self):
-        branch = self._create_branch()
-        previous = self._create_action(branch=branch, type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-09-29'))
-        with self._test_deadline_missed_aux(branch=branch, type=Action.TYPES.EXTENSION, extension=3) as action:
+        previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-09-29'))
+        with self._test_deadline_missed_aux(type=Action.TYPES.EXTENSION, extension=3) as action:
             self.assertFalse(action.deadline.is_deadline_missed)
             self.assertFalse(action.deadline.is_deadline_missed_at(local_today()))
 
     def test_deadline_missed_property_and_deadline_missed_at_method_with_extended_missed_deadline_missed_again(self):
-        branch = self._create_branch()
-        previous = self._create_action(branch=branch, type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-09-29'))
-        with self._test_deadline_missed_aux(branch=branch, type=Action.TYPES.EXTENSION, extension=2) as action:
+        previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-09-29'))
+        with self._test_deadline_missed_aux(type=Action.TYPES.EXTENSION, extension=2) as action:
             self.assertTrue(action.deadline.is_deadline_missed)
             self.assertTrue(action.deadline.is_deadline_missed_at(local_today()))
 
@@ -535,10 +483,8 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_action_types = Action.TYPES._inverse.keys()
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         for action_type, has_deadline, has_applicant_deadline, has_obligee_deadline, extra_args in tests:
-            action = self._create_action(branch=branch, type=action_type, delivered_date=naive_date(u'2010-10-05'), **extra_args)
+            action = self._create_action(type=action_type, delivered_date=naive_date(u'2010-10-05'), **extra_args)
             self.assertEqual(bool(action.deadline), has_deadline)
             self.assertEqual(action.has_applicant_deadline, has_applicant_deadline)
             self.assertEqual(action.has_obligee_deadline, has_obligee_deadline)
@@ -731,9 +677,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             ])
 
     def test_repr(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        action = self._create_action(branch=branch)
+        action = self._create_action()
         self.assertEqual(repr(action), u'<Action: [{}] {}>'.format(action.pk, action.get_extended_type_display()).encode(encoding=u'utf-8'))
 
     def test_action_type_query_methods(self):
@@ -760,12 +704,10 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_action_types = Action.TYPES._inverse.keys()
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         actions = defaultdict(list)
         for i in range(3):
             for action_type, _ in tests:
-                actions[action_type].append(self._create_action(branch=branch, type=action_type))
+                actions[action_type].append(self._create_action(type=action_type))
 
         for action_type, query_method in tests:
             result = getattr(Action.objects, query_method)()
@@ -795,14 +737,12 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         defined_action_types = Action.TYPES._inverse.keys()
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         applicant_actions = []
         obligee_actions = []
         implicit_actions = []
         for i in range(3):
             for action_type, is_applicant, is_obligee, is_implicit in tests:
-                action = self._create_action(branch=branch, type=action_type)
+                action = self._create_action(type=action_type)
                 if is_applicant:
                     applicant_actions.append(action)
                 if is_obligee:
@@ -842,9 +782,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertItemsEqual(Action.objects.of_inforequest(inforequest), actions)
 
     def test_order_by_pk_query_method(self):
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
-        actions = [self._create_action(branch=branch) for _ in range(20)]
+        actions = [self._create_action() for _ in range(20)]
         sample = random.sample(actions, 10)
         result = Action.objects.filter(pk__in=(d.pk for d in sample)).order_by_pk().reverse()
         self.assertEqual(list(result), sorted(sample, key=lambda d: -d.pk))
@@ -862,11 +800,9 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
                 u'2015-10-05',
                 ]
         random.shuffle(dates)
-        inforequest = self._create_inforequest()
-        branch = self._create_branch(inforequest=inforequest)
         actions = []
         for date in dates:
-            actions.append(self._create_action(branch=branch, created=naive_date(date), subject=u'order_by'))
+            actions.append(self._create_action(created=naive_date(date), subject=u'order_by'))
         result = Action.objects.filter(subject=u'order_by').order_by_created()
         self.assertEqual(list(result), sorted(actions, key=lambda a: (a.created, a.pk)))
 
