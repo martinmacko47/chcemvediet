@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import random
 import mock
+import datetime
 import contextlib
 from collections import defaultdict
 
@@ -12,8 +13,9 @@ from django.utils.translation import ugettext as __
 from poleno.timewarp import timewarp
 from poleno.attachments.models import Attachment
 from poleno.mail.models import Message, Recipient
-from poleno.utils.date import local_datetime_from_local, naive_date, local_today
+from poleno.utils.date import local_datetime_from_local, naive_date, local_today, utc_now
 from poleno.utils.test import created_instances
+from poleno.utils.translation import translation
 from poleno.workdays import workdays
 
 from .. import InforequestsTestCaseMixin
@@ -99,6 +101,25 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(action.subject, u'')
         self.assertEqual(action.content, u'')
 
+    def test_content_type_field(self):
+        tests = (
+            (Action.CONTENT_TYPES.PLAIN_TEXT, u'Plain Text'),
+            (Action.CONTENT_TYPES.HTML, u'HTML'),
+        )
+        # Make sure we are testing all defined action content_types
+        tested_action_content_types = [content_type for content_type, _ in tests]
+        defined_action_content_types = Action.CONTENT_TYPES._inverse.keys()
+        self.assertItemsEqual(defined_action_content_types, tested_action_content_types)
+
+        for content_type, expected_display in tests:
+            action = self._create_action(content_type=content_type)
+            self.assertEqual(action.content_type, content_type)
+            self.assertEqual(action.get_content_type_display(), expected_display)
+
+    def test_content_type_field_default_value_if_omitted(self):
+        action = self._create_action(omit=[u'content_type'])
+        self.assertEqual(action.content_type, Action.CONTENT_TYPES.PLAIN_TEXT)
+
     def test_attachment_set_relation(self):
         inforequest = self._create_inforequest()
         branch = self._create_branch(inforequest=inforequest)
@@ -113,6 +134,41 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         action = self._create_action(branch=branch)
         self.assertItemsEqual(action.attachment_set.all(), [])
 
+    def test_file_number_field(self):
+        action = self._create_action(file_number=u'12345')
+        self.assertEqual(action.file_number, u'12345')
+
+    def test_file_number_field_default_value_if_omitted(self):
+        action = self._create_action(omit=[u'file_number'])
+        self.assertEqual(action.file_number, u'')
+
+    def test_created_field(self):
+        dt = local_datetime_from_local(u'2010-10-05 10:33:00.979899')
+        action = self._create_action(created=dt)
+        self.assertEqual(action.created, dt)
+
+    def test_created_field_default_value_if_omitted(self):
+        action = self._create_action(omit=[u'created'])
+        self.assertAlmostEqual(action.created, utc_now(), delta=datetime.timedelta(seconds=1))
+
+    def test_sent_date_field(self):
+        date = naive_date(u'2010-10-05')
+        action = self._create_action(sent_date=date)
+        self.assertEqual(action.sent_date, date)
+
+    def test_sent_date_field_default_value_if_omitted(self):
+        action = self._create_action(omit=[u'sent_date'])
+        self.assertIsNone(action.sent_date)
+
+    def test_delivered_date_field(self):
+        date = naive_date(u'2010-10-05')
+        action = self._create_action(delivered_date=date)
+        self.assertEqual(action.delivered_date, date)
+
+    def test_delivered_date_field_default_value_if_omitted(self):
+        action = self._create_action(omit=[u'delivered_date'])
+        self.assertIsNone(action.delivered_date)
+
     def test_legal_date_field(self):
         inforequest = self._create_inforequest()
         branch = self._create_branch(inforequest=inforequest)
@@ -124,6 +180,15 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         branch = self._create_branch(inforequest=inforequest)
         with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_action.legal_date'):
             self._create_action(branch=branch, omit=[u'legal_date'])
+
+    def test_snooze_field(self):
+        date = naive_date(u'2010-10-05')
+        action = self._create_action(snooze=date)
+        self.assertEqual(action.snooze, date)
+
+    def test_snooze_field_default_value_if_omitted(self):
+        action = self._create_action(omit=[u'snooze'])
+        self.assertIsNone(action.snooze)
 
     def test_deadline_property(self):
         delivered_date = naive_date(u'2010-10-05')
@@ -332,6 +397,28 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         with self.assertNumQueries(0):
             self.assertEqual(action.attachments, [attachment1, attachment2])
 
+    def test_previous_next_and_is_last_action_properties(self):
+        branch = self._create_branch()
+        first = self._create_action(branch=branch)
+        second = self._create_action(branch=branch)
+        self.assertIsNone(first.previous_action)
+        self.assertEqual(first.next_action, second)
+        self.assertFalse(first.is_last_action)
+        self.assertEqual(second.previous_action, first)
+        self.assertIsNone(second.next_action)
+        self.assertTrue(second.is_last_action)
+
+    def test_action_path_property(self):
+        inforequest, _, _ = self._create_inforequest_scenario(u'confirmation', (u'advancement', [u'extension']), u'appeal')
+        actions = Action.objects.of_inforequest(inforequest).order_by_created()
+        request, confirmation, advancement, advanced_request, extension, appeal = actions
+        self.assertEqual(request.action_path, [request])
+        self.assertEqual(confirmation.action_path, [request, confirmation])
+        self.assertEqual(advancement.action_path, [request, confirmation, advancement])
+        self.assertEqual(advanced_request.action_path, [request, confirmation, advancement, advanced_request])
+        self.assertEqual(extension.action_path, [request, confirmation, advancement, advanced_request, extension])
+        self.assertEqual(appeal.action_path, [request, confirmation, advancement, appeal])
+
     def test_is_applicant_is_obligee_and_is_implicit_action_properties(self):
         tests = (                                   # Applicant, Obligee, Implicit
                 (Action.TYPES.REQUEST,                True,      False,   False),
@@ -362,6 +449,13 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             self.assertEqual(action.is_applicant_action, is_applicant)
             self.assertEqual(action.is_obligee_action, is_obligee)
             self.assertEqual(action.is_implicit_action, is_implicit)
+
+    def test_is_by_email_property(self):
+        email = self._create_message()
+        action1 = self._create_action(email=email)
+        action2 = self._create_action()
+        self.assertTrue(action1.is_by_email)
+        self.assertFalse(action2.is_by_email)
 
     @contextlib.contextmanager
     def _test_deadline_missed_aux(self, **kwargs):
@@ -433,7 +527,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
                 (Action.TYPES.REVERSION,              False, False,     False, dict()),
                 (Action.TYPES.REMANDMENT,             True,  False,     True,  dict()),
                 (Action.TYPES.ADVANCED_REQUEST,       True,  False,     True,  dict()),
-                (Action.TYPES.EXPIRATION,             True,  True,     False, dict()),
+                (Action.TYPES.EXPIRATION,             True,  True,      False, dict()),
                 (Action.TYPES.APPEAL_EXPIRATION,      False, False,     False, dict()),
                 )
         # Make sure we are testing all defined action types
@@ -448,6 +542,65 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             self.assertEqual(bool(action.deadline), has_deadline)
             self.assertEqual(action.has_applicant_deadline, has_applicant_deadline)
             self.assertEqual(action.has_obligee_deadline, has_obligee_deadline)
+
+    def test_has_obligee_deadline_snooze_missed_property(self):
+        with self._test_deadline_missed_aux(type=Action.TYPES.REQUEST, snooze=naive_date(u'2010-10-16')) as action:
+            timewarp.jump(local_datetime_from_local(u'2010-10-16 10:33:00'))
+            self.assertFalse(action.has_obligee_deadline_snooze_missed)
+        with self._test_deadline_missed_aux(type=Action.TYPES.REQUEST, snooze=naive_date(u'2010-10-16')) as action:
+            timewarp.jump(local_datetime_from_local(u'2010-10-17 10:33:00'))
+            self.assertTrue(action.has_obligee_deadline_snooze_missed)
+
+    def test_can_applicant_snooze_property(self):
+        with self._test_deadline_missed_aux(type=Action.TYPES.REQUEST) as action:
+            timewarp.jump(local_datetime_from_local(u'2010-10-13 10:33:00'))
+            self.assertFalse(action.can_applicant_snooze)
+        with self._test_deadline_missed_aux(type=Action.TYPES.REQUEST) as action:
+            timewarp.jump(local_datetime_from_local(u'2010-10-14 10:33:00'))
+            self.assertTrue(action.can_applicant_snooze)
+        with self._test_deadline_missed_aux(type=Action.TYPES.REQUEST) as action:
+            timewarp.jump(local_datetime_from_local(u'2010-10-19 10:33:00'))
+            self.assertFalse(action.can_applicant_snooze)
+
+    def test_get_extended_type_display_property(self):
+        tests = (
+            (Action.TYPES.REQUEST,                __(u'inforequests:Action:type:REQUEST'),                dict()),
+            (Action.TYPES.CLARIFICATION_RESPONSE, __(u'inforequests:Action:type:CLARIFICATION_RESPONSE'), dict()),
+            (Action.TYPES.APPEAL,                 __(u'inforequests:Action:type:APPEAL'),                 dict()),
+            (Action.TYPES.CONFIRMATION,           __(u'inforequests:Action:type:CONFIRMATION'),           dict()),
+            (Action.TYPES.EXTENSION,              __(u'inforequests:Action:type:EXTENSION'),              dict()),
+            (Action.TYPES.ADVANCEMENT,            __(u'inforequests:Action:type:ADVANCEMENT'),            dict()),
+            (Action.TYPES.CLARIFICATION_REQUEST,  __(u'inforequests:Action:type:CLARIFICATION_REQUEST'),  dict()),
+            (Action.TYPES.DISCLOSURE,             __(u'inforequests:Action:type:DISCLOSURE:NONE'),        dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE)),
+            (Action.TYPES.DISCLOSURE,             __(u'inforequests:Action:type:DISCLOSURE:PARTIAL'),     dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL)),
+            (Action.TYPES.DISCLOSURE,             __(u'inforequests:Action:type:DISCLOSURE:FULL'),        dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL)),
+            (Action.TYPES.REFUSAL,                __(u'inforequests:Action:type:REFUSAL'),                dict()),
+            (Action.TYPES.AFFIRMATION,            __(u'inforequests:Action:type:AFFIRMATION'),            dict()),
+            (Action.TYPES.REVERSION,              __(u'inforequests:Action:type:REVERSION'),              dict()),
+            (Action.TYPES.REMANDMENT,             __(u'inforequests:Action:type:REMANDMENT'),             dict()),
+            (Action.TYPES.ADVANCED_REQUEST,       __(u'inforequests:Action:type:ADVANCED_REQUEST'),       dict()),
+            (Action.TYPES.EXPIRATION,             __(u'inforequests:Action:type:EXPIRATION'),             dict()),
+            (Action.TYPES.APPEAL_EXPIRATION,      __(u'inforequests:Action:type:APPEAL_EXPIRATION'),      dict()),
+        )
+        # Make sure we are testing all defined action types
+        tested_action_types = set(a for a, _, _ in tests)
+        defined_action_types = Action.TYPES._inverse.keys()
+        self.assertItemsEqual(tested_action_types, defined_action_types)
+        # Make sure we are testing all defined action disclosure levels
+        tested_disclosure_levels = [a.get(u'disclosure_level') for _, _, a in tests if a.get(u'disclosure_level')]
+        defined_disclosure_levels = Action.DISCLOSURE_LEVELS._inverse.keys()
+        self.assertItemsEqual(defined_disclosure_levels, tested_disclosure_levels)
+
+        for action_type, expected_display, extra_args in tests:
+            action = self._create_action(type=action_type, **extra_args)
+            self.assertEqual(action.get_extended_type_display(), expected_display)
+
+    def test_get_absolute_url_method(self):
+        action = self._create_action()
+        lang = ((u'sk', u'Slovak'), (u'en', u'English'))
+        for language_code, _ in lang:
+            with translation(language_code):
+                self.assertEqual(action.get_absolute_url(), u'/{}/{}/{}-{}/#a{}'.format(language_code, __(u'main:urls:inforequests'), self.inforequest.slug, self.inforequest.pk, action.pk))
 
     def test_send_by_email_works_only_for_applicant_actions(self):
         tests = (
@@ -681,6 +834,13 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertItemsEqual(result_by_email, [request, confirmation, refusal, extension])
         self.assertItemsEqual(result_by_smail, [appeal, remandment, expiration])
 
+    def test_of_inforequest_query_method(self):
+        inforequest = self._create_inforequest()
+        branch = self._create_branch(inforequest=inforequest)
+        actions = [self._create_action() for _ in range(10)]
+        actions = [self._create_action(branch=branch) for _ in range(10)]
+        self.assertItemsEqual(Action.objects.of_inforequest(inforequest), actions)
+
     def test_order_by_pk_query_method(self):
         inforequest = self._create_inforequest()
         branch = self._create_branch(inforequest=inforequest)
@@ -709,3 +869,21 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             actions.append(self._create_action(branch=branch, created=naive_date(date), subject=u'order_by'))
         result = Action.objects.filter(subject=u'order_by').order_by_created()
         self.assertEqual(list(result), sorted(actions, key=lambda a: (a.created, a.pk)))
+
+    def test_before_and_after_query_methods(self):
+        Action.objects.all().delete()
+        datetimes = [
+                u'2010-10-05 10:33:00',
+                u'2010-10-06 10:33:00',
+                u'2010-10-06 10:33:45',
+                u'2010-10-10 10:33:00', # Several with the same date, to check secondary query
+                u'2010-10-10 10:33:00',
+                u'2010-10-10 10:33:00',
+                u'2010-10-10 10:33:00',
+                u'2010-11-10 10:33:00',
+                u'2011-10-10 10:33:00',
+        ]
+        actions = [self._create_action(created=dt) for dt in datetimes]
+        for i, a in enumerate(actions):
+            self.assertItemsEqual(Action.objects.before(a), actions[:i])
+            self.assertItemsEqual(Action.objects.after(a), actions[i+1:])
