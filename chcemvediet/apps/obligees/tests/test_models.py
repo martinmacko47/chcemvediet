@@ -4,6 +4,7 @@ import random
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.test import TestCase
 from django.utils.translation import ugettext as _
 
 from chcemvediet.tests import ChcemvedietTestCaseMixin
@@ -11,7 +12,7 @@ from chcemvediet.tests import ChcemvedietTestCaseMixin
 from ..models import Obligee, HistoricalObligee
 
 
-class ObligeeModelTest(ChcemvedietTestCaseMixin):
+class ObligeeModelTest(ChcemvedietTestCaseMixin, TestCase):
     u"""
     Tests ``Obligee`` and ``HistoricalObligee`` models.
     """

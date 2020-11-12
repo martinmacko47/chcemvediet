@@ -3,6 +3,7 @@
 import lxml.html
 from django import forms
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from poleno.utils.urls import reverse
@@ -11,7 +12,7 @@ from chcemvediet.tests import ChcemvedietTestCaseMixin
 from ..forms import ObligeeWidget, ObligeeField
 
 
-class ObligeeFieldTest(ChcemvedietTestCaseMixin):
+class ObligeeFieldTest(ChcemvedietTestCaseMixin, TestCase):
     u"""
     Tests ``ObligeeField`` field with ``ObligeeWidget`` widget.
     """
