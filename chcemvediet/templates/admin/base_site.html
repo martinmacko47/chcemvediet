@@ -9,19 +9,4 @@
   {% compress js %}
     {% assets "js" local=True %}
   {% endcompress %}
-
-  {% compress css %}
-    <style type="text/css">
-      .checkbox {
-        margin-top: 5px;
-        margin-bottom: 5px;
-        padding-left: 20px;
-      }
-
-      .checkbox input[type="checkbox"] {
-        float: left;
-        margin-left: -20px;
-      }
-    </style>
-  {% endcompress %}
 {% endblock %}

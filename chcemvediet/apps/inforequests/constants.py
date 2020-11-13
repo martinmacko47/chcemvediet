@@ -11,5 +11,5 @@ DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST = 60
 # inforequest.
 MAX_DAYS_TO_PUBLISH_INFOREQUEST = 365
 
-# Extend snooze of previous action by n days from today.
-EXTEND_SNOOZE_BY_DAYS = 10
+# Admin extend snooze of previous action by n days from today.
+ADMIN_EXTEND_SNOOZE_BY_DAYS = 10

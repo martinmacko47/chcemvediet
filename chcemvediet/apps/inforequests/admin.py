@@ -12,7 +12,7 @@ from poleno.utils.date import local_today
 from poleno.utils.misc import decorate, squeeze
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
                                 ReadOnlyAdminInlineMixin, NoBulkDeleteAdminMixin)
-from chcemvediet.apps.inforequests.constants import EXTEND_SNOOZE_BY_DAYS
+from chcemvediet.apps.inforequests.constants import ADMIN_EXTEND_SNOOZE_BY_DAYS
 
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
@@ -400,7 +400,7 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
                 <b>Warning:</b> The deleted action is not the last action in the branch. Deleting it
                 may cause logical errors in the inforequest history.
                 """)))
-        context[u'EXTEND_SNOOZE_BY_DAYS'] = EXTEND_SNOOZE_BY_DAYS
+        context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
 
     def delete_model(self, request, obj):
@@ -409,6 +409,6 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
                     and obj.type in [Action.TYPES.EXPIRATION, Action.TYPES.APPEAL_EXPIRATION]
                     and obj.previous_action):
                 previous = obj.previous_action
-                previous.snooze = local_today() + datetime.timedelta(days=EXTEND_SNOOZE_BY_DAYS)
+                previous.snooze = local_today() + datetime.timedelta(days=ADMIN_EXTEND_SNOOZE_BY_DAYS)
                 previous.save(update_fields=[u'snooze'])
         return super(ActionAdmin, self).delete_model(request, obj)

@@ -6,9 +6,7 @@
     {{ block.super }}
     {% if object.type == object.TYPES.EXPIRATION or object.type == object.TYPES.APPEAL_EXPIRATION %}
       {% prepend path=".//form" %}
-        <div class="checkbox">
-          <label><input name="snooze" type="checkbox" />Extend snooze of previous action by {{ EXTEND_SNOOZE_BY_DAYS }} days from today.</label>
-        </div>
+        <p><label><input name="snooze" type="checkbox" /> Extend snooze of previous action by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today.</label></p>
       {% endprepend %}
     {% endif %}
   {% endamend %}
