@@ -12,6 +12,7 @@ from . import InforequestsTestCaseMixin
 from ..signals import assign_email_on_message_received
 from ..models import InforequestEmail
 
+
 class AssignEmailOnMessageReceivedTest(InforequestsTestCaseMixin, TestCase):
     u"""
     Tests ``assign_email_on_message_received()`` event receiver.
