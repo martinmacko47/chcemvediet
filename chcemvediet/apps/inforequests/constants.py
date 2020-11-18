@@ -10,3 +10,6 @@ DEFAULT_DAYS_TO_PUBLISH_INFOREQUEST = 60
 # Maximum number of days after which inforequest can be marked as published, after closing
 # inforequest.
 MAX_DAYS_TO_PUBLISH_INFOREQUEST = 365
+
+# Admin extend snooze of previous action by n days from today.
+ADMIN_EXTEND_SNOOZE_BY_DAYS = 10
