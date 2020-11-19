@@ -9,7 +9,7 @@
 
 
 {% block blog %}
-  <a class="chv-blog pln-not-implemented" href="#">
+  <a class="chv-blog" href="{% block link %}{% endblock %}">
     <img class="chv-blog-img" src="{% block img %}{% endblock %}">
     <span class="chv-blog-date">{% block date %}{% endblock %}</span>
     <span class="chv-blog-text">{% block text %}{% endblock %}</span>
