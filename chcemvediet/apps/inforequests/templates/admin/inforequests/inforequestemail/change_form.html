@@ -1,0 +1,17 @@
+{% extends "admin/change_form.html" %}
+{% load amend prepend from poleno.amend %}
+
+{% block content %}
+  {% amend %}
+    {{ block.super }}
+    {% if not original.has_delete_permission %}
+      {% prepend path='.//div[@class="submit-row"]' %}
+        <p class="deletelink-box">Email is dependent on:
+          <a href="{% url 'admin:inforequests_action_change' original.email.action.pk %}">
+          &lt;Action: {{ original.email.action.pk }}&gt;
+          </a>
+        </p>
+      {% endprepend %}
+    {% endif %}
+  {% endamend %}
+{% endblock %}

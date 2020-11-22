@@ -1,6 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from aggregate_if import Count
 
@@ -72,6 +73,14 @@ class InforequestEmail(FormatMixin, models.Model):
                 [u'type', u'inforequest'],
                 ]
 
+    @cached_property
+    def has_delete_permission(self):
+        try:
+            action = self.email.action
+            return action not in Action.objects.of_inforequest(inforequest=self.inforequest)
+        except Action.DoesNotExist:
+            return True
+
     def __unicode__(self):
         return format(self.pk)
 
@@ -95,3 +104,6 @@ def datachecks(superficial, autofix):
         issues = [u'; '.join(issues)]
     for issue in issues:
         yield datacheck.Error(issue + u'.')
+
+# Must be after ``InforequestEmail`` to break cyclic dependency
+from .action import Action

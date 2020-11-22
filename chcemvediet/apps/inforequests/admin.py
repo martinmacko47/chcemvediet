@@ -267,6 +267,9 @@ class InforequestEmailAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'email')
         return queryset
 
+    def has_delete_permission(self, request, obj=None):
+        return obj.has_delete_permission if obj else True
+
 @admin.register(Branch, site=admin.site)
 class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     date_hierarchy = None
