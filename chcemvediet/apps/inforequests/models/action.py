@@ -345,7 +345,7 @@ class Action(FormatMixin, models.Model):
 
     @cached_property
     def has_obligee_deadline(self):
-        return bool(self.deadline) and self.deadline.is_obligee_deadline
+        return self.deadline is not None and self.deadline.is_obligee_deadline
 
     @cached_property
     def has_obligee_deadline_missed(self):
@@ -357,7 +357,7 @@ class Action(FormatMixin, models.Model):
 
     @cached_property
     def has_applicant_deadline(self):
-        return bool(self.deadline) and self.deadline.is_applicant_deadline
+        return self.deadline is not None and self.deadline.is_applicant_deadline
 
     @cached_property
     def has_applicant_deadline_missed(self):
