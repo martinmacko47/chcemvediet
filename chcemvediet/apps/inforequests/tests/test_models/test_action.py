@@ -159,6 +159,14 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_action.legal_date'):
             self._create_action(omit=[u'legal_date'])
 
+    def test_extension_field(self):
+        action = self._create_action(extension=3)
+        self.assertEqual(action.extension, 3)
+
+    def test_extension_field_default_value_if_omitted(self):
+        action = self._create_action(omit=[u'extension'])
+        self.assertIsNone(action.extension)
+
     def test_snooze_field(self):
         date = naive_date(u'2010-10-05')
         action = self._create_action(snooze=date)
@@ -167,49 +175,6 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
     def test_snooze_field_default_value_if_omitted(self):
         action = self._create_action(omit=[u'snooze'])
         self.assertIsNone(action.snooze)
-
-    def test_deadline_property(self):
-        delivered_date = naive_date(u'2010-10-05')
-        legal_date = naive_date(u'2010-10-04')
-        tests = (
-                (Action.TYPES.REQUEST,                naive_date(u'2010-10-15'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since delivered_date
-                (Action.TYPES.CLARIFICATION_RESPONSE, naive_date(u'2010-10-15'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since delivered_date
-                (Action.TYPES.APPEAL,                 naive_date(u'2010-10-20'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 15 CD since delivered_date
-                (Action.TYPES.CONFIRMATION,           naive_date(u'2010-10-15'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # previous action deadline
-                (Action.TYPES.EXTENSION,              naive_date(u'2010-10-19'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # previous action deadline + extension
-                (Action.TYPES.ADVANCEMENT,            None, None, dict()),
-                (Action.TYPES.CLARIFICATION_REQUEST,  naive_date(u'2010-10-12'), Deadline.TYPES.APPLICANT_DEADLINE, dict()),  # 7 CD since delivered date
-                (Action.TYPES.DISCLOSURE,             naive_date(u'2010-10-20'), Deadline.TYPES.APPLICANT_DEADLINE, dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE)),  # 15 CD since delivered_date
-                (Action.TYPES.DISCLOSURE,             naive_date(u'2010-10-20'), Deadline.TYPES.APPLICANT_DEADLINE, dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL)),  # 15 CD since delivered_date
-                (Action.TYPES.DISCLOSURE,             None, None, dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL)),
-                (Action.TYPES.REFUSAL,                naive_date(u'2010-10-20'), Deadline.TYPES.APPLICANT_DEADLINE, dict()),  # 15 CD since delivered_date
-                (Action.TYPES.AFFIRMATION,            None, None, dict()),
-                (Action.TYPES.REVERSION,              None, None, dict()),
-                (Action.TYPES.REMANDMENT,             naive_date(u'2010-10-20'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since legal_date advanced by 4 WD
-                (Action.TYPES.ADVANCED_REQUEST,       naive_date(u'2010-10-20'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since legal_date advanced by 4 WD
-                (Action.TYPES.EXPIRATION,             naive_date(u'2010-10-19'), Deadline.TYPES.APPLICANT_DEADLINE, dict()),  # 15 CD since legal_date
-                (Action.TYPES.APPEAL_EXPIRATION,      None, None, dict()),
-                )
-        # Make sure we are testing all defined action types
-        tested_action_types = set(a for a, _, _, _ in tests)
-        defined_action_types = Action.TYPES._inverse.keys()
-        self.assertItemsEqual(tested_action_types, defined_action_types)
-
-        for action_type, deadline_date, deadline_type, extra_args in tests:
-            previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=delivered_date)  # Deadline for CONFIRMATION, EXTENSION
-            action = self._create_action(type=action_type, delivered_date=delivered_date, legal_date=legal_date, extension=2, **extra_args)
-            dd = action.deadline and action.deadline.deadline_date
-            dt = action.deadline and action.deadline.type
-            self.assertEqual(dd, deadline_date)
-            self.assertEqual(dt, deadline_type)
-
-    def test_extension_field(self):
-        action = self._create_action(extension=3)
-        self.assertEqual(action.extension, 3)
-
-    def test_extension_field_default_value_if_omitted(self):
-        action = self._create_action(omit=[u'extension'])
-        self.assertIsNone(action.extension)
 
     def test_disclosure_level_field(self):
         tests = (
@@ -538,6 +503,41 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         with self._test_deadline_aux(type=Action.TYPES.REQUEST) as action:
             timewarp.jump(local_datetime_from_local(u'2010-10-19 10:33:00'))  # 6 CD behind deadline
             self.assertFalse(action.can_applicant_snooze)
+
+    def test_deadline_property(self):
+        delivered_date = naive_date(u'2010-10-05')
+        legal_date = naive_date(u'2010-10-04')
+        tests = (
+                (Action.TYPES.REQUEST,                naive_date(u'2010-10-15'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since delivered_date
+                (Action.TYPES.CLARIFICATION_RESPONSE, naive_date(u'2010-10-15'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since delivered_date
+                (Action.TYPES.APPEAL,                 naive_date(u'2010-10-20'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 15 CD since delivered_date
+                (Action.TYPES.CONFIRMATION,           naive_date(u'2010-10-15'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # previous action deadline
+                (Action.TYPES.EXTENSION,              naive_date(u'2010-10-19'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # previous action deadline + extension
+                (Action.TYPES.ADVANCEMENT,            None, None, dict()),
+                (Action.TYPES.CLARIFICATION_REQUEST,  naive_date(u'2010-10-12'), Deadline.TYPES.APPLICANT_DEADLINE, dict()),  # 7 CD since delivered date
+                (Action.TYPES.DISCLOSURE,             naive_date(u'2010-10-20'), Deadline.TYPES.APPLICANT_DEADLINE, dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE)),  # 15 CD since delivered_date
+                (Action.TYPES.DISCLOSURE,             naive_date(u'2010-10-20'), Deadline.TYPES.APPLICANT_DEADLINE, dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL)),  # 15 CD since delivered_date
+                (Action.TYPES.DISCLOSURE,             None, None, dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL)),
+                (Action.TYPES.REFUSAL,                naive_date(u'2010-10-20'), Deadline.TYPES.APPLICANT_DEADLINE, dict()),  # 15 CD since delivered_date
+                (Action.TYPES.AFFIRMATION,            None, None, dict()),
+                (Action.TYPES.REVERSION,              None, None, dict()),
+                (Action.TYPES.REMANDMENT,             naive_date(u'2010-10-20'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since legal_date advanced by 4 WD
+                (Action.TYPES.ADVANCED_REQUEST,       naive_date(u'2010-10-20'), Deadline.TYPES.OBLIGEE_DEADLINE, dict()),  # 8 WD since legal_date advanced by 4 WD
+                (Action.TYPES.EXPIRATION,             naive_date(u'2010-10-19'), Deadline.TYPES.APPLICANT_DEADLINE, dict()),  # 15 CD since legal_date
+                (Action.TYPES.APPEAL_EXPIRATION,      None, None, dict()),
+                )
+        # Make sure we are testing all defined action types
+        tested_action_types = set(a for a, _, _, _ in tests)
+        defined_action_types = Action.TYPES._inverse.keys()
+        self.assertItemsEqual(tested_action_types, defined_action_types)
+
+        for action_type, deadline_date, deadline_type, extra_args in tests:
+            previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=delivered_date)  # Deadline for CONFIRMATION, EXTENSION
+            action = self._create_action(type=action_type, delivered_date=delivered_date, legal_date=legal_date, extension=2, **extra_args)
+            dd = action.deadline and action.deadline.deadline_date
+            dt = action.deadline and action.deadline.type
+            self.assertEqual(dd, deadline_date)
+            self.assertEqual(dt, deadline_type)
 
     def test_create_classmethod(self):
         obligees = [self._create_obligee() for _ in range(3)]
