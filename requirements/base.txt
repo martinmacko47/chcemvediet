@@ -13,7 +13,6 @@ django-multiselectfield==0.1.3
 django-widget-tweaks==1.4.1
 django-compressor==1.5
 django-libsass==0.4
-django-bootstrap-sass==0.0.6-alpha
 jsonfield==1.0.2
 openpyxl==2.2.6
 python-magic==0.4.15

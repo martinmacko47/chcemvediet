@@ -49,7 +49,7 @@ INSTALLED_APPS = (
     u'simple_history',
     u'widget_tweaks',
     u'compressor',
-    u'bootstrap_sass',
+    u'vendor.bootstrap_sass',
     # Reused apps
     u'poleno.utils',
     u'poleno.dummymail',
