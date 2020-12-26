@@ -3,7 +3,6 @@
 import random
 import mock
 import datetime
-import contextlib
 from collections import defaultdict
 
 from django.db import IntegrityError
@@ -403,7 +402,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(action.deadline.workdays_remaining, 9)
         self.assertEqual(action.deadline.workdays_remaining_at(local_today()), 9)
 
-    def test_action_without_deadline(self):
+    def test_deadline_property_none_for_action_without_deadline(self):
         action = self._create_action(type=Action.TYPES.REVERSION)
         self.assertIsNone(action.deadline)
 
@@ -552,8 +551,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
                 )
         # Make sure we are testing all defined action types (except EXTENSION)
         tested_action_types = set(a for a, _ in tests)
-        defined_action_types = Action.TYPES._inverse.keys()
-        defined_action_types.remove(Action.TYPES.EXTENSION)
+        defined_action_types = [a for a in Action.TYPES._inverse.keys() if a != Action.TYPES.EXTENSION]
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
         for action_type, extra_args in tests:
@@ -567,9 +565,9 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
                 self.assertIsNone(action_without_extension.deadline)
 
     def test_deadline_property_with_extension_for_extension_action_type(self):
-        previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
+        previous1 = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
         action_with_extension = self._create_action(type=Action.TYPES.EXTENSION, extension=2)
-        previous = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
+        previous2 = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
         action_without_extension = self._create_action(type=Action.TYPES.EXTENSION)
         self.assertEqual(action_with_extension.deadline.deadline_date, naive_date(u'2010-10-19'))
         self.assertEqual(action_without_extension.deadline.deadline_date, naive_date(u'2010-10-15'))
