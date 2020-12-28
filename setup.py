@@ -466,14 +466,10 @@ def load_redirects(configure):
     from django.contrib.sites.models import Site
 
     Redirect.objects.all().delete()
-    site = Site.objects.get(pk=1)
-    with JsonFile(u'fixtures/redirects_redirect.json', u'r') as data:
-        for r in data:
-            redirect = Redirect(
-                    site=site,
-                    old_path=r[u'fields'][u'old_path'],
-                    new_path=r[u'fields'][u'new_path']
-                    )
+    site = Site.objects.get(name=u'chcemvediet')
+    with JsonFile(u'fixtures/redirects_redirect.sk.json', u'r') as data:
+        for old_path, new_path in data.items():
+            redirect = Redirect(site=site, old_path=old_path, new_path=new_path)
             redirect.save()
 
 def configure_site_domain(configure):

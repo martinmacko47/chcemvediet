@@ -1,9 +1,0 @@
-[
-{
-  "model": "redirects.redirect",
-  "fields": {
-    "old_path": "/sk/pripadove-studie/",
-    "new_path": "/sk/naco-infozakon/"
-  }
-}
-]
