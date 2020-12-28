@@ -443,7 +443,6 @@ def load_fixtures(configure):
     res.append(u'fixtures/sites_site.json')
     res.append(u'fixtures/auth_user.json')
     res.append(u'fixtures/socialaccount_socialapp.json')
-    res.append(u'fixtures/redirects_redirect.json')
     return res
 
 def create_or_sync_database(configure):
@@ -461,6 +460,21 @@ def create_or_sync_database(configure):
                 [u'env/bin/python', u'manage.py', u'loadsheets', u'fixtures/datasheets.xlsx'])
     else:
         call(u'Migrate DB:', [u'env/bin/python', u'manage.py', u'migrate'])
+
+def load_redirects(configure):
+    from django.contrib.redirects.models import Redirect
+    from django.contrib.sites.models import Site
+
+    Redirect.objects.all().delete()
+    site = Site.objects.get(pk=1)
+    with JsonFile(u'fixtures/redirects_redirect.json', u'r') as data:
+        for r in data:
+            redirect = Redirect(
+                    site=site,
+                    old_path=r[u'fields'][u'old_path'],
+                    new_path=r[u'fields'][u'new_path']
+                    )
+            redirect.save()
 
 def configure_site_domain(configure):
     from django.contrib.sites.models import Site
@@ -615,6 +629,7 @@ def main():
         # Configure database
         create_or_sync_database(configure)
         with atomic():
+            load_redirects(configure)
             configure_site_domain(configure)
             configure_admin_password(configure)
             configure_social_accounts(configure)

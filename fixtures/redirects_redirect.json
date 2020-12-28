@@ -2,9 +2,8 @@
 {
   "model": "redirects.redirect",
   "fields": {
-    "site": 1,
-    "old_path": "/pripadove-studie/",
-    "new_path": "/naco-infozakon/"
+    "old_path": "/sk/pripadove-studie/",
+    "new_path": "/sk/naco-infozakon/"
   }
 }
 ]
