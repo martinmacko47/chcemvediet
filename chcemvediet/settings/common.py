@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     u'django.contrib.sessions',
     u'django.contrib.sites',
     u'django.contrib.messages',
+    u'django.contrib.redirects',
     u'django.contrib.staticfiles',
     u'django.contrib.admin.apps.SimpleAdminConfig', # See "django-adminplus" docs for Django 1.7
     u'django.contrib.sitemaps',
@@ -75,6 +76,7 @@ MIDDLEWARE_CLASSES = (
     u'django.middleware.csrf.CsrfViewMiddleware',
     u'django.contrib.auth.middleware.AuthenticationMiddleware',
     u'django.contrib.messages.middleware.MessageMiddleware',
+    u'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
     u'django.middleware.locale.LocaleMiddleware',
     u'django.middleware.clickjacking.XFrameOptionsMiddleware',
     u'simple_history.middleware.HistoryRequestMiddleware',

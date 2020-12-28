@@ -1,0 +1,10 @@
+[
+{
+  "model": "redirects.redirect",
+  "fields": {
+    "site": 1,
+    "old_path": "/pripadove-studie/",
+    "new_path": "/naco-infozakon/"
+  }
+}
+]

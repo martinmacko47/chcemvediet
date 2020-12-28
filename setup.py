@@ -443,6 +443,7 @@ def load_fixtures(configure):
     res.append(u'fixtures/sites_site.json')
     res.append(u'fixtures/auth_user.json')
     res.append(u'fixtures/socialaccount_socialapp.json')
+    res.append(u'fixtures/redirects_redirect.json')
     return res
 
 def create_or_sync_database(configure):
