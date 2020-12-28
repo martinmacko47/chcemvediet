@@ -516,9 +516,9 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
                 self.assertIsNone(action_without_extension.deadline)
 
     def test_deadline_property_with_extension_for_extension_action_type(self):
-        previous1 = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
+        self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
         action_with_extension = self._create_action(type=Action.TYPES.EXTENSION, extension=2)
-        previous2 = self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
+        self._create_action(type=Action.TYPES.REQUEST, delivered_date=naive_date(u'2010-10-05'))
         action_without_extension = self._create_action(type=Action.TYPES.EXTENSION)
         self.assertEqual(action_with_extension.deadline.deadline_date, naive_date(u'2010-10-19'))
         self.assertEqual(action_without_extension.deadline.deadline_date, naive_date(u'2010-10-15'))
