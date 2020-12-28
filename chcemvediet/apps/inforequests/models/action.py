@@ -345,7 +345,7 @@ class Action(FormatMixin, models.Model):
 
     @cached_property
     def has_obligee_deadline(self):
-        return self.deadline and self.deadline.is_obligee_deadline
+        return self.deadline is not None and self.deadline.is_obligee_deadline
 
     @cached_property
     def has_obligee_deadline_missed(self):
@@ -357,7 +357,7 @@ class Action(FormatMixin, models.Model):
 
     @cached_property
     def has_applicant_deadline(self):
-        return self.deadline and self.deadline.is_applicant_deadline
+        return self.deadline is not None and self.deadline.is_applicant_deadline
 
     @cached_property
     def has_applicant_deadline_missed(self):
@@ -498,7 +498,7 @@ class Action(FormatMixin, models.Model):
 
     def send_by_email(self):
         if not self.is_applicant_action:
-            raise TypeError(u'{} is not applicant action'.format(self.get_type_display()))
+            raise TypeError(u'{} is not applicant action'.format(self.get_type_display()).encode(u'utf-8'))
         if not self.branch.collect_obligee_emails:
             # Django silently ignores messages with no recipients
             raise ValueError(u'Action has no recipients')
