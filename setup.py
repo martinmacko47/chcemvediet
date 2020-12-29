@@ -461,6 +461,17 @@ def create_or_sync_database(configure):
     else:
         call(u'Migrate DB:', [u'env/bin/python', u'manage.py', u'migrate'])
 
+def load_redirects(configure):
+    from django.contrib.redirects.models import Redirect
+    from django.contrib.sites.models import Site
+
+    Redirect.objects.all().delete()
+    site = Site.objects.get(name=u'chcemvediet')
+    with JsonFile(u'fixtures/redirects_redirect.sk.json', u'r') as data:
+        for old_path, new_path in data.items():
+            redirect = Redirect(site=site, old_path=old_path, new_path=new_path)
+            redirect.save()
+
 def configure_site_domain(configure):
     from django.contrib.sites.models import Site
 
@@ -614,6 +625,7 @@ def main():
         # Configure database
         create_or_sync_database(configure)
         with atomic():
+            load_redirects(configure)
             configure_site_domain(configure)
             configure_admin_password(configure)
             configure_social_accounts(configure)
