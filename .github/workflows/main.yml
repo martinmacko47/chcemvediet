@@ -42,6 +42,10 @@ jobs:
           ""
           # Google Custom Search API key (default)
           ""
+          # Google Recaptcha public key (default)
+          ""
+          # Google Recaptcha private key (default)
+          ""
           # Load datasheets / Neighbourhood dummy was omitted / Delete it?
           "y"
           # Load datasheets / Municipality dummy was omitted / Delete it?
