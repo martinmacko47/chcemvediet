@@ -438,6 +438,15 @@ def configure_search(configure, settings):
     search_api_key = configure.input(u'search_api_key', u'Google Custom Search API key')
     settings.setting(u'SEARCH_API_KEY', search_api_key)
 
+def configure_recaptcha(configure, settings):
+    print(INFO + textwrap.dedent(u"""
+            Recaptcha is a free service from Google that we use to protect sign up and login forms
+            from spam and abuse.""") + RESET)
+    recaptcha_public_key = configure.input(u'recaptcha_public_key', u'Recaptcha public key')
+    settings.setting(u'RECAPTCHA_PUBLIC_KEY', recaptcha_public_key)
+    recaptcha_private_key = configure.input(u'recaptcha_private_key', u'Recaptcha private key')
+    settings.setting(u'RECAPTCHA_PRIVATE_KEY', recaptcha_private_key)
+
 def load_fixtures(configure):
     res = []
     res.append(u'fixtures/sites_site.json')
@@ -615,6 +624,7 @@ def main():
             configure_cache(configure, settings)
             configure_mandrill(configure, settings)
             configure_search(configure, settings)
+            configure_recaptcha(configure, settings)
 
         # Settings module is configured, so we may use Django now.
         os.environ.setdefault(u'DJANGO_SETTINGS_MODULE', u'chcemvediet.settings')

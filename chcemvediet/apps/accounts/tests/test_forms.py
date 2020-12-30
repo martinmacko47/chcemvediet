@@ -3,6 +3,7 @@
 import lxml.html
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from poleno.utils.urls import reverse
 
@@ -16,6 +17,14 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
     added by ``SignupForm``.
     """
 
+    def setUp(self):
+        self.settings_override = override_settings(
+            RECAPTCHA_TESTING=True,
+            RECAPTCHA_PUBLIC_KEY=u'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+            RECAPTCHA_PRIVATE_KEY=u'6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
+        )
+        self.settings_override.enable()
+
     def _create_account_signup_data(self, **kwargs):
         defaults = {
                 u'first_name': u'Default Testing First Name',
@@ -27,6 +36,7 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
                 u'password1': u'default_testing_password',
                 u'password2': u'default_testing_password',
                 u'agreement': True,
+                u'g-recaptcha-response': u'PASSED',
                 }
         defaults.update(kwargs)
         return defaults

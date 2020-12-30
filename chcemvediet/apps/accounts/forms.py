@@ -1,5 +1,7 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+from allauth.account.forms import LoginForm as AllauthLoginForm
+from captcha.fields import ReCaptchaField
 from django import forms
 from django.utils.translation import ungettext_lazy, ugettext_lazy as _
 
@@ -9,6 +11,15 @@ from chcemvediet.apps.anonymization.anonymization import (WORD_SIZE_MIN,
                                                           get_default_anonymized_strings_for_user)
 from chcemvediet.apps.inforequests.constants import MAX_DAYS_TO_PUBLISH_INFOREQUEST
 
+
+class LoginForm(AllauthLoginForm):
+
+    def __init__(self, *args, **kwargs):
+        super(LoginForm, self).__init__(*args, **kwargs)
+        self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
+
+    def login(self, request, redirect_url=None):
+        return super(LoginForm, self).login(request, redirect_url)
 
 class SignupForm(forms.Form):
     first_name = forms.CharField(
@@ -57,6 +68,7 @@ class SignupForm(forms.Form):
             label=_(u'accounts:SignupForm:agreement:label'),
             required=True,
             )
+        self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
 
 
     def signup(self, request, user):

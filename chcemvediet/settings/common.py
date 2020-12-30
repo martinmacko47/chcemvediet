@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     u'widget_tweaks',
     u'compressor',
     u'vendor.bootstrap_sass',
+    u'captcha',
     # Reused apps
     u'poleno.utils',
     u'poleno.dummymail',
@@ -223,6 +224,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = u'optional'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_FORM_CLASS = u'chcemvediet.apps.accounts.forms.SignupForm'
+ACCOUNT_FORMS = {u'login': u'chcemvediet.apps.accounts.forms.LoginForm'}
 SOCIALACCOUNT_EMAIL_VERIFICATION = u'none'
 SOCIALACCOUNT_AUTO_SIGNUP = False
 LOGIN_REDIRECT_URL = u'inforequests:mine'

@@ -433,3 +433,14 @@ current directory and update the localization files for you:
 
 	$ cd chcemvediet/chcemvediet
 	$ ../env/bin/python ../manage.py makemessages -l sk -l en --no-wrap --no-location
+
+
+## 8. Google Recaptcha engine key
+
+ 1. Sign into [reCAPTCHA](https://www.google.com/recaptcha/admin/create) using your Google Account.
+
+ 2. Create new recaptcha with the following options:
+      * **reCAPTCHA type**: reCAPTCHA v2, "I'm not a robot" Checkbox.
+      * **Domains**: `127.0.0.1`
+
+ 3. Run `setup.py` to configure your google recaptcha private and public keys.
