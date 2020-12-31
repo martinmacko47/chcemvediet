@@ -229,6 +229,9 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = u'none'
 SOCIALACCOUNT_AUTO_SIGNUP = False
 LOGIN_REDIRECT_URL = u'inforequests:mine'
 
+# Django recaptcha settings
+NOCAPTCHA = True
+
 # Chcemvediet settings
 INVITATIONS_INVITATION_ONLY = False
 INVITATIONS_USERS_CAN_INVITE = True
