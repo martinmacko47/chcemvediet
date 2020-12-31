@@ -10,6 +10,51 @@ from poleno.utils.urls import reverse
 from . import AccountsTestCaseMixin
 
 
+class LoginFormTest(AccountsTestCaseMixin, TestCase):
+    u"""
+    Tests ``allauth`` ``account_login`` view using ``LoginForm`` form registered as
+    "account_login". Does not check ``account_login`` functionality, only checks functionality
+    added by ``LoginForm``.
+    """
+
+    def setUp(self):
+        self.settings_override = override_settings(
+            RECAPTCHA_PUBLIC_KEY=u'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+            RECAPTCHA_PRIVATE_KEY=u'6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
+        )
+        self.settings_override.enable()
+        user = User.objects.create(username=u'john', email=u'john@doe.org')
+        user.set_password(u'doe')
+        user.save()
+
+    def _create_account_login_data(self, **kwargs):
+        defaults = {
+                u'login': u'john@doe.org',
+                u'password': u'doe',
+                u'g-recaptcha-response': u'PASSED',
+                }
+        defaults.update(kwargs)
+        return defaults
+
+
+    def test_get_login_form(self):
+        response = self.client.get(reverse(u'account_login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, u'account/login.html')
+        html = lxml.html.fromstring(unicode(response.content, encoding=u'utf-8'))
+        element = html.get_element_by_id(u'g-recaptcha-response')
+
+    def test_post_login_form_with_valid_data(self):
+        data = self._create_account_login_data(login=u'john@doe.org', password=u'doe')
+        response = self.client.post(reverse(u'account_login'), data, follow=True)
+        self.assertTrue(response.context[u'user'].is_active)
+        self.assertRedirects(response, reverse(u'inforequests:mine'))
+
+    def test_recaptcha_field_is_required(self):
+        data = self._create_account_login_data(**{u'g-recaptcha-response': u''})
+        response = self.client.post(reverse(u'account_login'), data, follow=True)
+        self.assertFormError(response, u'form', u'recaptcha', u'This field is required.')
+
 class SignupFormTest(AccountsTestCaseMixin, TestCase):
     u"""
     Tests ``allauth`` ``account_signup`` view using ``SignupForm`` form registered as
@@ -19,7 +64,6 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
 
     def setUp(self):
         self.settings_override = override_settings(
-            RECAPTCHA_TESTING=True,
             RECAPTCHA_PUBLIC_KEY=u'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
             RECAPTCHA_PRIVATE_KEY=u'6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
         )
@@ -77,6 +121,8 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
         self.assertEqual(element.attrib[u'class'], u'form-control')
         self.assertEqual(element.attrib[u'name'], u'zip')
         self.assertEqual(element.attrib[u'type'], u'text')
+
+        element = html.get_element_by_id(u'g-recaptcha-response')
 
     def test_post_signup_form_with_valid_data_creates_user_and_his_profile(self):
         data = self._create_account_signup_data(
@@ -166,3 +212,8 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
         data = self._create_account_signup_data(agreement=False)
         response = self.client.post(reverse(u'account_signup'), data, follow=True)
         self.assertFormError(response, u'form', u'agreement', u'This field is required.')
+
+    def test_recaptcha_field_is_required(self):
+        data = self._create_account_signup_data(**{u'g-recaptcha-response': u''})
+        response = self.client.post(reverse(u'account_signup'), data, follow=True)
+        self.assertFormError(response, u'form', u'recaptcha', u'This field is required.')
