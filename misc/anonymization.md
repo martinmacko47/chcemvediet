@@ -92,3 +92,34 @@ Computed Properties:
 
 
 <sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>
+
+
+## Anonymization
+You can manually anonymize `Attachment` using management command:
+
+```
+manage.py attachment_anonymization attachment [options] [file]
+
+Options:
+  -v VERBOSITY, --verbosity=VERBOSITY
+                        Verbosity level; 0=minimal output, 1=normal output,
+                        2=verbose output, 3=very verbose output
+  --settings=SETTINGS   The Python path to a settings module, e.g.
+                        "myproject.settings.main". If this isn't provided, the
+                        DJANGO_SETTINGS_MODULE environment variable will be
+                        used.
+  --pythonpath=PYTHONPATH
+                        A directory to add to the Python path, e.g.
+                        "/home/djangoprojects/myproject".
+  --traceback           Raise on exception
+  --no-color            Don't colorize the command output.
+  -f FILENAME, --file=FILENAME
+                        define file path
+  --content_type=CONTENT_TYPE
+                        define content type of file
+  --debug=DEBUG         add debug message
+  --force               overwrite an existing successful
+                        AttachmentFinalization
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+```
