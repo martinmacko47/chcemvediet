@@ -1,9 +1,10 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import os
+
 import lxml.html
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from poleno.utils.urls import reverse
 
@@ -18,14 +19,13 @@ class LoginFormTest(AccountsTestCaseMixin, TestCase):
     """
 
     def setUp(self):
-        self.settings_override = override_settings(
-            RECAPTCHA_PUBLIC_KEY=u'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-            RECAPTCHA_PRIVATE_KEY=u'6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
-        )
-        self.settings_override.enable()
+        os.environ[u'RECAPTCHA_TESTING'] = u'True'
         user = User.objects.create(username=u'john', email=u'john@doe.org')
         user.set_password(u'doe')
         user.save()
+
+    def tearDown(self):
+        del os.environ[u'RECAPTCHA_TESTING']
 
     def _create_account_login_data(self, **kwargs):
         defaults = {
@@ -63,11 +63,10 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
     """
 
     def setUp(self):
-        self.settings_override = override_settings(
-            RECAPTCHA_PUBLIC_KEY=u'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-            RECAPTCHA_PRIVATE_KEY=u'6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
-        )
-        self.settings_override.enable()
+        os.environ[u'RECAPTCHA_TESTING'] = u'True'
+
+    def tearDown(self):
+        del os.environ[u'RECAPTCHA_TESTING']
 
     def _create_account_signup_data(self, **kwargs):
         defaults = {
@@ -216,4 +215,46 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
     def test_recaptcha_field_is_required(self):
         data = self._create_account_signup_data(**{u'g-recaptcha-response': u''})
         response = self.client.post(reverse(u'account_signup'), data, follow=True)
+        self.assertFormError(response, u'form', u'recaptcha', u'This field is required.')
+
+class ResetPasswordFormTest(AccountsTestCaseMixin, TestCase):
+    u"""
+    Tests ``allauth`` ``password_reset`` view using ``ResetPasswordForm`` form registered as
+    "password_reset". Does not check ``password_reset`` functionality, only checks functionality
+    added by ``ResetPasswordForm``.
+    """
+
+    def setUp(self):
+        user = User.objects.create(username=u'john', email=u'john@doe.org')
+        user.set_password(u'doe')
+        user.save()
+        os.environ[u'RECAPTCHA_TESTING'] = u'True'
+
+    def tearDown(self):
+        del os.environ[u'RECAPTCHA_TESTING']
+
+    def _create_account_password_reset_data(self, **kwargs):
+        defaults = {
+                u'email': u'john@doe.org',
+                u'g-recaptcha-response': u'PASSED',
+                }
+        defaults.update(kwargs)
+        return defaults
+
+
+    def test_get_login_form(self):
+        response = self.client.get(reverse(u'account_reset_password'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, u'account/password_reset.html')
+        html = lxml.html.fromstring(unicode(response.content, encoding=u'utf-8'))
+        element = html.get_element_by_id(u'g-recaptcha-response')
+
+    def test_post_reset_password_form_with_valid_data(self):
+        data = self._create_account_password_reset_data(email=u'john@doe.org')
+        response = self.client.post(reverse(u'account_reset_password'), data, follow=True)
+        self.assertRedirects(response, reverse(u'account_reset_password_done'))
+
+    def test_recaptcha_field_is_required(self):
+        data = self._create_account_password_reset_data(**{u'g-recaptcha-response': u''})
+        response = self.client.post(reverse(u'account_reset_password'), data, follow=True)
         self.assertFormError(response, u'form', u'recaptcha', u'This field is required.')

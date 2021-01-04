@@ -38,10 +38,8 @@
   </div>
   <div class="form-group">
     <div class="col-sm-12">
-      <div class="chv-maxwidth-200 center-block">
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_PUBLIC_KEY|urlencode }}"></div>
-      </div>
+      <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <div class="g-recaptcha" align="center" data-sitekey="{{ RECAPTCHA_PUBLIC_KEY|urlencode }}"></div>
     </div>
   </div>
   <div class="form-group">

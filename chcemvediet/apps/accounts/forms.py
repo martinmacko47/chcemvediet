@@ -18,9 +18,6 @@ class LoginForm(AllauthLoginForm):
         super(LoginForm, self).__init__(*args, **kwargs)
         self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
 
-    def login(self, request, redirect_url=None):
-        return super(LoginForm, self).login(request, redirect_url)
-
 class SignupForm(forms.Form):
     first_name = forms.CharField(
             max_length=30,

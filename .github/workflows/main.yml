@@ -42,9 +42,9 @@ jobs:
           ""
           # Google Custom Search API key (default)
           ""
-          # Google Recaptcha public key (default)
+          # Google reCaptcha public key (default)
           ""
-          # Google Recaptcha private key (default)
+          # Google reCaptcha private key (default)
           ""
           # Load datasheets / Neighbourhood dummy was omitted / Delete it?
           "y"

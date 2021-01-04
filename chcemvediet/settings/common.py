@@ -224,12 +224,15 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = u'optional'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_FORM_CLASS = u'chcemvediet.apps.accounts.forms.SignupForm'
-ACCOUNT_FORMS = {u'login': u'chcemvediet.apps.accounts.forms.LoginForm'}
+ACCOUNT_FORMS = {
+    u'login': u'chcemvediet.apps.accounts.forms.LoginForm',
+    u'reset_password': u'chcemvediet.apps.accounts.forms2.ResetPasswordForm',
+    }
 SOCIALACCOUNT_EMAIL_VERIFICATION = u'none'
 SOCIALACCOUNT_AUTO_SIGNUP = False
 LOGIN_REDIRECT_URL = u'inforequests:mine'
 
-# Django recaptcha settings
+# Django-recaptcha settings
 NOCAPTCHA = True
 
 # Chcemvediet settings

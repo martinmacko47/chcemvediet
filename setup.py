@@ -440,11 +440,11 @@ def configure_search(configure, settings):
 
 def configure_recaptcha(configure, settings):
     print(INFO + textwrap.dedent(u"""
-            Recaptcha is a free service from Google that we use to protect sign up and login forms
+            ReCaptcha is a free service from Google that we use to protect sign up and login forms
             from spam and abuse.""") + RESET)
-    recaptcha_public_key = configure.input(u'recaptcha_public_key', u'Recaptcha public key')
+    recaptcha_public_key = configure.input(u'recaptcha_public_key', u'reCaptcha public key')
     settings.setting(u'RECAPTCHA_PUBLIC_KEY', recaptcha_public_key)
-    recaptcha_private_key = configure.input(u'recaptcha_private_key', u'Recaptcha private key')
+    recaptcha_private_key = configure.input(u'recaptcha_private_key', u'reCaptcha private key')
     settings.setting(u'RECAPTCHA_PRIVATE_KEY', recaptcha_private_key)
 
 def load_fixtures(configure):

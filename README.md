@@ -324,7 +324,20 @@ your browser.
  5. Run `setup.py` to configure your google custom search API key.
 
 
-## 5. Mandrill transactional e-mail servis
+## 5. Google reCaptcha engine key
+
+ 1. Sign into [reCAPTCHA](https://www.google.com/recaptcha/admin/create) using your Google Account.
+
+ 2. Create new reCaptcha with the following options:
+      * **reCAPTCHA type**: reCAPTCHA v2, "I'm not a robot" Checkbox.
+      * **Domains**: `{domain}`
+  
+    Where `{domain}` is your production domain or `127.0.0.1` if in local development mode.
+
+ 3. Run `setup.py` to configure your google reCaptcha private and public keys.
+
+
+## 6. Mandrill transactional e-mail servis
 
 To use Mandrill, you need to register on their site http://mandrill.com/ and obtain a Mandrill API
 key. The configuration script `setup.py` will ask for this key.
@@ -352,7 +365,7 @@ a webhook to trigger on the following events: `send`, `deferral`, `hard_bounce`,
 into the configuration script and restart the server.
 
 
-## 6. Dummy e-mail infrastructure
+## 7. Dummy e-mail infrastructure
 
 Using the command:
 
@@ -400,7 +413,7 @@ e-mail address whatsoever. Nothing will be delivered. Also note, that all e-mail
 memory only, so they will disappear when the infrastructure is restarted.
 
 
-## 7. Contributing
+## 8. Contributing
 
 If you want to contribute, please, create a new branch for your changes:
 
@@ -411,7 +424,7 @@ If you want to contribute, please, create a new branch for your changes:
 And then submit a 'Pull Request' on GitHub.
 
 
-### 7.1. Site Content and translations
+### 8.1. Site Content and translations
 
 All site text content is stored in templates. Templates are in `template` directories all over the
 project. Some templates are translated in place and have their translated versions such as
@@ -433,14 +446,3 @@ current directory and update the localization files for you:
 
 	$ cd chcemvediet/chcemvediet
 	$ ../env/bin/python ../manage.py makemessages -l sk -l en --no-wrap --no-location
-
-
-## 8. Google Recaptcha engine key
-
- 1. Sign into [reCAPTCHA](https://www.google.com/recaptcha/admin/create) using your Google Account.
-
- 2. Create new recaptcha with the following options:
-      * **reCAPTCHA type**: reCAPTCHA v2, "I'm not a robot" Checkbox.
-      * **Domains**: `127.0.0.1`
-
- 3. Run `setup.py` to configure your google recaptcha private and public keys.
