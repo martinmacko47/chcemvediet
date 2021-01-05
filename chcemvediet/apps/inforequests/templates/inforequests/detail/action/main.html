@@ -14,8 +14,9 @@
 {% endcomment %}
 
 
-<div id="a{{ action.pk }}">
-  {% with print_id=idgenerator.next %}
+{% with action_id='a'|add:action.pk|stringformat:"s" %}
+<div id="{{ action_id }}">
+  {% with print_id=action_id %}
     <div class="panel panel-border-gray">
       <div class="panel-heading">
         <div class="pull-right">
@@ -110,3 +111,4 @@
     {% include "inforequests/detail/branch/sub.html" with branch=sub_branch %}
   {% endfor %}
 </div>
+{% endwith %}

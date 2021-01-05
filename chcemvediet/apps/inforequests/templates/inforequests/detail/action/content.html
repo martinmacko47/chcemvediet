@@ -7,12 +7,11 @@
  %  -- inforequest: chcemvediet.apps.inforequests.models.Inforequest
  %  -- branch: chcemvediet.apps.inforequests.models.Branch
  %  -- action: chcemvediet.apps.inforequests.models.Action
- %  -- print_id: string
  %
 {% endcomment %}
 
 
-<div id="{{ print_id }}" class="chv-color-black">
+<div class="chv-color-black">
   {% if action.content_type == action.CONTENT_TYPES.PLAIN_TEXT %}
     <p class="chv-preline">{% anonymize inforequest action.content %}</p>
   {% elif action.content_type == action.CONTENT_TYPES.HTML %}
