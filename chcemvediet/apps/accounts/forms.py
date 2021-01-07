@@ -1,6 +1,9 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-from allauth.account.forms import LoginForm as AllauthLoginForm
+from allauth.account.forms import (LoginForm as AllauthLoginForm,
+                                   SignupForm as AllauthSignupForm,
+                                   ResetPasswordForm as AllauthResetPasswordForm)
+from allauth.utils import set_form_field_order
 from captcha.fields import ReCaptchaField
 from django import forms
 from django.utils.translation import ungettext_lazy, ugettext_lazy as _
@@ -18,7 +21,7 @@ class LoginForm(AllauthLoginForm):
         super(LoginForm, self).__init__(*args, **kwargs)
         self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
 
-class SignupForm(forms.Form):
+class SignupForm(AllauthSignupForm):
     first_name = forms.CharField(
             max_length=30,
             label=_(u'accounts:SignupForm:first_name:label'),
@@ -55,20 +58,20 @@ class SignupForm(forms.Form):
                 }),
             regex=r'^\d{5}$',
             )
-
-    def __init__(self, *args, **kwargs):
-        super(SignupForm, self).__init__(*args, **kwargs)
-
-        # Defined here and not in the class definition above to make sure the field is places after
-        # allauth email and password fields.
-        self.fields[u'agreement'] = forms.BooleanField(
+    agreement = forms.BooleanField(
             label=_(u'accounts:SignupForm:agreement:label'),
             required=True,
             )
-        self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
+    recaptcha = ReCaptchaField(label=u'')
 
+    def __init__(self, *args, **kwargs):
+        super(SignupForm, self).__init__(*args, **kwargs)
+        fields_order = (u'first_name', u'last_name', u'street', u'city', u'zip', u'email',
+                        u'password1', u'password2', u'agreement', u'recaptcha',)
+        set_form_field_order(self, fields_order)
 
-    def signup(self, request, user):
+    def save(self, request):
+        user = super(SignupForm, self).save(request)
         user.first_name = self.cleaned_data[u'first_name']
         user.last_name = self.cleaned_data[u'last_name']
         user.save()
@@ -76,6 +79,7 @@ class SignupForm(forms.Form):
         user.profile.city = self.cleaned_data[u'city']
         user.profile.zip = self.cleaned_data[u'zip']
         user.profile.save()
+        return user
 
 class SettingsForm(forms.Form):
 
@@ -167,3 +171,9 @@ class SettingsForm(forms.Form):
             words, numbers = get_default_anonymized_strings_for_user(self.user)
             ret = words + numbers
         return u'\n'.join(ret)
+
+class ResetPasswordForm(AllauthResetPasswordForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ResetPasswordForm, self).__init__(*args, **kwargs)
+        self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
