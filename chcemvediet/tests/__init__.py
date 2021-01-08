@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import itertools
 import logging
+import os
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -31,6 +32,11 @@ class CustomTestRunner(DiscoverRunner):
     def setup_test_environment(self, **kwargs):
         super(CustomTestRunner, self).setup_test_environment(**kwargs)
         settings.LANGUAGE_CODE = u'en'
+        os.environ[u'RECAPTCHA_TESTING'] = u'True'
+
+    def teardown_test_environment(self, **kwargs):
+        super(CustomTestRunner, self).teardown_test_environment(**kwargs)
+        del os.environ[u'RECAPTCHA_TESTING']
 
     def run_tests(self, *args, **kwargs):
         logging.disable(logging.CRITICAL)

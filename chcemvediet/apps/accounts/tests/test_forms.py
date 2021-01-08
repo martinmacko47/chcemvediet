@@ -19,13 +19,9 @@ class LoginFormTest(AccountsTestCaseMixin, TestCase):
     """
 
     def setUp(self):
-        os.environ[u'RECAPTCHA_TESTING'] = u'True'
         user = User.objects.create(username=u'john', email=u'john@doe.org')
         user.set_password(u'doe')
         user.save()
-
-    def tearDown(self):
-        del os.environ[u'RECAPTCHA_TESTING']
 
     def _create_account_login_data(self, **kwargs):
         defaults = {
@@ -61,12 +57,6 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
     "account_signup". Does not check ``account_signup`` functionality, only checks functionality
     added by ``SignupForm``.
     """
-
-    def setUp(self):
-        os.environ[u'RECAPTCHA_TESTING'] = u'True'
-
-    def tearDown(self):
-        del os.environ[u'RECAPTCHA_TESTING']
 
     def _create_account_signup_data(self, **kwargs):
         defaults = {
@@ -228,10 +218,6 @@ class ResetPasswordFormTest(AccountsTestCaseMixin, TestCase):
         user = User.objects.create(username=u'john', email=u'john@doe.org')
         user.set_password(u'doe')
         user.save()
-        os.environ[u'RECAPTCHA_TESTING'] = u'True'
-
-    def tearDown(self):
-        del os.environ[u'RECAPTCHA_TESTING']
 
     def _create_account_password_reset_data(self, **kwargs):
         defaults = {
