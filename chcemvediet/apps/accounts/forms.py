@@ -81,6 +81,12 @@ class SignupForm(AllauthSignupForm):
         user.profile.save()
         return user
 
+class ResetPasswordForm(AllauthResetPasswordForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ResetPasswordForm, self).__init__(*args, **kwargs)
+        self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
+
 class SettingsForm(forms.Form):
 
     anonymize_inforequests = forms.BooleanField(
@@ -171,9 +177,3 @@ class SettingsForm(forms.Form):
             words, numbers = get_default_anonymized_strings_for_user(self.user)
             ret = words + numbers
         return u'\n'.join(ret)
-
-class ResetPasswordForm(AllauthResetPasswordForm):
-
-    def __init__(self, *args, **kwargs):
-        super(ResetPasswordForm, self).__init__(*args, **kwargs)
-        self.fields[u'recaptcha'] = ReCaptchaField(label=u'')
