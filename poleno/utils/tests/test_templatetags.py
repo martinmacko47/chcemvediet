@@ -173,6 +173,16 @@ class TemplatetagsStringTest(TestCase):
                 u'')
         self.assertRegexpMatches(rendered, r'^\(Lorem ipsum .*\)\(<p>.{30,}</p>\s*<p>.{30,}</p>\)$')
 
+    def test_format(self):
+        u"""
+        Test ``format`` template tag.
+        """
+        rendered = self._render(
+            u'{% load format from poleno.utils %}'
+            u'{% id|format:"id-%s-formatted" %}'
+            u'', id=1)
+        self.assertEqual(rendered, u'id-1-formatted')
+
 class TemplatetagsViewTest(TestCase):
     u"""
     Tests ``active`` template filter and ``change_lang`` template tag. Tests are performed by
