@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     u'widget_tweaks',
     u'compressor',
     u'vendor.bootstrap_sass',
+    u'captcha',
     # Reused apps
     u'poleno.utils',
     u'poleno.dummymail',
@@ -222,10 +223,17 @@ ACCOUNT_AUTHENTICATION_METHOD = u'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = u'optional'
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_SIGNUP_FORM_CLASS = u'chcemvediet.apps.accounts.forms.SignupForm'
+ACCOUNT_FORMS = {
+    u'signup': u'chcemvediet.apps.accounts.forms.SignupForm',
+    u'login': u'chcemvediet.apps.accounts.forms.LoginForm',
+    u'reset_password': u'chcemvediet.apps.accounts.forms.ResetPasswordForm',
+    }
 SOCIALACCOUNT_EMAIL_VERIFICATION = u'none'
 SOCIALACCOUNT_AUTO_SIGNUP = False
 LOGIN_REDIRECT_URL = u'inforequests:mine'
+
+# Django-recaptcha settings
+NOCAPTCHA = True
 
 # Chcemvediet settings
 INVITATIONS_INVITATION_ONLY = False

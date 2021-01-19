@@ -9,4 +9,5 @@ def settings(request):
         u'INSTALLED_APPS': django_settings.INSTALLED_APPS,
         u'DEVBAR_MESSAGE': django_settings.DEVBAR_MESSAGE,
         u'SEARCH_API_KEY': django_settings.SEARCH_API_KEY,
+        u'RECAPTCHA_PUBLIC_KEY': django_settings.RECAPTCHA_PUBLIC_KEY,
         }

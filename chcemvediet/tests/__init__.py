@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import itertools
 import logging
+import os
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -26,11 +27,18 @@ class CustomTestRunner(DiscoverRunner):
      -- Disabled logging while testing.
         Source: http://stackoverflow.com/questions/5255657/how-can-i-disable-logging-while-running-unit-tests-in-python-django
      -- Forced language code 'en'
+     -- Mocked google recaptcha.
+        Source: https://pypi.org/project/django-recaptcha/1.0.6/#unit-testing
     """
 
     def setup_test_environment(self, **kwargs):
         super(CustomTestRunner, self).setup_test_environment(**kwargs)
         settings.LANGUAGE_CODE = u'en'
+        os.environ[u'RECAPTCHA_TESTING'] = u'True'
+
+    def teardown_test_environment(self, **kwargs):
+        del os.environ[u'RECAPTCHA_TESTING']
+        super(CustomTestRunner, self).teardown_test_environment(**kwargs)
 
     def run_tests(self, *args, **kwargs):
         logging.disable(logging.CRITICAL)
