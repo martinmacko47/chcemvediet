@@ -202,7 +202,9 @@ class TemplatetagsViewTest(TestCase):
     def page_not_found(request):
         return HttpResponseNotFound(Template(
             u'{% load change_lang from poleno.utils %}'
+            u'({% change_lang "en" %})'
             u'({% change_lang "de" %})'
+            u'({% change_lang "fr" %})'
         ).render(Context({
             u'request': request,
         })))
@@ -268,8 +270,8 @@ class TemplatetagsViewTest(TestCase):
 
     def test_change_lang_tag_with_missing_language_in_url(self):
         u"""
-        Tests ``change_lang`` template tag by raising 404 exception, which is processed by custom
-        handler using a template with this tag.
+        Tests ``change_lang`` template tag without language prefix in URL. Checking that it
+        generates same URLs, for all defined languages, if they are active or not.
         """
         lang = ((u'de', u'Deutsch'), (u'en', u'English'), (u'fr', u'Francais'))
         with self.settings(
@@ -277,10 +279,12 @@ class TemplatetagsViewTest(TestCase):
                 MIDDLEWARE_CLASSES=[mc for mc in settings.MIDDLEWARE_CLASSES
                                     if mc != u'django.middleware.locale.LocaleMiddleware'],
                 ):
-            r = self.client.get(u'/language/')
-            self.assertIs(type(r), HttpResponseNotFound)
-            self.assertEqual(r.status_code, 404)
-            self.assertEqual(r.content, u'(/language/)')
+            for language, _ in lang:
+                with translation(language):
+                    r = self.client.get(u'/language/')
+                    self.assertIs(type(r), HttpResponseNotFound)
+                    self.assertEqual(r.status_code, 404)
+                    self.assertEqual(r.content, u'(/language/)(/language/)(/language/)')
 
 class AmendTemplatetagTest(TestCase):
     u"""
