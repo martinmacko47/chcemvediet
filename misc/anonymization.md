@@ -90,14 +90,16 @@ Properties:
 Computed Properties:
 * `content`: String; May be NULL; May be empty; Read-only.
 
+## Commands
 
-## `attachment_anonymization`
+### `attachment_anonymization`
 
 	 $ env/bin/python manage.py attachment_anonymization [options] attachment_id [file]
 
 
-Creates AttachmentFinalization instance for the specified Attachment. By default, the file path is
-read from stdin. You can pass file path explicitly as an argument.
+Creates AttachmentFinalization instance for the specified Attachment. The content source is file,
+that can be passed as an argument, or stdin. Preferred source is file. If file is not specified and
+stdin is empty, the command will fail.
 
 AttachmentFinalization created this way will be marked as successful. Only one successful
 AttachmentFinalization can be assigned to the Attachment.

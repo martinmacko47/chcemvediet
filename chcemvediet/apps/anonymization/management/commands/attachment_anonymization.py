@@ -1,3 +1,4 @@
+import sys
 from optparse import make_option
 
 import magic
@@ -11,19 +12,19 @@ from chcemvediet.apps.inforequests.models import Action
 
 
 class Command(BaseCommand):
-    args = u'attachment [file]'
+    args = u'attachment_id [file]'
     help = squeeze(u"""
-            Creates anonymization for the specified Attachment. By default, the file path is read
-            from stdin. File path can be explicitly passed as an command argument. Anonymization
-            created this way will be marked as successful. Only one successful anonymization can be
-            assigned to the Attachment.
+            Creates anonymization for the specified Attachment. The content source is file, that can
+            be passed as an argument, or stdin. Preferred source is file. If file is not specified
+            and stdin is empty, the command will fail. Anonymization created this way will be marked
+            as successful. Only one successful anonymization can be assigned to the Attachment.
             """)
 
     option_list = BaseCommand.option_list + (
         make_option(u'--content_type',
                     help=squeeze(u"""
-                            Content type of file, e.g. "application/pdf". Automatically computed if
-                            not specified.
+                            Content type of file, e.g. "application/pdf". Automatically guessed from
+                            the file content if not specified.
                             """)
                     ),
         make_option(u'--debug',
@@ -44,35 +45,44 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if not args:
             raise CommandError(u'attachment_anonymization takes at least 1 argument (0 given).')
-        if len(args) > 2:
+        elif len(args) > 2:
             raise CommandError(
                 u'attachment_anonymization takes at most 2 arguments ({} given).'.format(len(args))
-                )
-        pk = args[0]
-        filename = args[1] if len(args) == 2 else raw_input(u'File:')
-        if not filename:
-            raise CommandError(u'Missing source file name.')
-        with open(filename, u'rb') as file:
+            )
+
+        attachment_pk = args[0]
+        try:
+            attachment = Attachment.objects.attached_to(Action).get(pk=attachment_pk)
+        except (Attachment.DoesNotExist, ValueError):
+            raise CommandError(
+                u'Attachment instance with pk "{}" does not exist.'.format(attachment_pk)
+            )
+        attachments_finalization = (AttachmentFinalization.objects
+                                    .filter(attachment=attachment)
+                                    .successful())
+        if not options[u'force'] and attachments_finalization:
+            raise CommandError(squeeze(u"""
+                    Anonymization files already exist. Use the --force option to overwrite
+                    them.
+                    """))
+
+        if len(args) == 2:
+            filename = args[1]
             try:
-                attachment = Attachment.objects.attached_to(Action).get(pk=pk)
-                attachments_finalization = (AttachmentFinalization.objects
-                                            .filter(attachment=attachment)
-                                            .successful())
-                if options[u'force'] or not attachments_finalization:
-                    attachments_finalization.delete()
+                with open(filename, u'rb') as file:
                     content = file.read()
-                    content_type = magic.from_buffer(content, mime=True)
-                    AttachmentFinalization.objects.create(
-                        attachment=attachment,
-                        successful=True,
-                        file=ContentFile(content),
-                        content_type=options[u'content_type'] or content_type,
-                        debug=options[u'debug'],
-                    )
-                else:
-                    raise CommandError(squeeze(u"""
-                            Anonymization files already exist. Use the --force option to overwrite
-                            them.
-                            """))
-            except Attachment.DoesNotExist:
-                raise CommandError(u'Attachment instance with pk {} does not exist.'.format(pk))
+            except IOError as e:
+                raise CommandError(u'Could not open file: {}.'.format(e))
+        elif not sys.stdin.isatty():
+            content = sys.stdin.read()
+        else:
+            raise CommandError(u'Missing content source.')
+
+        attachments_finalization.delete()
+        AttachmentFinalization.objects.create(
+            attachment=attachment,
+            successful=True,
+            file=ContentFile(content),
+            content_type=options[u'content_type'] or magic.from_buffer(content, mime=True),
+            debug=options[u'debug'],
+        )

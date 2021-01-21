@@ -43,23 +43,39 @@ class AttachmentAnonymizationManagementCommandTest(ChcemvedietTestCaseMixin, Tes
             call_command(u'attachment_anonymization')
 
     def test_non_existent_attachment_raises_exception(self):
-        with self.assertRaisesMessage(CommandError, u'Attachment instance with pk -1 does not exist.'):
+        with self.assertRaisesMessage(CommandError, u'Attachment instance with pk "-1" does not exist.'):
             call_command(u'attachment_anonymization', u'-1', self.filename)
+
+    def test_invalid_attachment_id_raises_exception(self):
+        with self.assertRaisesMessage(CommandError, u'Attachment instance with pk "invalid_id" does not exist.'):
+            call_command(u'attachment_anonymization', u'invalid_id', self.filename)
 
     def test_command_with_too_many_arguments(self):
         with self.assertRaisesMessage(CommandError, u'attachment_anonymization takes at most 2 arguments (3 given).'):
             call_command(u'attachment_anonymization', self.attachment.pk, self.filename, u'filename2')
 
-    def test_file_argument_is_read_from_stdin_if_omitted(self):
+    def test_content_is_read_from_stdin_if_file_argument_is_omitted(self):
         self.addCleanup(setattr, sys, u'stdin', sys.stdin)
-        sys.stdin = StringIO(self.filename)
+        sys.stdin = StringIO(u'Content from stdin.')
         call_command(u'attachment_anonymization', self.attachment.pk)
+        attachment_finalization = AttachmentFinalization.objects.get(attachment=self.attachment)
+        self.assertEqual(attachment_finalization.file.read(), u'Content from stdin.')
 
     def test_file_argument_and_stdin_together_may_not_be_omitted(self):
-        self.addCleanup(setattr, sys, u'stdin', sys.stdin)
-        sys.stdin = StringIO(u'\n')
-        with self.assertRaisesMessage(CommandError, u'Missing source file name.'):
+        with self.assertRaisesMessage(CommandError, u'Missing content source.'):
             call_command(u'attachment_anonymization', self.attachment.pk)
+
+    def test_preferred_content_source_is_file(self):
+        self.addCleanup(setattr, sys, u'stdin', sys.stdin)
+        sys.stdin = StringIO(u'Content from stdin.')
+        call_command(u'attachment_anonymization', self.attachment.pk, self.filename)
+        attachment_finalization = AttachmentFinalization.objects.get(attachment=self.attachment)
+        self.assertEqual(attachment_finalization.file.read(), u'Default testing content')
+
+    def test_file_is_invalid(self):
+        filename = u'/tmp/invalid.txt'
+        with self.assertRaisesMessage(CommandError, u'Could not open file: '.format(filename)):
+            call_command(u'attachment_anonymization', self.attachment.pk, filename)
 
     def test_content_type_option(self):
         call_command(u'attachment_anonymization', self.attachment.pk, self.filename, content_type=u'application/pdf')
