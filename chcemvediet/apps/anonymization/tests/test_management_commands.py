@@ -62,7 +62,9 @@ class AttachmentAnonymizationManagementCommandTest(ChcemvedietTestCaseMixin, Tes
         self.assertEqual(attachment_finalization.file.read(), u'Content from stdin.')
 
     def test_file_argument_and_stdin_together_may_not_be_omitted(self):
-        with self.assertRaisesMessage(CommandError, u'Missing content source.'):
+        self.addCleanup(setattr, sys, u'stdin', sys.stdin)
+        sys.stdin = StringIO(u'')
+        with self.assertRaisesMessage(CommandError, u'No content given.'):
             call_command(u'attachment_anonymization', self.attachment.pk)
 
     def test_preferred_content_source_is_file(self):

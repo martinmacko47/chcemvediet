@@ -73,10 +73,10 @@ class Command(BaseCommand):
                     content = file.read()
             except IOError as e:
                 raise CommandError(u'Could not open file: {}.'.format(e))
-        elif not sys.stdin.isatty():
-            content = sys.stdin.read()
         else:
-            raise CommandError(u'Missing content source.')
+            content = sys.stdin.read()
+            if not content:
+                raise CommandError(u'No content given.')
 
         attachments_finalization.delete()
         AttachmentFinalization.objects.create(
