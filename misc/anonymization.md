@@ -90,5 +90,27 @@ Properties:
 Computed Properties:
 * `content`: String; May be NULL; May be empty; Read-only.
 
+## Commands
+
+### `attachment_anonymization`
+
+	 $ env/bin/python manage.py attachment_anonymization [options] attachment_id [file]
+
+
+Creates AttachmentFinalization instance for the specified Attachment. The content source is file,
+that can be passed as an argument, or stdin. Preferred source is file. If no file is specified and
+stdin is empty, the command will fail.
+
+AttachmentFinalization created this way will be marked as successful. Only one successful
+AttachmentFinalization can be assigned to the Attachment.
+
+* `--content_type=CONTENT_TYPE`: Content type of file, e.g. "application/pdf". Automatically
+                                 computed if not specified.
+* `--debug=DEBUG`: Debug message to the newly created instance. Empty by default.
+* `--force`: The command refuses to anonymize attachment if a successful anonymization already
+             exists. This flag disables this check. Deletes all existing successful
+             AttachmentFinalizations and creates new one. Unsuccessful AttachmentFinalizations will
+             stay unaffected.
+
 
 <sub>*\* Features that are marked ~~strikethrough~~ are not implemented yet.*</sub>

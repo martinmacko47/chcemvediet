@@ -322,6 +322,9 @@ class AttachmentAnonymization(FormatMixin, models.Model):
         return format(self.pk)
 
 class AttachmentFinalizationQuerySet(QuerySet):
+    def successful(self):
+        return self.filter(successful=True)
+
     def order_by_pk(self):
         return self.order_by(u'pk')
 
