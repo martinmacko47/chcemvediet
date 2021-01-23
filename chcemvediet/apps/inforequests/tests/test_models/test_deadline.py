@@ -11,7 +11,6 @@ class DeadlineTest(InforequestsTestCaseMixin, TestCase):
     Tests ``Deadline`` model.
     """
     def _create_deadline(self, **kwargs):
-        from chcemvediet.apps.inforequests.models.deadline import Deadline
         _today = kwargs.pop(u'_today', local_today())
         deadline = self._call_with_defaults(Deadline, kwargs, {
             u'type': Deadline.TYPES.OBLIGEE_DEADLINE,
