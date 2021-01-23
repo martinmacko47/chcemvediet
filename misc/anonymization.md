@@ -98,7 +98,7 @@ Computed Properties:
 
 
 Creates AttachmentFinalization instance for the specified Attachment. The content source is file,
-that can be passed as an argument, or stdin. Preferred source is file. If file is not specified and
+that can be passed as an argument, or stdin. Preferred source is file. If no file is specified and
 stdin is empty, the command will fail.
 
 AttachmentFinalization created this way will be marked as successful. Only one successful

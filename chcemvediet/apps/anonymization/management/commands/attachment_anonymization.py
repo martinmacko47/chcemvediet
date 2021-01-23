@@ -4,6 +4,7 @@ from optparse import make_option
 import magic
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 
 from poleno.attachments.models import Attachment
 from poleno.utils.misc import squeeze
@@ -14,10 +15,9 @@ from chcemvediet.apps.inforequests.models import Action
 class Command(BaseCommand):
     args = u'attachment_id [file]'
     help = squeeze(u"""
-            Creates anonymization for the specified Attachment. The content source is file, that can
-            be passed as an argument, or stdin. Preferred source is file. If file is not specified
-            and stdin is empty, the command will fail. Anonymization created this way will be marked
-            as successful. Only one successful anonymization can be assigned to the Attachment.
+            Creates anonymization for the specified Attachment. The anonymized content is read from
+            the given file or from stdin if no file is specified. If no file is specified and stdin
+            is empty, the command will fail.
             """)
 
     option_list = BaseCommand.option_list + (
@@ -33,15 +33,11 @@ class Command(BaseCommand):
                     ),
         make_option(u'--force',
                     action=u'store_true',
-                    help=squeeze(u"""
-                            The command refuses to anonymize attachment if a successful
-                            anonymization already exists. This flag disables this check. Deletes all
-                            existing successful anonymizations and creates new one. Unsuccessful
-                            anonymizations will stay unaffected.
-                            """)
+                    help=u'Overwrite any existing anonymization for the attachment.'
                     ),
     )
 
+    @transaction.atomic
     def handle(self, *args, **options):
         if not args:
             raise CommandError(u'attachment_anonymization takes at least 1 argument (0 given).')
@@ -61,10 +57,7 @@ class Command(BaseCommand):
                                     .filter(attachment=attachment)
                                     .successful())
         if not options[u'force'] and attachments_finalization:
-            raise CommandError(squeeze(u"""
-                    Anonymization files already exist. Use the --force option to overwrite
-                    them.
-                    """))
+            raise CommandError(u'Anonymization already exists. Use the --force to overwrite it.')
 
         if len(args) == 2:
             filename = args[1]
@@ -78,11 +71,12 @@ class Command(BaseCommand):
             if not content:
                 raise CommandError(u'No content given.')
 
-        attachments_finalization.delete()
-        AttachmentFinalization.objects.create(
-            attachment=attachment,
-            successful=True,
-            file=ContentFile(content),
-            content_type=options[u'content_type'] or magic.from_buffer(content, mime=True),
-            debug=options[u'debug'],
-        )
+        with transaction.atomic():
+            attachments_finalization.delete()
+            AttachmentFinalization.objects.create(
+                attachment=attachment,
+                successful=True,
+                file=ContentFile(content),
+                content_type=options[u'content_type'] or magic.from_buffer(content, mime=True),
+                debug=options[u'debug'],
+            )

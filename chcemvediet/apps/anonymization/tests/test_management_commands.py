@@ -42,7 +42,7 @@ class AttachmentAnonymizationManagementCommandTest(ChcemvedietTestCaseMixin, Tes
         with self.assertRaisesMessage(CommandError, u'attachment_anonymization takes at least 1 argument (0 given).'):
             call_command(u'attachment_anonymization')
 
-    def test_non_existent_attachment_raises_exception(self):
+    def test_non_existing_attachment_raises_exception(self):
         with self.assertRaisesMessage(CommandError, u'Attachment instance with pk "-1" does not exist.'):
             call_command(u'attachment_anonymization', u'-1', self.filename)
 
@@ -74,7 +74,7 @@ class AttachmentAnonymizationManagementCommandTest(ChcemvedietTestCaseMixin, Tes
         attachment_finalization = AttachmentFinalization.objects.get(attachment=self.attachment)
         self.assertEqual(attachment_finalization.file.read(), u'Default testing content')
 
-    def test_file_is_invalid(self):
+    def test_invalid_file_raises_exception(self):
         filename = u'/tmp/invalid.txt'
         with self.assertRaisesMessage(CommandError, u'Could not open file: '.format(filename)):
             call_command(u'attachment_anonymization', self.attachment.pk, filename)
@@ -104,11 +104,12 @@ class AttachmentAnonymizationManagementCommandTest(ChcemvedietTestCaseMixin, Tes
         attachment_finalization1 = AttachmentFinalization.objects.get(attachment=self.attachment)
         call_command(u'attachment_anonymization', self.attachment.pk, self.filename, force=True)
         attachment_finalization2 = AttachmentFinalization.objects.get(attachment=self.attachment)
+        self.assertNotEqual(attachment_finalization1.pk, attachment_finalization2.pk)
         with self.assertRaisesMessage(AttachmentFinalization.DoesNotExist, u'AttachmentFinalization matching query does not exist'):
             AttachmentFinalization.objects.get(pk=attachment_finalization1.pk)
 
-    def test_existent_attachment_finalization_raises_exception_if_force_option_is_omitted(self):
+    def test_existing_attachment_finalization_raises_exception_if_force_option_is_omitted(self):
         call_command(u'attachment_anonymization', self.attachment.pk, self.filename)
         attachment_finalization = AttachmentFinalization.objects.get(attachment=self.attachment)
-        with self.assertRaisesMessage(CommandError, u'Anonymization files already exist. Use the --force option to overwrite them.'):
+        with self.assertRaisesMessage(CommandError, u'Anonymization already exists. Use the --force to overwrite it.'):
             call_command(u'attachment_anonymization', self.attachment.pk, self.filename)
