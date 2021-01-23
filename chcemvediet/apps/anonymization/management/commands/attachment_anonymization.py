@@ -71,12 +71,11 @@ class Command(BaseCommand):
             if not content:
                 raise CommandError(u'No content given.')
 
-        with transaction.atomic():
-            attachments_finalization.delete()
-            AttachmentFinalization.objects.create(
-                attachment=attachment,
-                successful=True,
-                file=ContentFile(content),
-                content_type=options[u'content_type'] or magic.from_buffer(content, mime=True),
-                debug=options[u'debug'],
-            )
+        attachments_finalization.delete()
+        AttachmentFinalization.objects.create(
+            attachment=attachment,
+            successful=True,
+            file=ContentFile(content),
+            content_type=options[u'content_type'] or magic.from_buffer(content, mime=True),
+            debug=options[u'debug'],
+        )
