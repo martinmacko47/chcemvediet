@@ -259,8 +259,7 @@ class ChcemvedietTestCaseMixin(TestCase):
             })
 
     def _create_action(self, **kwargs):
-        _today = kwargs.pop(u'_today', local_today())
-        action = self._call_with_defaults(Action.objects.create, kwargs, {
+        return self._call_with_defaults(Action.objects.create, kwargs, {
                 u'branch': self.branch,
                 u'email': None,
                 u'type': Action.TYPES.REQUEST,
@@ -278,9 +277,6 @@ class ChcemvedietTestCaseMixin(TestCase):
                 u'refusal_reason': None,
                 u'last_deadline_reminder': None,
         })
-        if action.deadline:
-            action.deadline._today = _today
-        return action
 
     def _render(self, template, **context):
         return Template(template).render(Context(context))

@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import ugettext as __
 
+from poleno.timewarp import timewarp
 from poleno.attachments.models import Attachment
 from poleno.mail.models import Message, Recipient
 from poleno.utils.date import local_datetime_from_local, naive_date, local_today, utc_now
@@ -413,29 +414,38 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
             self.assertEqual(action.has_obligee_deadline, has_obligee_deadline)
 
     def test_has_obligee_deadline_missed_property(self):
-        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), _today=naive_date(u'2010-10-15'))
+        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-15 10:33:00'))
         self.assertFalse(action.has_obligee_deadline_missed)
-        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), _today=naive_date(u'2010-10-16'))
+        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'))
+        timewarp.jump(local_datetime_from_local(u'2011-10-16 10:33:00'))
         self.assertTrue(action.has_obligee_deadline_missed)
 
     def test_has_obligee_deadline_snooze_missed_property(self):
-        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), snooze=naive_date(u'2010-10-16'), _today=naive_date(u'2010-10-16'))
+        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), snooze=naive_date(u'2010-10-16'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-16 10:33:00'))
         self.assertFalse(action.has_obligee_deadline_snooze_missed)
-        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), snooze=naive_date(u'2010-10-16'), _today=naive_date(u'2010-10-17'))
+        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), snooze=naive_date(u'2010-10-16'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-17 10:33:00'))
         self.assertTrue(action.has_obligee_deadline_snooze_missed)
 
     def test_has_applicant_deadline_missed_property(self):
-        action = self._create_action(type=Action.TYPES.CLARIFICATION_REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), _today=naive_date(u'2010-10-12'))
+        action = self._create_action(type=Action.TYPES.CLARIFICATION_REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-12 10:33:00'))
         self.assertFalse(action.has_applicant_deadline_missed)
-        action = self._create_action(type=Action.TYPES.CLARIFICATION_REQUEST, legal_date=naive_date(u'2010-10-05'),  delivered_date=naive_date(u'2010-10-05'), _today=naive_date(u'2010-10-13'))
+        action = self._create_action(type=Action.TYPES.CLARIFICATION_REQUEST, legal_date=naive_date(u'2010-10-05'),  delivered_date=naive_date(u'2010-10-05'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-13 10:33:00'))
         self.assertTrue(action.has_applicant_deadline_missed)
 
     def test_can_applicant_snooze_property(self):
-        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), _today=naive_date(u'2010-10-15'))
+        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-15 10:33:00'))
         self.assertFalse(action.can_applicant_snooze)
-        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), _today=naive_date(u'2010-10-16'))
+        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-16 10:33:00'))
         self.assertTrue(action.can_applicant_snooze)
-        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'), _today=naive_date(u'2010-10-21'))
+        action = self._create_action(type=Action.TYPES.REQUEST, legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-21 10:33:00'))
         self.assertFalse(action.can_applicant_snooze)
 
     def test_deadline_property(self):
