@@ -22,7 +22,7 @@ class DeadlineTest(InforequestsTestCaseMixin, TestCase):
 
 
     def test_is_obligee_deadline_and_is_applicant_deadline_properties(self):
-        tests = (                                 # Obligee, Applicant
+        tests = (
                 (Deadline.TYPES.OBLIGEE_DEADLINE,   True,    False),
                 (Deadline.TYPES.APPLICANT_DEADLINE, False,   True),
         )
@@ -37,7 +37,7 @@ class DeadlineTest(InforequestsTestCaseMixin, TestCase):
             self.assertEqual(deadline.is_applicant_deadline, is_applicant_deadline)
 
     def test_is_in_calendar_days_and_is_in_workdays_properties(self):
-        tests = (                            # calendar_days, workdays
+        tests = (
                 (Deadline.UNITS.CALENDAR_DAYS, True,          False),
                 (Deadline.UNITS.WORKDAYS,      False,         True),
         )
