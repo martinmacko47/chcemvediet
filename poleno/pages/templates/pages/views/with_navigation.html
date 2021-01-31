@@ -21,16 +21,15 @@
     </ol>
   {% endif %}
   <div class="row">
-    <div class="col-sm-9">
+    <div class="col-sm-8">
       {% block page %}{% endblock %}
     </div>
-    <div class="col-sm-3">
-      <ul class="nav nav-tabs nav-stacked">
+    <div class="col-sm-4">
+      <ul class="nav nav-tabs nav-stacked chv-nav">
         {% for sibling in page.parent.subpages %}
           {% if not sibling.is_redirect and not sibling.is_disabled %}
             <li class="{% if sibling == page %}active{% endif %}">
               <a href="{{ sibling.url }}">
-                <i class="chv-icon chv-icon-lg icon-chevron-right pull-right"></i>
                 {{ sibling.label }}
               </a>
             </li>
