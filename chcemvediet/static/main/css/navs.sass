@@ -1,0 +1,30 @@
+
+.chv-nav
+  border: 1px solid $nav-tabs-border-color
+  border-radius: 4px
+  > li
+    position: relative
+    display: block
+    margin-top: 0px
+    margin-bottom: 0px
+    padding-top: 0px
+    padding-bottom: 0px
+    a
+      border: 0
+      color: inherit
+      margin-right: 0px
+      &:hover,
+      &:focus,
+        background-color: inherit
+    &.active > a
+      border: 0
+      color: $chv-color-blue
+      font-weight: bold
+      &:hover,
+      &:focus,
+        border: none
+        color: $chv-color-blue
+  li:not(:last-child)
+    border-bottom: 1px solid $nav-tabs-border-color
+  @media (max-width: $screen-xs-max)
+    margin-top: 35px
