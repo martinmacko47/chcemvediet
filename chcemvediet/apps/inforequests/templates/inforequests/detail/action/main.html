@@ -1,6 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 {% load trans from i18n %}
-{% load method call_with format from poleno.utils %}
 {% load anonymize anonymized from chcemvediet.anonymization %}
 
 {% comment %}
@@ -14,7 +13,7 @@
 {% endcomment %}
 
 
-{% with print_id=idgenerator.next|format:"print-%s" %}
+{% with print_id=idgenerator.next %}
 <div id="{{print_id}}">
   <div id="a{{action.pk}}">
     <div class="panel panel-border-gray">
