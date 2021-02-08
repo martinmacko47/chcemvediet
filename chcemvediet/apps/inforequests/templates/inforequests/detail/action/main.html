@@ -14,100 +14,100 @@
 
 
 {% with print_id=idgenerator.next %}
-<div id="{{print_id}}">
-  <div id="a{{action.pk}}">
-    <div class="panel panel-border-gray">
-      <div class="panel-heading">
-        <div class="pull-right">
-          {% include "inforequests/detail/action/controls.html" %}
+  <div id="{{print_id}}">
+    <div id="a{{action.pk}}">
+      <div class="panel panel-border-gray">
+        <div class="panel-heading">
+          <div class="pull-right">
+                                   {% include "inforequests/detail/action/controls.html" %}
+                                   </div>
+          <h3>{{ action.get_extended_type_display }}</h3>
+          {% if action.subject %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:subject' %}:</p>
+              <p class="col-sm-9 col-md-10"><strong>{% anonymize inforequest action.subject %}</strong></p>
+            </div>
+          {% endif %}
         </div>
-        <h3>{{ action.get_extended_type_display }}</h3>
-        {% if action.subject %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:subject' %}:</p>
-            <p class="col-sm-9 col-md-10"><strong>{% anonymize inforequest action.subject %}</strong></p>
+        <div class="panel-body chv-scheme-gray">
+          {% if action.email %}
+            {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.INBOUND %}
+              <div class="row">
+                <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_from' %}:</p>
+                <p class="col-sm-9 col-md-10 chv-semidense">{{ action.email.from_formatted }}</p>
+              </div>
+            {% endif %}
+            {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.OUTBOUND %}
+              <div class="row">
+                <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_to' %}:</p>
+                <div class="col-sm-9 col-md-10">{% include "inforequests/detail/action/recipients.html" %}</div>
+              </div>
+            {% endif %}
+          {% endif %}
+          {% if action.legal_date %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:legal_date' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.legal_date }}</p>
+            </div>
+          {% endif %}
+          {% if action.sent_date %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:sent_date' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.sent_date }}</p>
+            </div>
+          {% endif %}
+          {% if action.delivered_date %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:delivered_date' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.delivered_date }}</p>
+            </div>
+          {% endif %}
+          {% if action.type == ACTION_TYPES.EXTENSION %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:extension' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{% include "inforequests/detail/texts/extension.html" %}</p>
+            </div>
+          {% endif %}
+          {% if forloop.last and action.deadline  %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:deadline' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{% include "inforequests/detail/texts/deadline.html" %}</p>
+            </div>
+          {% endif %}
+          {% if action.file_number %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:file_number' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.file_number }}</p>
+            </div>
+          {% endif %}
+          {% if action.disclosure_level %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:disclosure_level' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.get_disclosure_level_display }}</p>
+            </div>
+          {% endif %}
+          {% if action.refusal_reason %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:refusal_reason' %}:</p>
+              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.get_refusal_reason_list|join:"<br>" }}</p>
+            </div>
+          {% endif %}
+          {% if action.attachments %}
+            <div class="row">
+              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:attachments' %}:</p>
+              <div class="col-sm-9 col-md-10 chv-semidense">{% include "inforequests/detail/action/attachments.html" %}</div>
+            </div>
+          {% endif %}
+        </div>
+        {% if action.content %}
+          <div class="panel-body">
+            {% include "inforequests/detail/action/content.html" %}
           </div>
         {% endif %}
       </div>
-      <div class="panel-body chv-scheme-gray">
-        {% if action.email %}
-          {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.INBOUND %}
-            <div class="row">
-              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_from' %}:</p>
-              <p class="col-sm-9 col-md-10 chv-semidense">{{ action.email.from_formatted }}</p>
-            </div>
-          {% endif %}
-          {% if not inforequest|anonymized or action.email.type == MESSAGE_TYPES.OUTBOUND %}
-            <div class="row">
-              <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:email_to' %}:</p>
-              <div class="col-sm-9 col-md-10">{% include "inforequests/detail/action/recipients.html" %}</div>
-            </div>
-          {% endif %}
-        {% endif %}
-        {% if action.legal_date %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:legal_date' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{{ action.legal_date }}</p>
-          </div>
-        {% endif %}
-        {% if action.sent_date %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:sent_date' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{{ action.sent_date }}</p>
-          </div>
-        {% endif %}
-        {% if action.delivered_date %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:delivered_date' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{{ action.delivered_date }}</p>
-          </div>
-        {% endif %}
-        {% if action.type == ACTION_TYPES.EXTENSION %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:extension' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{% include "inforequests/detail/texts/extension.html" %}</p>
-          </div>
-        {% endif %}
-        {% if forloop.last and action.deadline  %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:deadline' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{% include "inforequests/detail/texts/deadline.html" %}</p>
-          </div>
-        {% endif %}
-        {% if action.file_number %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:file_number' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{{ action.file_number }}</p>
-          </div>
-        {% endif %}
-        {% if action.disclosure_level %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:disclosure_level' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{{ action.get_disclosure_level_display }}</p>
-          </div>
-        {% endif %}
-        {% if action.refusal_reason %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:refusal_reason' %}:</p>
-            <p class="col-sm-9 col-md-10 chv-semidense">{{ action.get_refusal_reason_list|join:"<br>" }}</p>
-          </div>
-        {% endif %}
-        {% if action.attachments %}
-          <div class="row">
-            <p class="col-sm-3 col-md-2 chv-dense">{% trans 'inforequests:detail:action:attachments' %}:</p>
-            <div class="col-sm-9 col-md-10 chv-semidense">{% include "inforequests/detail/action/attachments.html" %}</div>
-          </div>
-        {% endif %}
-      </div>
-      {% if action.content %}
-        <div class="panel-body">
-          {% include "inforequests/detail/action/content.html" %}
-        </div>
-      {% endif %}
+      {% for sub_branch in inforequest|method:'branches_advanced_by'|call_with:action %}
+        {% include "inforequests/detail/branch/sub.html" with branch=sub_branch %}
+      {% endfor %}
     </div>
-    {% for sub_branch in inforequest|method:'branches_advanced_by'|call_with:action %}
-      {% include "inforequests/detail/branch/sub.html" with branch=sub_branch %}
-    {% endfor %}
   </div>
-</div>
 {% endwith %}
