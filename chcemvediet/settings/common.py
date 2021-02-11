@@ -197,6 +197,7 @@ ASSETS = (
     u'poleno/js/autocomplete.js',
     u'poleno/js/autosize_textarea.js',
     u'poleno/js/collapsable.js',
+    u'poleno/css/collapsable.css',
     u'poleno/js/composite_text.js',
     u'poleno/js/datepicker.js',
     u'poleno/js/editable.js',
@@ -216,7 +217,6 @@ ASSETS = (
     u'main/js/01.bootstrapfix.js',
     u'main/css/02.jqueryfix.css',
     u'main/css/03.gcsefix.css',
-    u'poleno/css/collapsable.css',
     )
 
 # Django-allauth settings
