@@ -4,12 +4,13 @@ import datetime
 
 from django.contrib import admin
 from django.contrib.admin.utils import NestedObjects
+from django.core.exceptions import PermissionDenied
 from django.db import router
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
 
 from poleno.utils.date import local_today
-from poleno.utils.misc import decorate, squeeze
+from poleno.utils.misc import decorate
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
                                 ReadOnlyAdminInlineMixin, NoBulkDeleteAdminMixin)
 from chcemvediet.apps.inforequests.constants import ADMIN_EXTEND_SNOOZE_BY_DAYS
@@ -46,18 +47,9 @@ class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
             yield to_delete
 
     def render_delete_form(self, request, context):
-        obj = context[u'object']
-        outbound, inbound = self.nested_inforequestemail_queryset(obj)
-        if outbound:
-            context[u'deleted_objects'].extend([
-                u'Outbound messages will be deleted:',
-                [admin_obj_format(inforequestemail) for inforequestemail in outbound]
-            ])
-        if inbound:
-            context[u'deleted_objects'].extend([
-                u'Inbound messages will be marked undecided:',
-                [admin_obj_format(inforequestemail) for inforequestemail in inbound]
-            ])
+        outbound, inbound = self.nested_inforequestemail_queryset(context[u'object'])
+        context[u'outbound'] = [admin_obj_format(inforequestemail) for inforequestemail in outbound]
+        context[u'inbound'] = [admin_obj_format(inforequestemail) for inforequestemail in inbound]
         return super(DeleteNestedInforequestEmailAdminMixin, self).render_delete_form(request,
                                                                                       context)
 
@@ -384,26 +376,13 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
     def get_inforequest(self, obj):
         return obj.branch.inforequest
 
-    def has_delete_permission(self, request, obj=None):
-        if obj is None:
-            return True
-        if obj.type in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST]:
-            return False
-        if len(obj.branch.actions) > 1:
-            return True
-        return False
-
     def render_delete_form(self, request, context):
-        action = context[u'object']
-        if not action.is_last_action:
-            context[u'deleted_objects'].insert(0, format_html(squeeze(u"""
-                <b>Warning:</b> The deleted action is not the last action in the branch. Deleting it
-                may cause logical errors in the inforequest history.
-                """)))
         context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
 
     def delete_model(self, request, obj):
+        if obj.delete_dependency:
+            raise PermissionDenied
         if request.POST:
             if (request.POST.get(u'snooze')
                     and obj.type in [Action.TYPES.EXPIRATION, Action.TYPES.APPEAL_EXPIRATION]
