@@ -1,13 +1,36 @@
 {% extends "admin/delete_confirmation.html" %}
-{% load amend prepend from poleno.amend %}
+{% load amend prepend before after delete from poleno.amend %}
 
 {% block content %}
   {% amend %}
     {{ block.super }}
+    {% after path="./ul[1]" %}
+      {% if outbound %}
+        <p>Outbound messages will be deleted:</p>
+        <ul>{{ outbound|unordered_list }}</ul>
+      {% endif %}
+      {% if inbound %}
+        <p>Inbound messages will be marked undecided:</p>
+        <ul>{{ inbound|unordered_list }}</ul>
+      {% endif %}
+    {% endafter %}
+    {% if not object.is_last_action %}
+      {% before path=".//form" %}
+        <p>
+          <b>Warning:</b> The deleted action is not the last action in the branch. Deleting it may
+          cause logical errors in the inforequest history.
+        </p>
+      {% endbefore %}
+    {% endif %}
     {% if object.type == object.TYPES.EXPIRATION or object.type == object.TYPES.APPEAL_EXPIRATION %}
       {% prepend path=".//form" %}
         <p><label><input name="snooze" type="checkbox" /> Extend snooze of previous action by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today.</label></p>
       {% endprepend %}
+    {% endif %}
+    {% if object.delete_dependency %}
+      <p><b>Info:</b> Delete not allowed.</p>
+      <ul>{{ object.delete_dependency|unordered_list }}</ul>
+      {% delete path=".//form" %}
     {% endif %}
   {% endamend %}
 {% endblock %}
