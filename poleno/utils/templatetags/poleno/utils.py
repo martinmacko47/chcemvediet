@@ -244,7 +244,6 @@ def with_(value, arg):
         return u'[not callable]'
     return partial(value, arg)
 
-
 @register.simple_tag
 def lorem(randseed=None, count=1, method=None):
     u"""

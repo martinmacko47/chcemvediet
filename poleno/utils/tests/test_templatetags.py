@@ -173,7 +173,6 @@ class TemplatetagsStringTest(TestCase):
                 u'')
         self.assertRegexpMatches(rendered, r'^\(Lorem ipsum .*\)\(<p>.{30,}</p>\s*<p>.{30,}</p>\)$')
 
-
 class TemplatetagsViewTest(TestCase):
     u"""
     Tests ``active`` template filter and ``change_lang`` template tag. Tests are performed by
