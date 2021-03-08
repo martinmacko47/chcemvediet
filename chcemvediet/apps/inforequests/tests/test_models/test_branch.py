@@ -6,14 +6,14 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from poleno.timewarp import timewarp
-from poleno.mail.models import Message, Recipient
+from poleno.mail.models import Recipient
 from poleno.utils.date import local_datetime_from_local, naive_date
 from poleno.utils.misc import flatten, Bunch
 from poleno.utils.test import created_instances
-from chcemvediet.apps.obligees.models import Obligee
 
 from .. import InforequestsTestCaseMixin
-from ...models import Inforequest, InforequestEmail, Branch, Action, ActionDraft
+from ...models import Inforequest, Branch, Action
+
 
 class BranchTest(InforequestsTestCaseMixin, TestCase):
     u"""
@@ -26,7 +26,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(branch.inforequest, inforequest)
 
     def test_inforequest_field_may_not_be_null(self):
-        with self.assertRaisesMessage(IntegrityError, u'inforequests_branch.inforequest_id may not be NULL'):
+        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_branch.inforequest_id'):
             self._create_branch(omit=[u'inforequest'])
 
     def test_obligee_field(self):
@@ -103,18 +103,6 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
         branch = self._create_branch(inforequest=inforequest)
         result = branch.action_set.all()
         self.assertEqual(list(result), [])
-
-    def test_actiondraft_set_relation(self):
-        inforequest, branch, _ = self._create_inforequest_scenario()
-        draft1 = self._create_action_draft(inforequest=inforequest, branch=branch, type=ActionDraft.TYPES.CONFIRMATION)
-        draft2 = self._create_action_draft(inforequest=inforequest, branch=branch, type=ActionDraft.TYPES.EXTENSION)
-        result = branch.actiondraft_set.all()
-        self.assertItemsEqual(result, [draft1, draft2])
-
-    def test_actiondraft_set_relation_empty_by_default(self):
-        _, branch, _ = self._create_inforequest_scenario()
-        result = branch.actiondraft_set.all()
-        self.assertItemsEqual(result, [])
 
     def test_inforequest_branch_set_backward_relation(self):
         inforequest, branch1, actions = self._create_inforequest_scenario(u'advancement')
@@ -381,58 +369,58 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                     )),
                 (Action.TYPES.CONFIRMATION, Bunch(
                     scenario=[u'confirmation'],
-                    allowed=[           u'extension', u'advancement', u'clarification_request', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action'],
-                    expired=[u'appeal', u'extension', u'advancement', u'clarification_request', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action', u'applicant_action'],
+                    allowed=[           u'confirmation', u'extension', u'advancement', u'clarification_request', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action'],
+                    expired=[u'appeal', u'confirmation', u'extension', u'advancement', u'clarification_request', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action', u'applicant_action'],
                     )),
                 (Action.TYPES.EXTENSION, Bunch(
                     scenario=[u'extension'],
-                    allowed=[           u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action'],
-                    expired=[u'appeal', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action', u'applicant_action'],
+                    allowed=[           u'extension', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action'],
+                    expired=[u'appeal', u'extension', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action', u'applicant_action'],
                     )),
                 (Action.TYPES.ADVANCEMENT, Bunch(
                     scenario=[u'advancement'],
-                    allowed=[u'appeal', u'applicant_action'],
-                    expired=[u'appeal', u'applicant_action'],
+                    allowed=[u'appeal', u'advancement', u'obligee_action', u'obligee_email_action', u'applicant_action'],
+                    expired=[           u'advancement', u'obligee_action', u'obligee_email_action'],
                     )),
                 (Action.TYPES.CLARIFICATION_REQUEST, Bunch(
                     scenario=[u'clarification_request'],
                     allowed=[u'clarification_response', u'clarification_request', u'obligee_action', u'obligee_email_action', u'applicant_action', u'applicant_email_action'],
-                    expired=[u'clarification_response', u'clarification_request', u'obligee_action', u'obligee_email_action', u'applicant_action', u'applicant_email_action'],
+                    expired=[                           u'clarification_request', u'obligee_action', u'obligee_email_action'],
                     )),
                 (Action.TYPES.DISCLOSURE, Bunch(
                     scenario=[(u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE))],
-                    allowed=[u'appeal', u'applicant_action'],
-                    expired=[u'appeal', u'applicant_action'],
+                    allowed=[u'appeal', u'disclosure', u'obligee_action', u'obligee_email_action', u'applicant_action'],
+                    expired=[           u'disclosure', u'obligee_action', u'obligee_email_action'],
                     )),
                 (Action.TYPES.DISCLOSURE, Bunch(
                     scenario=[(u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL))],
-                    allowed=[u'appeal', u'applicant_action'],
-                    expired=[u'appeal', u'applicant_action'],
+                    allowed=[u'appeal', u'disclosure', u'obligee_action', u'obligee_email_action', u'applicant_action'],
+                    expired=[           u'disclosure', u'obligee_action', u'obligee_email_action'],
                     )),
                 (Action.TYPES.DISCLOSURE, Bunch(
                     scenario=[(u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL))],
-                    allowed=[],
-                    expired=[],
+                    allowed=[u'disclosure', u'obligee_action', u'obligee_email_action'],
+                    expired=[u'disclosure', u'obligee_action', u'obligee_email_action'],
                     )),
                 (Action.TYPES.REFUSAL, Bunch(
                     scenario=[u'refusal'],
-                    allowed=[u'appeal', u'applicant_action'],
-                    expired=[u'appeal', u'applicant_action'],
+                    allowed=[u'appeal', u'refusal', u'obligee_action', u'obligee_email_action', u'applicant_action'],
+                    expired=[           u'refusal', u'obligee_action', u'obligee_email_action'],
                     )),
                 (Action.TYPES.AFFIRMATION, Bunch(
                     scenario=[u'refusal', u'appeal', u'affirmation'],
-                    allowed=[],
-                    expired=[],
+                    allowed=[u'affirmation', u'obligee_action'],
+                    expired=[u'affirmation', u'obligee_action'],
                     )),
                 (Action.TYPES.REVERSION, Bunch(
                     scenario=[u'refusal', u'appeal', u'reversion'],
-                    allowed=[],
-                    expired=[],
+                    allowed=[u'reversion', u'obligee_action'],
+                    expired=[u'reversion', u'obligee_action'],
                     )),
                 (Action.TYPES.REMANDMENT, Bunch(
                     scenario=[u'refusal', u'appeal', u'remandment'],
-                    allowed=[           u'extension', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action'],
-                    expired=[u'appeal', u'extension', u'disclosure', u'refusal', u'obligee_action', u'obligee_email_action', u'applicant_action'],
+                    allowed=[           u'extension', u'disclosure', u'refusal', u'remandment', u'obligee_action', u'obligee_email_action'],
+                    expired=[u'appeal', u'extension', u'disclosure', u'refusal', u'remandment', u'obligee_action', u'obligee_email_action', u'applicant_action'],
                     )),
                 (Action.TYPES.ADVANCED_REQUEST, Bunch(
                     branch=1,
@@ -443,7 +431,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 (Action.TYPES.EXPIRATION, Bunch(
                     scenario=[u'expiration'],
                     allowed=[u'appeal', u'applicant_action'],
-                    expired=[u'appeal', u'applicant_action'],
+                    expired=[],
                     )),
                 (Action.TYPES.APPEAL_EXPIRATION, Bunch(
                     scenario=[u'refusal', u'appeal', u'appeal_expiration'],
@@ -599,7 +587,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 added_action = action_set.get()
                 self.assertEqual(branch.last_action, added_action)
                 self.assertEqual(added_action.type, expected_action_type)
-                self.assertEqual(added_action.effective_date, naive_date(u'2010-10-05'))
+                self.assertEqual(added_action.created.date(), naive_date(u'2010-10-05'))
 
     def test_collect_obligee_emails_method(self):
         obligee = self._create_obligee(emails=u'Obligee1 <oblige1@a.com>, oblige2@a.com')
@@ -623,7 +611,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                     )),
                 )
 
-        result = branch.collect_obligee_emails()
+        result = branch.collect_obligee_emails
         self.assertItemsEqual(result, [
                 # Outboud email contributes with its recipient addresses only
                 (u'Request To1',  u'request-to1@a.com'),
@@ -648,7 +636,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 (u'refusal', dict(email=dict(from_name=u'Refusal From', from_mail=u'address@a.com'))),
                 )
 
-        result = branch.collect_obligee_emails()
+        result = branch.collect_obligee_emails
         self.assertItemsEqual(result, [
                 # Address name from later email has priority
                 (u'Refusal From', u'address@a.com'),
@@ -667,7 +655,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 (u'refusal', dict(email=dict(from_name=u'Refusal From', from_mail=u'address@a.com'))),
                 )
 
-        result = branch.collect_obligee_emails()
+        result = branch.collect_obligee_emails
         self.assertItemsEqual(result, [
                 # Obligee instance address has priority
                 (u'Obligee', u'address@a.com'),
@@ -681,12 +669,12 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 u'refusal',
                 (u'advancement', [obligee2, u'advanced_request', u'refusal']),
                 )
-        result = list(branch.collect_obligee_emails())
+        result = branch.collect_obligee_emails
         self.assertItemsEqual(result, [(u'Obligee1', u'obligee1@a.com')])
 
         # For reference check that the method for the advanced branch returs the other address
         branch2 = [o for o in flatten(actions) if isinstance(o, Branch)][0]
-        result = list(branch2.collect_obligee_emails())
+        result = branch2.collect_obligee_emails
         self.assertItemsEqual(result, [(u'Ignored', u'obligee2@a.com')])
 
     def test_repr(self):
@@ -694,6 +682,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(repr(branch), u'<Branch: %s>' % branch.pk)
 
     def test_main_and_advanced_query_methods(self):
+        Branch.objects.all().delete()
         _, branch1, actions = self._create_inforequest_scenario((u'advancement', [], []))
         _, (_, [(branch2, _), (branch3, _)]) = actions
         result = Branch.objects.main()
