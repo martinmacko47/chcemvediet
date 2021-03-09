@@ -572,29 +572,29 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
             )
 
     def test_add_expiration_if_expired_method(self):
-        tests = (                                   # Expected action type,      branch, scenario
-                (Action.TYPES.REQUEST,                Action.TYPES.EXPIRATION,        0, []),
-                (Action.TYPES.CLARIFICATION_RESPONSE, Action.TYPES.EXPIRATION,        0, [u'clarification_request', u'clarification_response']),
-                (Action.TYPES.APPEAL,                 Action.TYPES.APPEAL_EXPIRATION, 0, [u'expiration', u'appeal']),
-                (Action.TYPES.CONFIRMATION,           Action.TYPES.EXPIRATION,        0, [u'confirmation']),
-                (Action.TYPES.EXTENSION,              Action.TYPES.EXPIRATION,        0, [u'extension']),
-                (Action.TYPES.ADVANCEMENT,            None,                           0, [u'advancement']),
-                (Action.TYPES.CLARIFICATION_REQUEST,  None,                           0, [u'clarification_request']),
-                (Action.TYPES.DISCLOSURE,             None,                           0, [u'disclosure']),
-                (Action.TYPES.REFUSAL,                None,                           0, [u'refusal']),
-                (Action.TYPES.AFFIRMATION,            None,                           0, [u'refusal', u'appeal', u'affirmation']),
-                (Action.TYPES.REVERSION,              None,                           0, [u'refusal', u'appeal', u'reversion']),
-                (Action.TYPES.REMANDMENT,             Action.TYPES.EXPIRATION,        0, [u'refusal', u'appeal', u'remandment']),
-                (Action.TYPES.ADVANCED_REQUEST,       Action.TYPES.EXPIRATION,        1, [u'advancement']),
-                (Action.TYPES.EXPIRATION,             None,                           0, [u'expiration']),
-                (Action.TYPES.APPEAL_EXPIRATION,      None,                           0, [u'refusal', u'appeal', u'appeal_expiration']),
+        tests = (                                   # legal date,                expected action type,      branch, scenario
+                (Action.TYPES.REQUEST,                naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, []),
+                (Action.TYPES.CLARIFICATION_RESPONSE, naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'clarification_request', u'clarification_response']),
+                (Action.TYPES.APPEAL,                 naive_date(u'2010-07-20'), Action.TYPES.APPEAL_EXPIRATION, 0, [u'expiration', u'appeal']),
+                (Action.TYPES.CONFIRMATION,           naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'confirmation']),
+                (Action.TYPES.EXTENSION,              naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'extension']),
+                (Action.TYPES.ADVANCEMENT,            None,                      None,                           0, [u'advancement']),
+                (Action.TYPES.CLARIFICATION_REQUEST,  None,                      None,                           0, [u'clarification_request']),
+                (Action.TYPES.DISCLOSURE,             None,                      None,                           0, [u'disclosure']),
+                (Action.TYPES.REFUSAL,                None,                      None,                           0, [u'refusal']),
+                (Action.TYPES.AFFIRMATION,            None,                      None,                           0, [u'refusal', u'appeal', u'affirmation']),
+                (Action.TYPES.REVERSION,              None,                      None,                           0, [u'refusal', u'appeal', u'reversion']),
+                (Action.TYPES.REMANDMENT,             naive_date(u'2010-07-21'), Action.TYPES.EXPIRATION,        0, [u'refusal', u'appeal', u'remandment']),
+                (Action.TYPES.ADVANCED_REQUEST,       naive_date(u'2010-07-21'), Action.TYPES.EXPIRATION,        1, [u'advancement']),
+                (Action.TYPES.EXPIRATION,             None,                      None,                           0, [u'expiration']),
+                (Action.TYPES.APPEAL_EXPIRATION,      None,                      None,                           0, [u'refusal', u'appeal', u'appeal_expiration']),
                 )
         # Make sure we are testing all defined action types
-        tested_action_types = set(a for a, _, _, _ in tests)
+        tested_action_types = set(a for a, _, _, _, _ in tests)
         defined_action_types = Action.TYPES._inverse.keys()
         self.assertItemsEqual(tested_action_types, defined_action_types)
 
-        for action_type, expected_action_type, branch, scenario in tests:
+        for action_type, legal_date, expected_action_type, branch, scenario in tests:
             timewarp.jump(local_datetime_from_local(u'2010-07-05 10:33:00'))
             objs = self._create_inforequest_scenario(*scenario)
             branch = [o for o in flatten(objs) if isinstance(o, Branch)][branch]
@@ -620,7 +620,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 added_action = action_set.get()
                 self.assertEqual(branch.last_action, added_action)
                 self.assertEqual(added_action.type, expected_action_type)
-                self.assertEqual(added_action.created.date(), naive_date(u'2010-10-05'))
+                self.assertEqual(added_action.legal_date, legal_date)
 
     def test_collect_obligee_emails_method(self):
         obligee = self._create_obligee(emails=u'Obligee1 <oblige1@a.com>, oblige2@a.com')
