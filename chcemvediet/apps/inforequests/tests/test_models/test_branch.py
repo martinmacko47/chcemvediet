@@ -162,6 +162,13 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
         self.assertTrue(branch1.is_main)
         self.assertFalse(branch2.is_main)
 
+    def test_tree_order_property(self):
+        _, branch1, actions = self._create_inforequest_scenario((u'advancement', [], []))
+        _, (_, [(branch2, _), (branch3, _)]) = actions
+        self.assertItemsEqual(branch1.tree_order, [branch1.pk])
+        self.assertItemsEqual(branch2.tree_order, [branch1.pk, branch2.pk])
+        self.assertItemsEqual(branch3.tree_order, [branch1.pk, branch3.pk])
+
     def test_prefetch_actions_staticmethod(self):
         inforequest, branch, actions = self._create_inforequest_scenario(u'confirmation', u'extension')
 
@@ -474,17 +481,17 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
 
             # Check actions allowed when the last action deadline is not expired yet
             for can_add_property in can_add_properties:
-                value = getattr(branch, u'can_add_%s' % can_add_property)
+                value = getattr(branch, u'can_add_{}'.format(can_add_property))
                 expected = can_add_property in test.allowed
-                self.assertEqual(value, expected, u'can_add_%s is %s after %r' % (can_add_property, value, test.scenario))
+                self.assertEqual(value, expected, u'can_add_{} is {} after {}'.format(can_add_property, value, test.scenario))
 
             # Check actions allowed when the last action deadline is expired
             timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
             branch = Branch.objects.get(pk=branch.pk)
             for can_add_property in can_add_properties:
-                value = getattr(branch, u'can_add_%s' % can_add_property)
+                value = getattr(branch, u'can_add_{}'.format(can_add_property))
                 expected = can_add_property in test.expired
-                self.assertEqual(value, expected, u'can_add_%s is %s after expired %r' % (can_add_property, value, test.scenario))
+                self.assertEqual(value, expected, u'can_add_{} is {} after expired {}'.format(can_add_property, value, test.scenario))
 
     def test_can_add_action_method(self):
         tests = (                                   # expected result
@@ -533,12 +540,36 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
         _, branch, _ = self._create_inforequest_scenario()
         for action_types, expected_result, expected_message in tests:
             if expected_result is True:
-                self.assertTrue(branch.can_add_action(*action_types), u'can_add_action(%s) is False' % action_types)
+                self.assertTrue(branch.can_add_action(*action_types), u'can_add_action({}) is False'.format(action_types))
             elif expected_result is False:
-                self.assertFalse(branch.can_add_action(*action_types), u'can_add_action(%s) is True' % action_types)
+                self.assertFalse(branch.can_add_action(*action_types), u'can_add_action({}) is True'.format(action_types))
             else:
                 with self.assertRaisesMessage(expected_result, expected_message):
                     branch.can_add_action(*action_types)
+
+    def test_create_classmethod(self):
+        branch = Branch.create(
+            obligee=self.obligee,
+            inforequest=self.inforequest,
+            action_kwargs=dict(
+                type=Action.TYPES.REQUEST,
+                legal_date=naive_date(u'2010-10-05'),
+            ),
+        )
+        self.assertEqual(branch.action_set.count(), 0)
+        branch.save()
+        self.assertEqual(branch.action_set.count(), 1)
+
+    def test_create_classmethod_action_type_must_be_request_or_advanced_request(self):
+        with self.assertRaisesMessage(AssertionError, u'Branch must be created with a request or an advanced request action'):
+            branch = Branch.create(
+                obligee=self.obligee,
+                inforequest=self.inforequest,
+                action_kwargs=dict(
+                    type=Action.TYPES.CLARIFICATION_RESPONSE,
+                    legal_date=naive_date(u'2010-10-05'),
+                ),
+            )
 
     def test_add_expiration_if_expired_method(self):
         tests = (                                   # Expected action type,      branch, scenario
@@ -681,7 +712,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
 
     def test_repr(self):
         _, branch, _ = self._create_inforequest_scenario()
-        self.assertEqual(repr(branch), u'<Branch: %s>' % branch.pk)
+        self.assertEqual(repr(branch), u'<Branch: {}>'.format(branch.pk))
 
     def test_main_and_advanced_query_methods(self):
         Branch.objects.all().delete()
