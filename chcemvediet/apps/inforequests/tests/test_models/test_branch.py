@@ -548,36 +548,53 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                     branch.can_add_action(*action_types)
 
     def test_create_classmethod(self):
-        branch = Branch.create(
-            obligee=self.obligee,
-            inforequest=self.inforequest,
-            action_kwargs=dict(
-                type=Action.TYPES.REQUEST,
-                legal_date=naive_date(u'2010-10-05'),
-            ),
+        tests = (
+            (Action.TYPES.REQUEST,                True),
+            (Action.TYPES.CLARIFICATION_RESPONSE, False),
+            (Action.TYPES.APPEAL,                 False),
+            (Action.TYPES.CONFIRMATION,           False),
+            (Action.TYPES.EXTENSION,              False),
+            (Action.TYPES.ADVANCEMENT,            False),
+            (Action.TYPES.CLARIFICATION_REQUEST,  False),
+            (Action.TYPES.DISCLOSURE,             False),
+            (Action.TYPES.REFUSAL,                False),
+            (Action.TYPES.AFFIRMATION,            False),
+            (Action.TYPES.REVERSION,              False),
+            (Action.TYPES.REMANDMENT,             False),
+            (Action.TYPES.ADVANCED_REQUEST,       True),
+            (Action.TYPES.EXPIRATION,             False),
+            (Action.TYPES.APPEAL_EXPIRATION,      False),
         )
-        self.assertEqual(branch.action_set.count(), 0)
-        branch.save()
-        self.assertEqual(branch.action_set.count(), 1)
+        # Make sure we are testing all defined action types
+        tested_action_types = set(a for a, _ in tests)
+        defined_action_types = Action.TYPES._inverse.keys()
+        self.assertItemsEqual(tested_action_types, defined_action_types)
 
-    def test_create_classmethod_action_type_must_be_request_or_advanced_request(self):
-        with self.assertRaisesMessage(AssertionError, u'Branch must be created with a request or an advanced request action'):
-            branch = Branch.create(
+        for action_type, create in tests:
+            branch_kwargs = dict(
                 obligee=self.obligee,
                 inforequest=self.inforequest,
                 action_kwargs=dict(
-                    type=Action.TYPES.CLARIFICATION_RESPONSE,
+                    type=action_type,
                     legal_date=naive_date(u'2010-10-05'),
                 ),
             )
+            if create:
+                branch = Branch.create(**branch_kwargs)
+                self.assertEqual(branch.action_set.count(), 0)
+                branch.save()
+                self.assertEqual(branch.action_set.count(), 1)
+            else:
+                with self.assertRaisesMessage(AssertionError, u'Branch must be created with a request or an advanced request action'):
+                    branch = Branch.create(**branch_kwargs)
 
     def test_add_expiration_if_expired_method(self):
         tests = (                                   # legal date,                expected action type,      branch, scenario
                 (Action.TYPES.REQUEST,                naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, []),
                 (Action.TYPES.CLARIFICATION_RESPONSE, naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'clarification_request', u'clarification_response']),
                 (Action.TYPES.APPEAL,                 naive_date(u'2010-07-20'), Action.TYPES.APPEAL_EXPIRATION, 0, [u'expiration', u'appeal']),
-                (Action.TYPES.CONFIRMATION,           naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'confirmation']),
-                (Action.TYPES.EXTENSION,              naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'extension']),
+                (Action.TYPES.CONFIRMATION,           naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'request', u'confirmation']),
+                (Action.TYPES.EXTENSION,              naive_date(u'2010-07-15'), Action.TYPES.EXPIRATION,        0, [u'request', u'extension']),
                 (Action.TYPES.ADVANCEMENT,            None,                      None,                           0, [u'advancement']),
                 (Action.TYPES.CLARIFICATION_REQUEST,  None,                      None,                           0, [u'clarification_request']),
                 (Action.TYPES.DISCLOSURE,             None,                      None,                           0, [u'disclosure']),
@@ -622,7 +639,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 self.assertEqual(added_action.type, expected_action_type)
                 self.assertEqual(added_action.legal_date, legal_date)
 
-    def test_collect_obligee_emails_method(self):
+    def test_collect_obligee_emails_property(self):
         obligee = self._create_obligee(emails=u'Obligee1 <oblige1@a.com>, oblige2@a.com')
         _, branch, _ = self._create_inforequest_scenario(obligee,
                 (u'request', dict(
@@ -658,7 +675,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 (u'',             u'oblige2@a.com'),
                 ])
 
-    def test_collect_obligee_emails_method_gives_priority_to_more_recent_messages(self):
+    def test_collect_obligee_emails_property_gives_priority_to_more_recent_messages(self):
         u"""
         Checks that if the same email address is used in multiple messages with different names,
         the name used with the most recent message has priority.
@@ -677,7 +694,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 (u'Obligee',      u'oblige@a.com'),
                 ])
 
-    def test_collect_obligee_emails_method_gives_priority_to_obligee_instance(self):
+    def test_collect_obligee_emails_property_gives_priority_to_obligee_instance(self):
         u"""
         Checks that if the same email address is used as obligee address and inbound message from
         adress with different names, the name used with obligee instance has priority.
@@ -694,7 +711,7 @@ class BranchTest(InforequestsTestCaseMixin, TestCase):
                 (u'Obligee', u'address@a.com'),
                 ])
 
-    def test_collect_obligee_emails_method_ignores_addresses_from_other_branches(self):
+    def test_collect_obligee_emails_property_ignores_addresses_from_other_branches(self):
         obligee1 = self._create_obligee(emails=u'Obligee1 <obligee1@a.com>')
         obligee2 = self._create_obligee(emails=u'Ignored <obligee2@a.com>')
         _, branch, actions = self._create_inforequest_scenario(obligee1,
