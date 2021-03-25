@@ -6,7 +6,7 @@
  * If element is collapsed, ``data-target-shown`` elements are displayed, ``data-target-hidden``
  * elements are hidden. Vice versa if element is expanded.
  *
- * When expanding element, location hash is updated to the value of ``data-hash``. Content and
+ * When expanding element, location hash is updated to the ``id`` of element. Content and
  * elements are displayed automatically when opened using direct link.
  *
  * Requires:
@@ -19,7 +19,7 @@
  *      <p class="hidden visible-if-expanded">Expanded</p>
  *    </div>
  *    <p id="content" class="collapse" data-target-shown=".visible-if-collapsed"
- *       data-target-hidden=".visible-if-expanded" data-container=".parent" data-hash="content">
+ *       data-target-hidden=".visible-if-expanded" data-container=".parent">
  *      Content
  *    </p>
  *  </div>
@@ -29,12 +29,8 @@ $(function(){
 		var container = $(this).data('container') || 'html';
 		var target_shown = $(this).data('target-shown');
 		var target_hidden = $(this).data('target-hidden');
-		var hash = $(this).data('hash');
 		$(this).closest(container).find(target_shown).addClass('hidden');
 		$(this).closest(container).find(target_hidden).removeClass('hidden');
-		if (hash) {
-			history.replaceState({}, '', '#' + hash);
-		}
 	}
 	function collapse_hide(){
 		var container = $(this).data('container') || 'html';
@@ -49,6 +45,11 @@ $(function(){
 		var e = $(location.hash);
 		if (e.data('toggle') === 'collapse') {
 			$(e.data('target')).collapse('show');
+		}
+	});
+	$('[data-toggle="collapse"]').on('click', function(){
+		if (this.id && $($(this).data('target')).hasClass('collapse')) {
+		    history.replaceState({}, '', '#' + this.id);
 		}
 	});
 });
