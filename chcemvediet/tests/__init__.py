@@ -256,6 +256,7 @@ class ChcemvedietTestCaseMixin(TestCase):
         return self._call_with_defaults(Branch.objects.create, kwargs, {
             u'inforequest': self.inforequest,
             u'obligee': self.obligee,
+            u'advanced_by': None,
             })
 
     def _create_action(self, **kwargs):

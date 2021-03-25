@@ -334,7 +334,7 @@ class Branch(FormatMixin, models.Model):
         action_kwargs = kwargs.pop(u'action_kwargs', None) or {}
         branch = Branch(*args, **kwargs)
 
-        assert (action_kwargs[u'type'] in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST],
+        assert action_kwargs[u'type'] in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST], (
                 u'Branch must be created with a request or an advanced request action')
 
         @after_saved(branch)
@@ -394,7 +394,7 @@ def datachecks(superficial, autofix):
     branches = (Branch.objects
             .filter(advanced_by__isnull=False)
             .filter(~Q(advanced_by__branch__inforequest=F(u'inforequest')))
-            .select_related('advanced_by__branch')
+            .select_related(u'advanced_by__branch')
             )
 
     if superficial:
