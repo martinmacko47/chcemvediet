@@ -49,7 +49,7 @@ $(function(){
 	});
 	$('[data-toggle="collapse"]').on('click', function(){
 		if (this.id && $($(this).data('target')).hasClass('collapse')) {
-		    history.replaceState({}, '', '#' + this.id);
+			history.replaceState({}, '', '#' + this.id);
 		}
 	});
 });
