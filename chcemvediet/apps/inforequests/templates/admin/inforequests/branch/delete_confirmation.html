@@ -4,7 +4,7 @@
 {% block content %}
   {% amend %}
     {{ block.super }}
-    {% after path="./ul[1]" %}
+    {% after path="./ul[last()]" %}
       {% if outbound %}
         <p>Outbound messages will be deleted:</p>
         <ul>{{ outbound|unordered_list }}</ul>

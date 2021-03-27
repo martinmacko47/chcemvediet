@@ -8,13 +8,11 @@ from django.db.models import Prefetch, Q, F
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django.contrib.contenttypes import generic
-from django.utils.html import format_html
 from aggregate_if import Count
 from multiselectfield import MultiSelectField
 
 from poleno import datacheck
 from poleno.attachments.models import Attachment
-from poleno.utils.admin import admin_obj_format
 from poleno.workdays import workdays
 from poleno.utils.models import FieldChoices, QuerySet, join_lookup, after_saved
 from poleno.utils.date import utc_now, local_today
@@ -451,17 +449,6 @@ class Action(FormatMixin, models.Model):
             return None
 
         raise ValueError(u'Invalid action type: {}'.format(self.type))
-
-    @cached_property
-    def delete_dependency(self):
-        dependency = []
-        if self.type in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST]:
-            dependency.append(format_html(
-                u'{} is type {}.'.format(admin_obj_format(self), self.get_type_display())))
-        if len(self.branch.actions) == 1:
-            dependency.append(format_html(
-                u'{} is the only action in the branch.'.format(admin_obj_format(self))))
-        return dependency
 
     @classmethod
     def create(cls, *args, **kwargs):
