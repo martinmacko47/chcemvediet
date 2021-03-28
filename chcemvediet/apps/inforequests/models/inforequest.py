@@ -544,7 +544,9 @@ class Inforequest(FormatMixin, models.Model):
     def _send_notification(self, template, anchor, dictionary):
         dictionary.update({
                 u'inforequest': self,
-                u'url': complete_url(self.get_absolute_url(anchor)),
+                u'url': u'{}?next={}'.format(complete_url(reverse(u'account_login')),
+                                             self.get_absolute_url(anchor)
+                                             ),
                 })
         msg = render_mail(template,
                 from_email=settings.DEFAULT_FROM_EMAIL,
