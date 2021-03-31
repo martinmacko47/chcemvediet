@@ -543,11 +543,11 @@ class Inforequest(FormatMixin, models.Model):
         return reverse(u'inforequests:detail', kwargs=dict(inforequest=self)) + anchor
 
     def _send_notification(self, template, anchor, dictionary):
-        next_url = urlencode({u'next': self.get_absolute_url(anchor)})
-        url = complete_url(reverse(u'account_login')) + u'?' + next_url
         dictionary.update({
                 u'inforequest': self,
-                u'url': url,
+                u'url': complete_url(reverse(u'account_login')) + u'?' + urlencode({
+                    u'next': self.get_absolute_url(anchor),
+                    }),
                 })
         msg = render_mail(template,
                 from_email=settings.DEFAULT_FROM_EMAIL,
