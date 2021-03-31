@@ -4,6 +4,7 @@ from django.db import models, IntegrityError, transaction, connection
 from django.db.models import Q, Prefetch, Max
 from django.conf import settings
 from django.utils.functional import cached_property
+from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from aggregate_if import Count
@@ -542,11 +543,11 @@ class Inforequest(FormatMixin, models.Model):
         return reverse(u'inforequests:detail', kwargs=dict(inforequest=self)) + anchor
 
     def _send_notification(self, template, anchor, dictionary):
+        next_url = urlencode({u'next': self.get_absolute_url(anchor)})
+        url = complete_url(reverse(u'account_login')) + u'?' + next_url
         dictionary.update({
                 u'inforequest': self,
-                u'url': u'{}?next={}'.format(complete_url(reverse(u'account_login')),
-                                             self.get_absolute_url(anchor)
-                                             ),
+                u'url': url,
                 })
         msg = render_mail(template,
                 from_email=settings.DEFAULT_FROM_EMAIL,
