@@ -337,7 +337,13 @@ def change_lang(context, lang=None):
     try:
         url_parts = resolve(path)
         view_name = url_parts.view_name
+        args = url_parts.args
         kwargs = url_parts.kwargs
+
+        # Mix *args and **kwargs in call to reverse
+        for i in range(len(args)):
+            name = u'_{}'.format(i)
+            kwargs[name] = args[i]
 
         # Ask the view what to show after changing language.
         if hasattr(url_parts.func, u'change_lang'):

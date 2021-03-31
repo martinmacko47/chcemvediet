@@ -199,6 +199,14 @@ class TemplatetagsViewTest(TestCase):
             u'request': request,
         })))
 
+    def arguments_view(request, *args, **kwargs):
+        return HttpResponse(Template(
+            u'{% load change_lang from poleno.utils %}'
+            u'({% change_lang "en" %})'
+        ).render(Context({
+            u'request': request,
+        })))
+
     def page_not_found(request):
         return HttpResponseNotFound(Template(
             u'{% load change_lang from poleno.utils %}'
@@ -216,6 +224,8 @@ class TemplatetagsViewTest(TestCase):
             url(r'^$', active_view, name=u'index'),
             url(r'^first/', active_view, name=u'first'),
         ))),
+        url(r'^args/(.+)/(.+)/(.+)/', arguments_view, name=u'args'),
+        url(r'^kwargs/(?P<a>\d+)/(?P<b>\d+)/(?P<c>\d+)/', arguments_view, name=u'kwargs'),
     ))
     urlpatterns += tuple(i18n_patterns(u'',
         url(r'^language/', language_view, name=u'language'),
@@ -285,6 +295,18 @@ class TemplatetagsViewTest(TestCase):
                     self.assertIs(type(r), HttpResponseNotFound)
                     self.assertEqual(r.status_code, 404)
                     self.assertEqual(r.content, u'(/language/)(/language/)(/language/)')
+
+    def test_change_lang_tag_with_positional_arguments(self):
+        r = self.client.get(u'/args/1/2/3/')
+        self.assertIs(type(r), HttpResponse)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content, u'(/args/1/2/3/)')
+
+    def test_change_lang_tag_with_keyword_arguments(self):
+        r = self.client.get(u'/kwargs/1/2/3/')
+        self.assertIs(type(r), HttpResponse)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content, u'(/kwargs/1/2/3/)')
 
 class AmendTemplatetagTest(TestCase):
     u"""
