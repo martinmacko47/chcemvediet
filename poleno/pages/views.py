@@ -20,9 +20,9 @@ def change_lang(lang, path):
     tranlation = page.translation(lang)
 
     if tranlation:
-        return u'pages:view', dict(path=tranlation.lpath)
+        return u'pages:view', (), dict(path=tranlation.lpath)
     else:
-        return u'pages:alternatives', dict(lang=page.lang, path=page.lpath)
+        return u'pages:alternatives', (), dict(lang=page.lang, path=page.lpath)
 
 @decorate(change_lang=change_lang)
 @require_http_methods([u'HEAD', u'GET'])
