@@ -253,8 +253,8 @@ class ChangeLangTemplatetagTest(TestCase):
 
     urlpatterns = tuple(i18n_patterns(u'',
         url(r'^language/$', language_view, name=u'language'),
-        url(r'^language/(?P<a>\d+)/(?P<b>\d+)/$', language_view, name=u'language_kwargs'),
-        url(r'^language/(.+)/(.+)/(.+)/$', language_view, name=u'language_args'),
+        url(r'^kwargs/(?P<a>\d+)/(?P<b>\d+)/$', language_view, name=u'language_kwargs'),
+        url(r'^args/(.+)/(.+)/(.+)/$', language_view, name=u'language_args'),
     ))
 
     urls = Bunch(
@@ -302,16 +302,16 @@ class ChangeLangTemplatetagTest(TestCase):
                 self.assertEqual(r.content, u'(/language/)(/language/)(/language/)')
 
     def test_change_lang_tag_with_positional_arguments(self):
-        r = self.client.get(u'/en/language/1/2/3/')
+        r = self.client.get(u'/en/args/1/2/3/')
         self.assertIs(type(r), HttpResponse)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.content, u'(/en/language/1/2/3/)(/de/language/1/2/3/)(/fr/language/1/2/3/)')
+        self.assertEqual(r.content, u'(/en/args/1/2/3/)(/de/args/1/2/3/)(/fr/args/1/2/3/)')
 
     def test_change_lang_tag_with_keyword_arguments(self):
-        r = self.client.get(u'/en/language/1/2/')
+        r = self.client.get(u'/en/kwargs/1/2/')
         self.assertIs(type(r), HttpResponse)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.content, u'(/en/language/1/2/)(/de/language/1/2/)(/fr/language/1/2/)')
+        self.assertEqual(r.content, u'(/en/kwargs/1/2/)(/de/kwargs/1/2/)(/fr/kwargs/1/2/)')
 
 class AmendTemplatetagTest(TestCase):
     u"""
