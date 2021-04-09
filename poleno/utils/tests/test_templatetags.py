@@ -423,6 +423,85 @@ class AmendTemplatetagTest(TestCase):
                 u'</ul>'
                 u'')
 
+    def test_set_attributes_tag_add_attribute(self):
+        rendered = self._render(
+                u'{% load amend set_attributes from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li>xxx</li>'
+                u'    <li>yyy</li>'
+                u'    <li>zzz</li>'
+                u'  </ul>'
+                u'  {% set_attributes path=".//li" aaa="value" %}'
+                u'  {% set_attributes path=".//li[2]" bbb=True %}'
+                u'  {% set_attributes path=".//li[3]" ccc="value" ddd="value" eee=True %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li aaa="value">xxx</li>'
+                u'  <li aaa="value" bbb>yyy</li>'
+                u'  <li aaa="value" ccc="value" ddd="value" eee>zzz</li>'
+                u'</ul>'
+                u'')
+
+    def test_set_attributes_tag_edit_attribute(self):
+        rendered = self._render(
+                u'{% load amend set_attributes from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li aaa="value">xxx</li>'
+                u'    <li aaa="value" bbb="value" ccc="value">yyy</li>'
+                u'    <li aaa="value">zzz</li>'
+                u'  </ul>'
+                u'  {% set_attributes path=".//li" aaa="new_value" %}'
+                u'  {% set_attributes path=".//li[2]" bbb="new_value" ccc="new_value" %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li aaa="new_value">xxx</li>'
+                u'  <li aaa="new_value" bbb="new_value" ccc="new_value">yyy</li>'
+                u'  <li aaa="new_value">zzz</li>'
+                u'</ul>'
+                u'')
+
+    def test_set_attributes_tag_remove_attribute(self):
+        rendered = self._render(
+                u'{% load amend set_attributes from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li aaa="value">xxx</li>'
+                u'    <li aaa="value" bbb>yyy</li>'
+                u'    <li aaa="value" ccc="value" ddd="value" eee fff>zzz</li>'
+                u'  </ul>'
+                u'  {% set_attributes path=".//li" aaa=None %}'
+                u'  {% set_attributes path=".//li[2]" bbb=False %}'
+                u'  {% set_attributes path=".//li[3]" ccc=None ddd="" eee=None fff="" %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>xxx</li>'
+                u'  <li>yyy</li>'
+                u'  <li>zzz</li>'
+                u'</ul>'
+                u'')
+
+    def test_set_attributes_tag_with_invalid_key(self):
+        with self.assertRaisesMessage(ValueError, u'Invalid tag name'):
+            rendered = self._render(
+                    u'{% load amend set_attributes from poleno.amend %}'
+                    u'{% amend %}'
+                    u'  <ul>'
+                    u'    <li>xxx</li>'
+                    u'    <li>yyy</li>'
+                    u'    <li>zzz</li>'
+                    u'  </ul>'
+                    u'  {% set_attributes path=".//li" Aaa=True %}'
+                    u'{% endamend %}'
+                    u'')
+
     def test_amend_tag_on_plain_text(self):
         rendered = self._render(
                 u'{% load amend prepend append from poleno.amend %}'

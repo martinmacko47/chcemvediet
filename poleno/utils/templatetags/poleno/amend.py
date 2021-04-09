@@ -1,5 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import re
 import lxml.html
 
 from poleno.utils.template import Library
@@ -240,6 +241,50 @@ def delete(context, path):
         elements = fragment.findall(path)
         for element in elements:
             element.drop_tree()
+        return fragment
+
+    context[u'_amend'].append(action)
+    return u''
+
+@register.simple_tag(takes_context=True)
+def set_attributes(context, path, **kwargs):
+    u"""
+    Select elements specified by XPath and add, remove or edit their attributes.
+
+    Example:
+        {% amend %}
+          <ul>
+            <li>xxx</li>
+            <li ccc="value" ddd>yyy</li>
+            <li eee="value">zzz</li>
+          </ul>
+          {% set_attributes path=".//li[1]" aaa="value" bbb=True %}
+          {% set_attributes path=".//li[2]" ccc=None ddd=False %}
+          {% set_attributes path=".//li[3]" eee="new_value" %}
+        {% endamend %}
+
+    Result:
+        <ul>
+          <li aaa="value" bbb>xxx</li>
+          <li>yyy</li>
+          <li eee="new_value">zzz</li>
+        </ul>
+    """
+    if u'_amend' not in context:
+        context[u'_amend'] = []
+
+    def action(fragment):
+        elements = fragment.findall(path)
+        for element in elements:
+            for key, value in kwargs.items():
+                if not re.match(r'^[a-z][a-z0-9_.-]*$', key):
+                    raise ValueError(u'Invalid tag name')
+                if key not in element.attrib and not value:
+                    continue
+                elif not value:
+                    element.attrib.pop(key)
+                else:
+                    element.set(key, value if value != True else None)
         return fragment
 
     context[u'_amend'].append(action)
