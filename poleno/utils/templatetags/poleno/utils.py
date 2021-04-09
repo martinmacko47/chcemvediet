@@ -337,14 +337,15 @@ def change_lang(context, lang=None):
     try:
         url_parts = resolve(path)
         view_name = url_parts.view_name
+        args = url_parts.args
         kwargs = url_parts.kwargs
 
         # Ask the view what to show after changing language.
         if hasattr(url_parts.func, u'change_lang'):
-            view_name, kwargs = url_parts.func.change_lang(lang, **kwargs)
+            view_name, args, kwargs = url_parts.func.change_lang(lang, *args, **kwargs)
 
         with translation(lang):
-            url = reverse(view_name, kwargs=kwargs)
+            url = reverse(view_name, args=args, kwargs=kwargs)
     except Resolver404:
         url = path
 

@@ -8,6 +8,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from poleno.utils.date import utc_datetime_from_local, local_datetime_from_local
 from poleno.utils.misc import Bunch
@@ -173,10 +174,9 @@ class TemplatetagsStringTest(TestCase):
                 u'')
         self.assertRegexpMatches(rendered, r'^\(Lorem ipsum .*\)\(<p>.{30,}</p>\s*<p>.{30,}</p>\)$')
 
-class TemplatetagsViewTest(TestCase):
+class ActiveTemplatefilterTest(TestCase):
     u"""
-    Tests ``active`` template filter and ``change_lang`` template tag. Tests are performed by
-    requesting views using templates with these filters and tags.
+    Tests ``active`` template filter.
     """
     def active_view(request):
         return HttpResponse(Template(
@@ -189,26 +189,6 @@ class TemplatetagsViewTest(TestCase):
             u'request': request,
         })))
 
-    def language_view(request):
-        return HttpResponse(Template(
-            u'{% load change_lang from poleno.utils %}'
-            u'({% change_lang "en" %})'
-            u'({% change_lang "de" %})'
-            u'({% change_lang "fr" %})'
-        ).render(Context({
-            u'request': request,
-        })))
-
-    def page_not_found(request):
-        return HttpResponseNotFound(Template(
-            u'{% load change_lang from poleno.utils %}'
-            u'({% change_lang "en" %})'
-            u'({% change_lang "de" %})'
-            u'({% change_lang "fr" %})'
-        ).render(Context({
-            u'request': request,
-        })))
-
     urlpatterns = tuple(patterns(u'',
         url(r'^$', active_view, name=u'index'),
         url(r'^first/', active_view, name=u'first'),
@@ -217,13 +197,9 @@ class TemplatetagsViewTest(TestCase):
             url(r'^first/', active_view, name=u'first'),
         ))),
     ))
-    urlpatterns += tuple(i18n_patterns(u'',
-        url(r'^language/', language_view, name=u'language'),
-    ))
 
     urls = Bunch(
         urlpatterns=urlpatterns,
-        handler404=page_not_found,
     )
 
 
@@ -250,41 +226,92 @@ class TemplatetagsViewTest(TestCase):
         self.assertEqual(r3.content, u'(index=False)(first=False)(second=True)(second:first=False)')
         self.assertEqual(r4.content, u'(index=False)(first=False)(second=True)(second:first=True)')
 
+class ChangeLangTemplatetagTest(TestCase):
+    u"""
+    Tests ``change_lang`` template tag. Tests are performed by requesting view using template with
+    this tag.
+    """
+    def language_view(request, *args, **kwargs):
+        return HttpResponse(Template(
+            u'{% load change_lang from poleno.utils %}'
+            u'({% change_lang "en" %})'
+            u'({% change_lang "de" %})'
+            u'({% change_lang "fr" %})'
+        ).render(Context({
+            u'request': request,
+        })))
+
+    def page_not_found(request):
+        return HttpResponseNotFound(Template(
+            u'{% load change_lang from poleno.utils %}'
+            u'({% change_lang "en" %})'
+            u'({% change_lang "de" %})'
+            u'({% change_lang "fr" %})'
+        ).render(Context({
+            u'request': request,
+        })))
+
+    urlpatterns = tuple(i18n_patterns(u'',
+        url(r'^language/$', language_view, name=u'language'),
+        url(r'^kwargs/(?P<a>\d+)/(?P<b>\d+)/$', language_view, name=u'language_kwargs'),
+        url(r'^args/(.+)/(.+)/(.+)/$', language_view, name=u'language_args'),
+    ))
+
+    urls = Bunch(
+        urlpatterns=urlpatterns,
+        handler404=page_not_found,
+    )
+
+    def _pre_setup(self):
+        super(ChangeLangTemplatetagTest, self)._pre_setup()
+        self.lang = ((u'de', u'Deutsch'), (u'en', u'English'), (u'fr', u'Francais'))
+        self.settings_override = override_settings(
+            LANGUAGES=self.lang,
+            MIDDLEWARE_CLASSES=[mc for mc in settings.MIDDLEWARE_CLASSES
+                                if mc != u'django.middleware.locale.LocaleMiddleware'],
+            )
+        self.settings_override.enable()
+
+    def _post_teardown(self):
+        self.settings_override.disable()
+        super(ChangeLangTemplatetagTest, self)._post_teardown()
+
+
     def test_change_lang_tag(self):
         u"""
         Tests ``change_lang`` template tag by requesting a view using a template with this tag.
         Checking that it generates correct links to the same view in different languages.
         """
-        lang = ((u'de', u'Deutsch'), (u'en', u'English'), (u'fr', u'Francais'))
-        with self.settings(
-                LANGUAGES=lang,
-                MIDDLEWARE_CLASSES=[mc for mc in settings.MIDDLEWARE_CLASSES
-                                    if mc != u'django.middleware.locale.LocaleMiddleware'],
-                ):
-            for language, _ in lang:
-                with translation(language):
-                    r = self.client.get(u'/{}/language/'.format(language))
-                    self.assertIs(type(r), HttpResponse)
-                    self.assertEqual(r.status_code, 200)
-                    self.assertEqual(r.content, u'(/en/language/)(/de/language/)(/fr/language/)')
+        for language, _ in self.lang:
+            with translation(language):
+                r = self.client.get(u'/{}/language/'.format(language))
+                self.assertIs(type(r), HttpResponse)
+                self.assertEqual(r.status_code, 200)
+                self.assertEqual(r.content, u'(/en/language/)(/de/language/)(/fr/language/)')
 
     def test_change_lang_tag_with_missing_language_in_url(self):
         u"""
         Tests ``change_lang`` template tag without language prefix in URL. Checking that it
         generates same URLs, for all defined languages, if they are active or not.
         """
-        lang = ((u'de', u'Deutsch'), (u'en', u'English'), (u'fr', u'Francais'))
-        with self.settings(
-                LANGUAGES=lang,
-                MIDDLEWARE_CLASSES=[mc for mc in settings.MIDDLEWARE_CLASSES
-                                    if mc != u'django.middleware.locale.LocaleMiddleware'],
-                ):
-            for language, _ in lang:
-                with translation(language):
-                    r = self.client.get(u'/language/')
-                    self.assertIs(type(r), HttpResponseNotFound)
-                    self.assertEqual(r.status_code, 404)
-                    self.assertEqual(r.content, u'(/language/)(/language/)(/language/)')
+        for language, _ in self.lang:
+            with translation(language):
+                r = self.client.get(u'/language/')
+                self.assertIs(type(r), HttpResponseNotFound)
+                self.assertEqual(r.status_code, 404)
+                self.assertEqual(r.content, u'(/language/)(/language/)(/language/)')
+
+    def test_change_lang_tag_with_positional_arguments(self):
+        r = self.client.get(u'/en/args/1/2/3/')
+        self.assertIs(type(r), HttpResponse)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content, u'(/en/args/1/2/3/)(/de/args/1/2/3/)(/fr/args/1/2/3/)')
+
+    def test_change_lang_tag_with_keyword_arguments(self):
+        r = self.client.get(u'/en/kwargs/1/2/')
+        self.assertIs(type(r), HttpResponse)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content, u'(/en/kwargs/1/2/)(/de/kwargs/1/2/)(/fr/kwargs/1/2/)')
 
 class AmendTemplatetagTest(TestCase):
     u"""
