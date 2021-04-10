@@ -15,6 +15,7 @@ DATABASES = {
     u'default': {
         u'ENGINE': u'django.db.backends.mysql',
         u'CONN_MAX_AGE': 60,
+        u'OPTIONS': {'charset': 'utf8mb4'},
         # Filled in 'configured.py'
         u'NAME': u'',
         u'USER': u'',
