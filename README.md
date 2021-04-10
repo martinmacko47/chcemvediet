@@ -177,9 +177,10 @@ You need the following packages installed
 
 #### 2.1.1. MySQL Configuration
 
-Make sure your database has configured UTF-8 charset with correct collation:
+Make sure your database has configured correct UTF-8 charset with full 4-byte support and with
+correct collation:
 
-	mysql> alter database {database} character set utf8 collate utf8_general_ci;
+	mysql> alter database {database} character set utf8mb4 collate utf8mb4_general_ci;
 
 Where `{database}` is your database name. You must alter database charset before creating any
 tables, otherwise they will keep the old charset.

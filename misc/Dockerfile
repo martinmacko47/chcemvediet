@@ -10,6 +10,7 @@ RUN \
     libssl-dev \
     cron \
     git \
+    vim \
     # Dependencies
     apache2 \
     mysql-server \
@@ -41,7 +42,7 @@ RUN \
   /etc/init.d/mysql start && \
   printf "%s\n" \
     "create database chcemvediet;" \
-    "alter database chcemvediet character set utf8 collate utf8_general_ci;" \
+    "alter database chcemvediet character set utf8mb4 collate utf8mb4_general_ci;" \
     "grant all privileges on chcemvediet.* to chcemvediet@localhost identified by 'nbusr123';" \
     | mysql && \
   :
@@ -131,6 +132,10 @@ RUN \
     # Unique cache key prefix (default)
     "" \
     # Google Custom Search API key (default)
+    "" \
+    # Google reCaptcha public key (default)
+    "" \
+    # Google reCaptcha private key (default)
     "" \
     # Load datasheets / Neighbourhood dummy was omitted / Delete it?
     "y" \
