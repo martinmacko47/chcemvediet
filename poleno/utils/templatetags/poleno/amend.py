@@ -253,20 +253,26 @@ def set_attributes(context, path, **kwargs):
     Example:
         {% amend %}
           <ul>
-            <li>xxx</li>
-            <li ccc="value" ddd>yyy</li>
-            <li eee="value">zzz</li>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
           </ul>
-          {% set_attributes path=".//li[1]" aaa="value" bbb=True %}
-          {% set_attributes path=".//li[2]" ccc=None ddd=False %}
-          {% set_attributes path=".//li[3]" eee="new_value" %}
+          {% set_attributes path=".//li[1]" aaa=None bbb=None %}
+          {% set_attributes path=".//li[2]" aaa=False bbb=False %}
+          {% set_attributes path=".//li[3]" aaa=True bbb=True %}
+          {% set_attributes path=".//li[4]" aaa="bar" bbb="baz" ccc="" %}
+          {% set_attributes path=".//li[5]" aaa=1 bbb=2 ccc=0 %}
         {% endamend %}
 
     Result:
         <ul>
-          <li aaa="value" bbb>xxx</li>
-          <li>yyy</li>
-          <li eee="new_value">zzz</li>
+          <li>xxx</li>
+          <li>xxx</li>
+          <li aaa bbb>xxx</li>
+          <li aaa="bar" bbb="baz" ccc="">xxx</li>
+          <li aaa="1" bbb="2" ccc="0">xxx</li>
         </ul>
     """
     if u'_amend' not in context:
