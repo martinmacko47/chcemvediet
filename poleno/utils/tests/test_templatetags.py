@@ -513,3 +513,26 @@ class AmendTemplatetagTest(TestCase):
                 u'  <li>xxx!</li>'
                 u'</ul>'
                 u'')
+
+    def test_without_amend_tag(self):
+        rendered = self._render(
+                u'{% load prepend append before after delete set_attributes from poleno.amend %}'
+                u'<ul>'
+                u'  <li>aaa</li>'
+                u'  <li>bbb</li>'
+                u'</ul>'
+                u'<p>foobar</p>'
+                u'{% prepend path=".//ul" %}<li>ccc</li>{% endprepend %}'
+                u'{% append path=".//ul" %}<li>ddd</li>{% endappend %}'
+                u'{% before path=".//li[2]" %}<li>eee</li>{% endbefore %}'
+                u'{% after path=".//li[2]" %}<li>fff</li>{% endafter %}'
+                u'{% delete path=".//p" %}'
+                u'{% set_attributes path=".//ul" att=True %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>aaa</li>'
+                u'  <li>bbb</li>'
+                u'</ul>'
+                u'<p>foobar</p>'
+                u'')
