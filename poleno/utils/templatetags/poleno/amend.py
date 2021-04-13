@@ -1,6 +1,5 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import re
 import lxml.html
 
 from poleno.utils.template import Library
@@ -277,14 +276,12 @@ def set_attributes(context, path, **kwargs):
         elements = fragment.findall(path)
         for element in elements:
             for key, value in kwargs.items():
-                if not re.match(r'^[a-z][a-z0-9_.-]*$', key):
-                    raise ValueError(u'Invalid tag name')
-                if key not in element.attrib and not value:
-                    continue
-                elif not value:
-                    element.attrib.pop(key)
+                if value is None or value is False:
+                    element.attrib.pop(key, None)
+                elif value is True:
+                    element.set(key, None)
                 else:
-                    element.set(key, value if value != True else None)
+                    element.set(key, str(value))
         return fragment
 
     context[u'_amend'].append(action)
