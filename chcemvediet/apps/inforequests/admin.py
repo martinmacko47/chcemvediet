@@ -376,7 +376,7 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
     def get_inforequest(self, obj):
         return obj.branch.inforequest
 
-    def delete_dependency(self, obj):
+    def delete_constraints(self, obj):
         dependency = []
         if obj.type in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST]:
             dependency.append(format_html(
@@ -387,12 +387,12 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
         return dependency
 
     def render_delete_form(self, request, context):
-        context[u'delete_dependency'] = self.delete_dependency(context[u'object'])
+        context[u'delete_constraints'] = self.delete_constraints(context[u'object'])
         context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
 
     def delete_model(self, request, obj):
-        if self.delete_dependency(obj):
+        if self.delete_constraints(obj):
             raise PermissionDenied
         if request.POST:
             if (request.POST.get(u'snooze')

@@ -1,6 +1,6 @@
 {% extends "admin/delete_confirmation.html" %}
 {% load i18n %}
-{% load amend prepend before after delete from poleno.amend %}
+{% load amend prepend before after set_attributes from poleno.amend %}
 
 {% block content %}
   {% amend %}
@@ -28,15 +28,14 @@
         <p><label><input name="snooze" type="checkbox" /> Extend snooze of previous action by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today.</label></p>
       {% endprepend %}
     {% endif %}
-    {% if delete_dependency %}
+    {% if delete_constraints %}
       {% before path=".//form" %}
-        <p class="errornote">Delete not allowed.</p>
-        <ul>{{ delete_dependency|unordered_list }}</ul>
+        <div class="errornote">
+          <p>Delete not allowed.</p>
+          <ul>{{ delete_constraints|unordered_list }}</ul>
+        </div>
       {% endbefore %}
-      {% delete path=".//form//input[@type='submit']" %}
-      {% after path=".//form//input[@name='post']" %}
-        <input type="submit" value="{% trans "Yes, I'm sure" %}" disabled/>
-      {% endafter %}
+      {% set_attributes path=".//form//input[@type='submit']" disabled=True %}
     {% endif %}
   {% endamend %}
 {% endblock %}
