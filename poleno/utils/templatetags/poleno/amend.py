@@ -244,3 +244,51 @@ def delete(context, path):
 
     context[u'_amend'].append(action)
     return u''
+
+@register.simple_tag(takes_context=True)
+def set_attributes(context, path, **kwargs):
+    u"""
+    Select elements specified by XPath and add, remove or edit their attributes.
+
+    Example:
+        {% amend %}
+          <ul>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
+            <li aaa="foo">xxx</li>
+          </ul>
+          {% set_attributes path=".//li[1]" aaa=None bbb=None %}
+          {% set_attributes path=".//li[2]" aaa=False bbb=False %}
+          {% set_attributes path=".//li[3]" aaa=True bbb=True %}
+          {% set_attributes path=".//li[4]" aaa="bar" bbb="baz" ccc="" %}
+          {% set_attributes path=".//li[5]" aaa=1 bbb=2 ccc=0 %}
+        {% endamend %}
+
+    Result:
+        <ul>
+          <li>xxx</li>
+          <li>xxx</li>
+          <li aaa bbb>xxx</li>
+          <li aaa="bar" bbb="baz" ccc="">xxx</li>
+          <li aaa="1" bbb="2" ccc="0">xxx</li>
+        </ul>
+    """
+    if u'_amend' not in context:
+        context[u'_amend'] = []
+
+    def action(fragment):
+        elements = fragment.findall(path)
+        for element in elements:
+            for key, value in kwargs.items():
+                if value is None or value is False:
+                    element.attrib.pop(key, None)
+                elif value is True:
+                    element.set(key, None)
+                else:
+                    element.set(key, str(value))
+        return fragment
+
+    context[u'_amend'].append(action)
+    return u''

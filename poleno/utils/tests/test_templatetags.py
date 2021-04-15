@@ -423,6 +423,34 @@ class AmendTemplatetagTest(TestCase):
                 u'</ul>'
                 u'')
 
+    def test_set_attributes_tag(self):
+        rendered = self._render(
+                u'{% load amend set_attributes from poleno.amend %}'
+                u'{% amend %}'
+                u'  <ul>'
+                u'    <li aaa="foo">xxx</li>'
+                u'    <li aaa="foo">xxx</li>'
+                u'    <li aaa="foo">xxx</li>'
+                u'    <li aaa="foo">xxx</li>'
+                u'    <li aaa="foo">xxx</li>'
+                u'  </ul>'
+                u'  {% set_attributes path=".//li[1]" aaa=None bbb=None %}'
+                u'  {% set_attributes path=".//li[2]" aaa=False bbb=False %}'
+                u'  {% set_attributes path=".//li[3]" aaa=True bbb=True %}'
+                u'  {% set_attributes path=".//li[4]" aaa="bar" bbb="baz" ccc="" %}'
+                u'  {% set_attributes path=".//li[5]" aaa=1 bbb=2 ccc=0 %}'
+                u'{% endamend %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>xxx</li>'
+                u'  <li>xxx</li>'
+                u'  <li aaa bbb>xxx</li>'
+                u'  <li aaa="bar" bbb="baz" ccc="">xxx</li>'
+                u'  <li aaa="1" bbb="2" ccc="0">xxx</li>'
+                u'</ul>'
+                u'')
+
     def test_amend_tag_on_plain_text(self):
         rendered = self._render(
                 u'{% load amend prepend append from poleno.amend %}'
@@ -484,4 +512,27 @@ class AmendTemplatetagTest(TestCase):
                 u'  <li>bbb!</li>'
                 u'  <li>xxx!</li>'
                 u'</ul>'
+                u'')
+
+    def test_without_amend_tag(self):
+        rendered = self._render(
+                u'{% load prepend append before after delete set_attributes from poleno.amend %}'
+                u'<ul>'
+                u'  <li>aaa</li>'
+                u'  <li>bbb</li>'
+                u'</ul>'
+                u'<p>foobar</p>'
+                u'{% prepend path=".//ul" %}<li>ccc</li>{% endprepend %}'
+                u'{% append path=".//ul" %}<li>ddd</li>{% endappend %}'
+                u'{% before path=".//li[2]" %}<li>eee</li>{% endbefore %}'
+                u'{% after path=".//li[2]" %}<li>fff</li>{% endafter %}'
+                u'{% delete path=".//p" %}'
+                u'{% set_attributes path=".//ul" att=True %}'
+                u'')
+        self.assertHTMLEqual(rendered,
+                u'<ul>'
+                u'  <li>aaa</li>'
+                u'  <li>bbb</li>'
+                u'</ul>'
+                u'<p>foobar</p>'
                 u'')
