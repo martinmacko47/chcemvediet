@@ -1,0 +1,18 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load amend after from poleno.amend %}
+
+{% block content %}
+  {% amend %}
+    {{ block.super }}
+    {% after path="./ul[last()]" %}
+      {% if outbound %}
+        <p>Outbound messages will be deleted:</p>
+        <ul>{{ outbound|unordered_list }}</ul>
+      {% endif %}
+      {% if inbound %}
+        <p>Inbound messages will be marked undecided:</p>
+        <ul>{{ inbound|unordered_list }}</ul>
+      {% endif %}
+    {% endafter %}
+  {% endamend %}
+{% endblock %}
