@@ -1,5 +1,5 @@
 {% extends "admin/delete_confirmation.html" %}
-{% load amend after from poleno.amend %}
+{% load amend before after set_attributes from poleno.amend %}
 
 {% block content %}
   {% amend %}
@@ -14,5 +14,14 @@
         <ul>{{ inbound|unordered_list }}</ul>
       {% endif %}
     {% endafter %}
+    {% if delete_constraints %}
+      {% before path=".//form" %}
+        <div class="errornote">
+          <p>Delete not allowed.</p>
+          <ul>{{ delete_constraints|unordered_list }}</ul>
+        </div>
+      {% endbefore %}
+      {% set_attributes path=".//form//input[@type='submit']" disabled=False %}
+    {% endif %}
   {% endamend %}
 {% endblock %}

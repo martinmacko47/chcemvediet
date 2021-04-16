@@ -319,10 +319,18 @@ class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
     def get_inforequest(self, obj):
         return obj.inforequest
 
-    def has_delete_permission(self, request, obj=None):
-        if obj is None:
-            return True
-        return not obj.is_main
+    def delete_constraints(self, obj):
+        if obj.is_main:
+            return [format_html(u'{} is main.'.format(admin_obj_format(obj)))]
+
+    def render_delete_form(self, request, context):
+        context[u'delete_constraints'] = self.delete_constraints(context[u'object'])
+        return super(BranchAdmin, self).render_delete_form(request, context)
+
+    def delete_model(self, request, obj):
+        if self.delete_constraints(obj):
+            raise PermissionDenied
+        return super(BranchAdmin, self).delete_model(request, obj)
 
 @admin.register(Action, site=admin.site)
 class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
