@@ -1,0 +1,16 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+
+{% comment %}
+ %
+ % Context:
+ %  -- None
+ %
+{% endcomment %}
+
+{% block case_study %}
+  <a class="chv-blog" rel="noreferrer noopener" href="{% block link %}{% endblock %}" target="_blank">
+    <img class="chv-case-study-img" src="{% block img %}{% endblock %}">
+    <span class="chv-blog-date">{% block date %}{% endblock %}</span>
+    <span class="chv-blog-text">{% block text %}{% endblock %}</span>
+  </a>
+{% endblock %}

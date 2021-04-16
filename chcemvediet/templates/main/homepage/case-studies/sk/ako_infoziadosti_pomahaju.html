@@ -1,0 +1,18 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% extends "main/homepage/case-studies/base.html" %}
+{% load static from staticfiles %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- None
+ %
+{% endcomment %}
+
+{% block link %}https://www.youtube.com/watch?v=7z4VgEbCBOk{% endblock %}
+{% block img %}{% static "main/images/case-studies/3.jpg" %}{% endblock %}
+{% block date %}4. október 2018{% endblock %}
+{% block text %}
+  Ako infožiadosti pomáhajú zvýšiť transparentnosť majetku úradníkov? Investigatívny novinár M.
+  Turček si vyžiadal zdôvodnenie predaja majetku obce Jelenec riaditeľovi KÚFS.
+{% endblock %}
