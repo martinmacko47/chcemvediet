@@ -7,16 +7,17 @@ import mock
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.http import urlencode
 from django.test import TestCase
 
 from poleno.timewarp import timewarp
 from poleno.mail.models import Message
 from poleno.utils.date import local_datetime_from_local, local_datetime_from_utc, utc_now, naive_date
 from poleno.utils.test import created_instances
-from poleno.utils.urls import reverse
+from poleno.utils.urls import reverse, complete_url
 
 from .. import InforequestsTestCaseMixin
-from ...models import Inforequest, InforequestEmail, Branch, Action, ActionDraft
+from ...models import Inforequest, InforequestEmail, Branch, Action
 
 
 class InforequestTest(InforequestsTestCaseMixin, TestCase):
@@ -114,7 +115,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
             mock_random.return_value = u'bbbb'
             inforequest1 = self._create_inforequest()
             mock_random.reset_mock()
-            with self.assertRaisesMessage(IntegrityError, u'column unique_email is not unique'):
+            with self.assertRaisesMessage(IntegrityError, u'UNIQUE constraint failed: inforequests_inforequest.unique_email'):
                 inforequest2 = self._create_inforequest()
             self.assertEqual(mock_random.mock_calls, [mock.call(i) for i in range(4,11)])
 
@@ -176,18 +177,6 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
     def test_branch_set_relation_empty_by_default(self):
         inforequest = self._create_inforequest()
         result = inforequest.branch_set.all()
-        self.assertItemsEqual(result, [])
-
-    def test_actiondraft_set_relation(self):
-        inforequest, _, _ = self._create_inforequest_scenario()
-        draft1 = self._create_action_draft(inforequest=inforequest, type=ActionDraft.TYPES.CONFIRMATION)
-        draft2 = self._create_action_draft(inforequest=inforequest, type=ActionDraft.TYPES.EXTENSION)
-        result = inforequest.actiondraft_set.all()
-        self.assertItemsEqual(result, [draft1, draft2])
-
-    def test_actiondraft_set_relation_empty_by_default(self):
-        inforequest, _, _ = self._create_inforequest_scenario()
-        result = inforequest.actiondraft_set.all()
         self.assertItemsEqual(result, [])
 
     def test_inforequestemail_set_relation(self):
@@ -767,22 +756,22 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
                 [u'confirmation'],
                 )],
             ))
-        # The main branch last action is ``ADVANCEMENT``. The main branch adcanced to other
-        # three branches ending with ``EXTENSION`` and ``CLARIFICATION_REQUEST`` and
-        # ``ADVANCEMENT``, respectivelly. The latter advancement advanced to yet another branch
+        # The main branch last action is ``ADVANCEMENT``. The main branch advanced to other
+        # three branches ending with ``REMANDMENT`` and ``CLARIFICATION_REQUEST`` and
+        # ``ADVANCEMENT``, respectively. The latter advancement advanced to yet another branch
         # ending with ``CONFIRMATION``.
         self.assertFalse(inforequest.can_add_request)
         self.assertTrue(inforequest.can_add_clarification_response) # from ``CLARIFICATION_REQUEST``
         self.assertTrue(inforequest.can_add_appeal)                 # from ``ADVANCEMENT``
-        self.assertFalse(inforequest.can_add_confirmation)
+        self.assertTrue(inforequest.can_add_confirmation)           # from ``CONFIRMATION``
         self.assertTrue(inforequest.can_add_extension)              # from ``REMANDMENT`` and ``CONFIRMATION``
-        self.assertTrue(inforequest.can_add_advancement)            # from ``CONFIRMATION``
+        self.assertTrue(inforequest.can_add_advancement)            # from ``ADVANCEMENT`` and ``CONFIRMATION``
         self.assertTrue(inforequest.can_add_clarification_request)  # from ``CLARIFICATION_REQUEST`` and ``CONFIRMATION``
         self.assertTrue(inforequest.can_add_disclosure)             # from ``REMANDMENT`` and ``CONFIRMATION``
         self.assertTrue(inforequest.can_add_refusal)                # from ``REMANDMENT`` and ``CONFIRMATION``
         self.assertFalse(inforequest.can_add_affirmation)
         self.assertFalse(inforequest.can_add_reversion)
-        self.assertFalse(inforequest.can_add_remandment)
+        self.assertTrue(inforequest.can_add_remandment)             # from ``REMANDMENT``
 
         self.assertTrue(inforequest.can_add_applicant_action)
         self.assertTrue(inforequest.can_add_applicant_email_action)
@@ -924,14 +913,19 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
             inforequest.send_received_email_notification(email)
         msg = message_set.get()
 
-        url = u'%s#decide' % reverse(u'inforequests:detail', args=(inforequest.pk,))
+        url = u'{}?{}'.format(
+            complete_url(reverse(u'account_login')),
+            urlencode({
+                u'next': reverse(u'inforequests:detail', kwargs=dict(inforequest=inforequest)),
+            })
+        )
         self.assertIn(url, msg.text)
         self.assertIn(u'Subject: Received email subject', msg.text)
         self.assertIn(u'Received email text content.', msg.text)
 
     def test_send_undecided_email_reminder(self):
         u"""
-        Checks thet the sent notification contains a link to to decide the received email. Also
+        Checks that the sent notification contains a link to to decide the received email. Also
         checks that ``last_undecided_email_reminder`` field is updated.
         """
         inforequest, _, _ = self._create_inforequest_scenario()
@@ -941,13 +935,18 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
             inforequest.send_undecided_email_reminder()
         msg = message_set.get()
 
-        url = u'%s#decide' % reverse(u'inforequests:detail', args=(inforequest.pk,))
+        url = u'{}?{}'.format(
+                complete_url(reverse(u'account_login')),
+                urlencode({
+                    u'next': reverse(u'inforequests:detail', kwargs=dict(inforequest=inforequest)),
+                })
+        )
         self.assertIn(url, msg.text)
         self.assertAlmostEqual(inforequest.last_undecided_email_reminder, utc_now(), delta=datetime.timedelta(seconds=10))
 
     def test_send_obligee_deadline_reminder(self):
         u"""
-        Checks thet the sent notification contains a link to the expired actioon. Also checks that
+        Checks that the sent notification contains a link to the expired actioon. Also checks that
         its ``last_deadline_reminder`` field is updated.
         """
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:22:00'))
@@ -958,13 +957,18 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
             inforequest.send_obligee_deadline_reminder(request)
         msg = message_set.get()
 
-        url = u'%s#action-%s' % (reverse(u'inforequests:detail', args=(inforequest.pk,)), request.pk)
+        url = u'{}?{}'.format(
+                complete_url(reverse(u'account_login')),
+                urlencode({
+                    u'next': reverse(u'inforequests:detail', kwargs=dict(inforequest=inforequest)) + u'#a{}'.format(request.pk),
+                })
+        )
         self.assertIn(url, msg.text)
         self.assertAlmostEqual(request.last_deadline_reminder, utc_now(), delta=datetime.timedelta(seconds=10))
 
     def test_send_applicant_deadline_reminder(self):
         u"""
-        Checks thet the sent notification contains a link to the expired actioon. Also checks that
+        Checks that the sent notification contains a link to the expired action. Also checks that
         its ``last_deadline_reminder`` field is updated.
         """
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:22:00'))
@@ -975,13 +979,18 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
             inforequest.send_applicant_deadline_reminder(clarification_request)
         msg = message_set.get()
 
-        url = u'%s#action-%s' % (reverse(u'inforequests:detail', args=(inforequest.pk,)), clarification_request.pk)
+        url = u'{}?{}'.format(
+                complete_url(reverse(u'account_login')),
+                urlencode({
+                    u'next': reverse(u'inforequests:detail', kwargs=dict(inforequest=inforequest)) + u'#a{}'.format(clarification_request.pk),
+                })
+        )
         self.assertIn(url, msg.text)
         self.assertAlmostEqual(clarification_request.last_deadline_reminder, utc_now(), delta=datetime.timedelta(seconds=10))
 
     def test_repr(self):
-        inforequest = self._create_inforequest()
-        self.assertEqual(repr(inforequest), u'<Inforequest: %s>' % inforequest.pk)
+        inforequest = self._create_inforequest(subject=u'Subject')
+        self.assertEqual(repr(inforequest), u'<Inforequest: [{}] {}>'.format(inforequest.pk, inforequest.subject))
 
     def test_owned_by_query_method(self):
         inforequest1 = self._create_inforequest(applicant=self.user1)
@@ -997,6 +1006,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         self.assertItemsEqual(result, [])
 
     def test_closed_and_not_closed_query_methods(self):
+        Inforequest.objects.all().delete()
         inforequest1 = self._create_inforequest(closed=True)
         inforequest2 = self._create_inforequest(closed=False)
         inforequest3 = self._create_inforequest(closed=True)
@@ -1007,6 +1017,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         self.assertItemsEqual(result, [inforequest2, inforequest4])
 
     def test_with_and_without_undecided_email_query_methods(self):
+        Inforequest.objects.all().delete()
         inforequest1, _, _ = self._create_inforequest_scenario(u'confirmation', u'extension')
         inforequest2, _, _ = self._create_inforequest_scenario(u'refusal')
         inforequest3, _, _ = self._create_inforequest_scenario()
@@ -1026,6 +1037,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(list(result), sorted(sample, key=lambda d: -d.pk))
 
     def test_order_by_submission_date_query_method(self):
+        Inforequest.objects.all().delete()
         dates = [
                 u'2014-10-04',
                 u'2014-10-05',

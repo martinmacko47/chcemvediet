@@ -228,6 +228,11 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _create_inforequest(self, **kwargs):
         return self._call_with_defaults(Inforequest.objects.create, kwargs, {
                 u'applicant': self.user,
+                u'subject': u'Default Testing Subject',
+                u'content': u'Default Testing Content',
+                u'closed': False,
+                u'published': False,
+                u'last_undecided_email_reminder': None,
                 })
 
     def _create_inforequest_email(self, **kwargs):
