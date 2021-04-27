@@ -882,9 +882,9 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         inforequest, _, _ = self._create_inforequest_scenario()
         for action_types, expected_result, expected_message in tests:
             if expected_result is True:
-                self.assertTrue(inforequest.can_add_action(*action_types), u'can_add_action(%s) is False' % action_types)
+                self.assertTrue(inforequest.can_add_action(*action_types), u'can_add_action({}) is False'.format(action_types))
             elif expected_result is False:
-                self.assertFalse(inforequest.can_add_action(*action_types), u'can_add_action(%s) is True' % action_types)
+                self.assertFalse(inforequest.can_add_action(*action_types), u'can_add_action({}) is True'.format(action_types))
             else:
                 with self.assertRaisesMessage(expected_result, expected_message):
                     inforequest.can_add_action(*action_types)
@@ -1173,7 +1173,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         random.shuffle(dates)
         inforequests = []
         for date in dates:
-            timewarp.jump(local_datetime_from_local(u'%s 10:33:00' % date))
+            timewarp.jump(local_datetime_from_local(u'{} 10:33:00'.format(date)))
             inforequests.append(self._create_inforequest())
         result = Inforequest.objects.order_by_submission_date()
         self.assertEqual(list(result), sorted(inforequests, key=lambda ir: (ir.submission_date, ir.pk)))
