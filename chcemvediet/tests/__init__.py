@@ -76,6 +76,9 @@ class ChcemvedietTestCaseMixin(TestCase):
         street = kwargs.pop(u'street', u'Default User Street')
         city = kwargs.pop(u'city', u'Default User City')
         zip = kwargs.pop(u'zip', u'00000')
+        anonymize_inforequests = kwargs.pop(u'anonymize_inforequests', False)
+        custom_anonymized_strings = kwargs.pop(u'custom_anonymized_strings', None)
+        days_to_publish_inforequest = kwargs.pop(u'days_to_publish_inforequest', 60)
         email_verified = kwargs.pop(u'email_verified', True)
         user = self._call_with_defaults(User.objects.create_user, kwargs, {
                 u'username': u'default_testing_username_{}'.format(nr),
@@ -87,6 +90,9 @@ class ChcemvedietTestCaseMixin(TestCase):
         user.profile.street = street
         user.profile.city = city
         user.profile.zip = zip
+        user.profile.anonymize_inforequests = anonymize_inforequests
+        user.profile.custom_anonymized_strings = custom_anonymized_strings
+        user.profile.days_to_publish_inforequest = days_to_publish_inforequest
         user.profile.save()
         if email_verified:
             user.emailaddress_set.create(email=user.email, verified=True)
