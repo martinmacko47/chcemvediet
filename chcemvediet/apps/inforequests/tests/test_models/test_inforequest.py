@@ -8,9 +8,8 @@ from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.http import urlencode
-from django.utils.translation import ugettext_lazy as _
 from django.test import TestCase
-from django.utils.translation import ugettext as __
+from django.utils.translation import ugettext
 
 from poleno.timewarp import timewarp
 from poleno.mail.models import Message
@@ -248,7 +247,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
 
     def test_slug_property_with_empty_subject(self):
         inforequest = self._create_inforequest(subject=u'')
-        self.assertEqual(inforequest.slug, _(u'inforequests:Inforequest:fallback_slug'))
+        self.assertEqual(inforequest.slug, ugettext(u'inforequests:Inforequest:fallback_slug'))
 
     def test_prefetch_branches_staticmethod(self):
         inforequest, branch1, actions = self._create_inforequest_scenario(u'advancement')
@@ -768,15 +767,72 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         _, _, appeal, _ = actions
         self.assertEqual(inforequest.last_action, appeal)
 
+    def test_last_action_property_with_multiple_branches(self):
+        inforequest, _, actions = self._create_inforequest_scenario(
+            (u'request', dict(created=naive_date(u'2012-10-06'))),
+            (u'advancement', dict(created=naive_date(u'2012-10-06')),
+                [
+                    (u'advanced_request', dict(created=naive_date(u'2012-10-06'))),
+                    (u'refusal', dict(created=naive_date(u'2012-10-06'))),
+                    (u'appeal', dict(created=naive_date(u'2012-10-07'))),
+                    (u'remandment', dict(created=naive_date(u'2012-10-08'))),
+                ],
+                [
+                    (u'advanced_request', dict(created=naive_date(u'2012-10-06'))),
+                    (u'clarification_request', dict(created=naive_date(u'2012-10-07'))),
+                ],
+                [
+                    (u'advanced_request', dict(created=naive_date(u'2012-10-06'))),
+                    (u'advancement', dict(created=naive_date(u'2012-10-06')), [
+                        (u'advanced_request', dict(created=naive_date(u'2012-10-07'))),
+                        (u'confirmation', dict(created=naive_date(u'2012-10-07'))),
+                    ])
+                ],
+            ))
+        _, (_, ((_, actions3), (_, actions4), (_, actions5))) = actions
+        _, _, _, remandment = actions3
+        self.assertEqual(inforequest.last_action, remandment)
+
+    def test_last_action_property_with_one_action(self):
+        inforequest, _, actions = self._create_inforequest_scenario()
+        self.assertEqual(inforequest.last_action, actions[0])
+
     def test_disclosure_level_property(self):
-        inforequest, _, _ = self._create_inforequest_scenario(
-            (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE)),
-            (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL)),
-            (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL)),
-        )
+        tested_disclosure_levels = (
+                Action.DISCLOSURE_LEVELS.NONE,
+                Action.DISCLOSURE_LEVELS.PARTIAL,
+                Action.DISCLOSURE_LEVELS.FULL,
+                )
+        # Make sure we are testing all defined disclosure_levels
+        defined_disclosure_levels = Action.DISCLOSURE_LEVELS._inverse.keys()
+        self.assertItemsEqual(tested_disclosure_levels, defined_disclosure_levels)
+
+        for disclosure_level in tested_disclosure_levels:
+            inforequest, _, _ = self._create_inforequest_scenario(
+                (u'disclosure', dict(disclosure_level=disclosure_level)),
+                )
+            self.assertEqual(inforequest.disclosure_level, disclosure_level)
+
+    def test_disclosure_level_property_on_all_action_types(self):
+        for action_name in Action.TYPES._inverse.values():
+            inforequest, _, _ = self._create_inforequest_scenario(
+                (action_name, dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL)),
+            )
+            self.assertEqual(inforequest.disclosure_level, Action.DISCLOSURE_LEVELS.PARTIAL)
+
+    def test_disclosure_level_property_with_multiple_branches(self):
+        inforequest, _, _ = self._create_inforequest_scenario((u'advancement',
+            [(u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE))],
+            [(u'advancement',
+                [(u'reversion', dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL))],
+                )],
+            [(u'advancement',
+                [(u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL))],
+                )],
+            ))
         self.assertEqual(inforequest.disclosure_level, Action.DISCLOSURE_LEVELS.FULL)
 
-    def test_disclosure_level_property_without_disclosure_action(self):
+    def test_disclosure_level_property_without_action_with_disclosure_level(self):
         inforequest, _, _ = self._create_inforequest_scenario()
         self.assertIsNone(inforequest.disclosure_level)
 
@@ -967,7 +1023,9 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         lang = ((u'sk', u'Slovak'), (u'en', u'English'))
         for language_code, _ in lang:
             with translation(language_code):
-                self.assertEqual(inforequest.get_absolute_url(u'anchor'), u'/{}/{}/{}-{}/anchor'.format(language_code, __(u'main:urls:inforequests'), inforequest.slug, inforequest.pk))
+                expected_url = u'/{}/{}/{}-{}/#anchor'.format(language_code,
+                        ugettext(u'main:urls:inforequests'), inforequest.slug, inforequest.pk)
+                self.assertEqual(inforequest.get_absolute_url(u'#anchor'), expected_url)
 
     def test_send_notification(self):
         u"""
@@ -1078,7 +1136,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
 
     def test_repr(self):
         inforequest = self._create_inforequest(subject=u's' * 40)
-        self.assertEqual(repr(inforequest), u'<Inforequest: [{}] {}>'.format(inforequest.pk, inforequest.subject[:30]))
+        self.assertEqual(repr(inforequest), u'<Inforequest: [{}] {}>'.format(inforequest.pk, u's' * 30))
 
     def test_owned_by_query_method(self):
         inforequest1 = self._create_inforequest(applicant=self.user1)
@@ -1106,21 +1164,22 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
 
     def test_successful_and_unsuccessful_query_methods(self):
         Inforequest.objects.all().delete()
-        successful_inforequests = []
-        unsuccessful_inforequests = []
-        for closed in (False, True):
-            for disclosure_level in Action.DISCLOSURE_LEVELS._inverse.keys():
-                inforequest, _, _ = self._create_inforequest_scenario(
-                    {u'closed': closed},
-                    (u'disclosure', dict(disclosure_level=disclosure_level)),
-                )
-                if closed:
-                    if disclosure_level >= Action.DISCLOSURE_LEVELS.PARTIAL:
-                        successful_inforequests.append(inforequest)
-                    else:
-                        unsuccessful_inforequests.append(inforequest)
-        self.assertItemsEqual(Inforequest.objects.successful(), successful_inforequests)
-        self.assertItemsEqual(Inforequest.objects.unsuccessful(), unsuccessful_inforequests)
+        inforequest1, _, _ = self._create_inforequest_scenario({u'closed': True},
+                (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE)))
+        inforequest2, _, _ = self._create_inforequest_scenario({u'closed': False},
+                (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.NONE)))
+        inforequest3, _, _ = self._create_inforequest_scenario({u'closed': True},
+                (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL)))
+        inforequest4, _, _ = self._create_inforequest_scenario({u'closed': False},
+                (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.PARTIAL)))
+        inforequest5, _, _ = self._create_inforequest_scenario({u'closed': True},
+                (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL)))
+        inforequest6, _, _ = self._create_inforequest_scenario({u'closed': False},
+                (u'disclosure', dict(disclosure_level=Action.DISCLOSURE_LEVELS.FULL)))
+        result_successful = Inforequest.objects.successful()
+        result_unsuccessful = Inforequest.objects.unsuccessful()
+        self.assertItemsEqual(result_successful, [inforequest3, inforequest5])
+        self.assertItemsEqual(result_unsuccessful, [inforequest1])
 
     def test_published_not_published_and_published_unknown_query_methods(self):
         Inforequest.objects.all().delete()
@@ -1130,12 +1189,12 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         inforequest4 = self._create_inforequest(published=True)
         inforequest5 = self._create_inforequest(published=False)
         inforequest6 = self._create_inforequest(published=None)
-        result = Inforequest.objects.published()
-        self.assertItemsEqual(result, [inforequest1, inforequest4])
-        result = Inforequest.objects.not_published()
-        self.assertItemsEqual(result, [inforequest2, inforequest5])
-        result = Inforequest.objects.published_unknown()
-        self.assertItemsEqual(result, [inforequest3, inforequest6])
+        result_published = Inforequest.objects.published()
+        result_not_published = Inforequest.objects.not_published()
+        result_published_unknown = Inforequest.objects.published_unknown()
+        self.assertItemsEqual(result_published, [inforequest1, inforequest4])
+        self.assertItemsEqual(result_not_published, [inforequest2, inforequest5])
+        self.assertItemsEqual(result_published_unknown, [inforequest3, inforequest6])
 
     def test_with_and_without_undecided_email_query_methods(self):
         Inforequest.objects.all().delete()

@@ -90,7 +90,7 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
     def _create_inforequest_scenario__action(self, inforequest, branch, args):
         action_name = args.pop(0)
         action_type = getattr(Action.TYPES, action_name.upper())
-        action_extra = args.pop() if args and isinstance(args[0], dict) else {}
+        action_extra = args.pop(0) if args and isinstance(args[0], dict) else {}
         action_args = {u'branch': branch, u'type': action_type}
 
         if action_type in Action.APPLICANT_ACTION_TYPES or action_type in Action.OBLIGEE_ACTION_TYPES:

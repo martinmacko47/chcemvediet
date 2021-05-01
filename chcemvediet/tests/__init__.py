@@ -76,7 +76,7 @@ class ChcemvedietTestCaseMixin(TestCase):
         street = kwargs.pop(u'street', u'Default User Street')
         city = kwargs.pop(u'city', u'Default User City')
         zip = kwargs.pop(u'zip', u'00000')
-        anonymize_inforequests = kwargs.pop(u'anonymize_inforequests', False)
+        anonymize_inforequests = kwargs.pop(u'anonymize_inforequests', True)
         custom_anonymized_strings = kwargs.pop(u'custom_anonymized_strings', None)
         days_to_publish_inforequest = kwargs.pop(u'days_to_publish_inforequest', 60)
         email_verified = kwargs.pop(u'email_verified', True)
@@ -237,7 +237,7 @@ class ChcemvedietTestCaseMixin(TestCase):
                 u'subject': u'Default Testing Subject',
                 u'content': u'Default Testing Content',
                 u'closed': False,
-                u'published': False,
+                u'published': None,
                 u'last_undecided_email_reminder': None,
                 })
 
