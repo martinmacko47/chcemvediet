@@ -24,6 +24,9 @@
   {% if user.is_authenticated %}
     {# FIXME: Show something to authenticated user; See #110 #}
   {% else %}
+      <div class="col-md-8 col-sm-6">
+        {% include "main/homepage/casestudy/main.html" %}
+      </div>
     <div class="col-md-4 col-sm-6 hidden-xs">
       {% include "main/homepage/texts/why_register.html" %}
       <div class="text-center chv-above-1">
@@ -41,8 +44,5 @@
       {% include "main/homepage/login.html" %}
     </div>
   {% endif %}
-  <div class="col-md-8 col-sm-6">
-    <h2 id="vybrane-pripady" class="text-center">Vybrané prípady</h2>
-    {% include "main/homepage/case-studies/items.html" %}
   </div>
 </div>

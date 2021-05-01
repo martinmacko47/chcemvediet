@@ -57,18 +57,56 @@ a:hover, a:focus
     height: ($chv-baseline * 4)
     width: ($chv-baseline * 4)
     margin-right: $chv-baseline
-  > .chv-case-study-img
-    display: block
-    float: left
-    height: ($chv-baseline * 8)
-    width: ($chv-baseline * 8)
-    margin-right: $chv-baseline
   > .chv-blog-date
     display: block
     @include chv-baseline($chv-fontsize-base * 0.9, 0.5, 0, 0.5)
     color: lighten($chv-color-gray, 20%)
     white-space: nowrap
   > .chv-blog-text
+    display: block
+    // Prevent orphaned text if the space next to the float image is too narrow. Can't use
+    // ``@include chv-baseline()`` directly because text top padding is lost when it is pushed
+    // bellow the image. To make sure the padding is not lost, we move it into ``:before``.
+    padding-top: 1px
+    padding-bottom: 0
+    margin-top: -1px
+    margin-bottom: (-1 * chv_baseline_fix($chv-fontsize-base, 1))
+    font-size: $chv-fontsize-base
+    line-height: $chv-baseline
+    &:before
+      content: " "
+      display: block
+      width: 10em
+      padding-top: chv_baseline_fix($chv-fontsize-base, 1)
+      overflow: hidden
+
+//
+// Casestudy link component
+//
+
+.chv-casestudy.chv-casestudy
+  display: block
+  padding: ($chv-baseline - 1px)
+  margin-bottom: ($chv-baseline * 1.2)
+  border: solid 1px $chv-color-gray-ll
+  border-radius: 4px
+  color: #4d4d4d
+  &:hover, &:focus
+    color: darken(#4d4d4d, 20%)
+  @include clearfix()
+  > .chv-casestudy-img
+    display: block
+    float: left
+    height: ($chv-baseline * 8)
+    width: ($chv-baseline * 8)
+    margin-right: $chv-baseline
+    margin-bottom: ($chv-baseline * 1.5)
+  > .chv-casestudy-date
+    display: block
+    @include chv-baseline($chv-fontsize-base * 0.9, 0.5, 0, 0.5)
+    color: lighten($chv-color-gray, 20%)
+    white-space: nowrap
+  > .chv-casestudy-text
     display: block
     // Prevent orphaned text if the space next to the float image is too narrow. Can't use
     // ``@include chv-baseline()`` directly because text top padding is lost when it is pushed
