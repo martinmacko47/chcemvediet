@@ -1,0 +1,25 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% extends "main/homepage/casestudy/base.html" %}
+{% load static from staticfiles %}
+{% load lorem from poleno.utils %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- None
+ %
+{% endcomment %}
+
+
+{% block casestudy %}
+  <h3>Case study</h3>
+  <p>chv-casestudy <br>main/homepage/casestudy/base.html</p>
+  <div class="sg-specimen chv-scheme-white">
+    {{ block.super }}
+  </div>
+{% endblock %}
+
+{% block img %}{% static "main/images/casestudy/ako_infoziadosti_pomahaju.jpg" %}{% endblock %}
+{% block date %}1. apríl 2015{% endblock %}
+{% block heading %}{% lorem 3 %}{% endblock %}
+{% block text %}{% lorem 3 %}{% endblock %}
