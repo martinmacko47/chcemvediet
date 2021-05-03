@@ -96,47 +96,26 @@ a:hover, a:focus
   &:hover, &:focus
     color: darken(#4d4d4d, 20%)
   @include clearfix()
+  > .chv-casestudy-img
+      display: block
+      float: left
+      height: ($chv-baseline * 8)
+      width: ($chv-baseline * 8)
+      margin-right: $chv-baseline
   > .chv-casestudy-wrap
     flex-basis: 50%
     flex-grow:1
-  .chv-casestudy-img
-    display: block
-    float: left
-    height: ($chv-baseline * 8)
-    width: ($chv-baseline * 8)
-    margin-right: $chv-baseline
-  .chv-casestudy-date
-    display: block
-    font-size: ($chv-fontsize-base * 0.9)
-    line-height: ($chv-baseline * 0.5)
-    color: lighten($chv-color-gray, 20%)
-    white-space: nowrap
-    &:before
-      content: " "
+    > .chv-casestudy-date
       display: block
-      width: 11.1em
-      padding-top: chv_baseline_fix($chv-fontsize-base, 1)
-      overflow: hidden
-  .chv-casestudy-heading
-    font-weight: 700
-    color: $chv-color-blue
-  .chv-casestudy-text, .chv-casestudy-heading
-    display: block
-    // Prevent orphaned text if the space next to the float image is too narrow. Can't use
-    // ``@include chv-baseline()`` directly because text top padding is lost when it is pushed
-    // bellow the image. To make sure the padding is not lost, we move it into ``:before``.
-    padding-top: 1px
-    padding-bottom: 0
-    margin-top: -1px
-    margin-bottom: (-1 * chv_baseline_fix($chv-fontsize-base, 1))
-    font-size: $chv-fontsize-base
-    line-height: $chv-baseline
-    &:before
-      content: " "
+      @include chv-baseline($chv-fontsize-base * 0.9, 1, 0, 0.1)
+      color: lighten($chv-color-gray, 20%)
+      white-space: nowrap
+    > .chv-casestudy-heading
+      font-weight: 700
+      color: $chv-color-blue
+    > .chv-casestudy-text, .chv-casestudy-heading
       display: block
-      width: 10em
-      padding-top: chv_baseline_fix($chv-fontsize-base, 1)
-      overflow: hidden
+      @include chv-baseline($chv-fontsize-base, 1, 0, 0.1)
 
 //
 // Component for statistics with big numbers
