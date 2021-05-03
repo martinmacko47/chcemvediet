@@ -380,7 +380,7 @@ class Inforequest(FormatMixin, models.Model):
     def disclosure_level(self):
         u"""
         Cached maximum disclosure level to the inforequest. Returns None if the inforequest hasn't
-        got any disclosure action.
+        got any action, that may disclose information.
         """
         return (Action.objects.of_inforequest(inforequest=self)
                 .aggregate(Max(u'disclosure_level'))[u'disclosure_level__max']
