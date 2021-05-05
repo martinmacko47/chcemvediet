@@ -5,18 +5,6 @@ from poleno.utils.date import utc_now, utc_datetime_from_local
 from poleno import datacheck
 
 
-def attachment_file_is_working(attachment):
-    if not attachment.file:
-        return None
-    try:
-        try:
-            attachment.file.open(u'rb')
-        finally:
-            attachment.file.close()
-    except IOError:
-        return False
-    return True
-
 def attachment_file_check(attachments):
     u"""
     Checks that every Attachment (or Attachment like) instance, which file is not NULL, has its file

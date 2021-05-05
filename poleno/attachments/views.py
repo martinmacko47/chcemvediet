@@ -5,7 +5,6 @@ import os
 from django.conf import settings
 from django.http import Http404, JsonResponse
 
-from poleno.attachments.utils import attachment_file_is_working
 from poleno.utils.http import send_file_response
 
 from .models import Attachment
@@ -32,7 +31,9 @@ def download(request, attachment, filename=None):
     u"""
     Download view for attachments and attachment like objects
     """
-    if not attachment_file_is_working(attachment):
-        raise Http404()
     path = os.path.join(settings.MEDIA_ROOT, attachment.file.name)
-    return send_file_response(request, path, filename or attachment.name, attachment.content_type)
+    try:
+        return send_file_response(request, path, filename or attachment.name,
+                                  attachment.content_type)
+    except OSError:
+        raise Http404()
