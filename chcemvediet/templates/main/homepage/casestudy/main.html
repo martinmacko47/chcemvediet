@@ -1,0 +1,16 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load trans from i18n %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- None
+ %
+{% endcomment %}
+
+<h2 id="{% trans 'main:homepage:casestudy:anchor' %}" class="text-center">
+  {% trans 'main:homepage:casestudy:heading' %}
+</h2>
+{% include "main/homepage/casestudy/sk/sef_danovych_kriminalistov.html" %}
+{% include "main/homepage/casestudy/sk/ako_infoziadosti_pomahaju.html" %}
+{% include "main/homepage/casestudy/sk/ako_pomaha_nas_portal.html" %}

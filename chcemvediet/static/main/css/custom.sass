@@ -81,6 +81,43 @@ a:hover, a:focus
       overflow: hidden
 
 //
+// Casestudy link component
+//
+
+.chv-casestudy.chv-casestudy
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  padding: ($chv-baseline - 1px)
+  margin-bottom: $chv-baseline
+  border: solid 1px $chv-color-gray-ll
+  border-radius: 4px
+  color: #4d4d4d
+  &:hover, &:focus
+    color: darken(#4d4d4d, 20%)
+  @include clearfix()
+  > .chv-casestudy-img
+      display: block
+      float: left
+      height: ($chv-baseline * 8)
+      width: ($chv-baseline * 8)
+      margin-right: $chv-baseline
+  > .chv-casestudy-wrap
+    flex-basis: 50%
+    flex-grow: 1
+    > .chv-casestudy-date
+      display: block
+      @include chv-baseline($chv-fontsize-base * 0.9, 1, 0, 0)
+      color: lighten($chv-color-gray, 20%)
+      white-space: nowrap
+    > .chv-casestudy-heading
+      font-weight: 700
+      color: $chv-color-blue
+    > .chv-casestudy-text, .chv-casestudy-heading
+      display: block
+      @include chv-baseline($chv-fontsize-base, 1, 0.5, 0)
+
+//
 // Component for statistics with big numbers
 //
 

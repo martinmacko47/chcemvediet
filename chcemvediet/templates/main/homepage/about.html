@@ -21,6 +21,10 @@
       </a>
     </div>
   </div>
+  <div class="col-md-8 col-sm-6">
+    {% include "main/homepage/casestudy/main.html" %}
+  </div>
+  <div class="chv-hidden-md col-sm-12"></div>
   {% if user.is_authenticated %}
     {# FIXME: Show something to authenticated user; See #110 #}
   {% else %}
