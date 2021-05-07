@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from django.contrib import admin
+from django.contrib.admin.actions import delete_selected
+from django.contrib import admin, messages
 from django.contrib.admin.utils import NestedObjects
 from django.core.exceptions import PermissionDenied
-from django.db import router
+from django.db import router, transaction
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
 
 from poleno.utils.date import local_today
-from poleno.utils.misc import decorate
+from poleno.utils.misc import decorate, squeeze
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
                                 ReadOnlyAdminInlineMixin, NoBulkDeleteAdminMixin)
 from chcemvediet.apps.inforequests.constants import ADMIN_EXTEND_SNOOZE_BY_DAYS
@@ -333,7 +334,7 @@ class BranchAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
         return super(BranchAdmin, self).delete_model(request, obj)
 
 @admin.register(Action, site=admin.site)
-class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
+class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     date_hierarchy = u'created'
     list_display = [
             u'id',
@@ -374,6 +375,9 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
     inlines = [
             BranchInline,
             ]
+    actions = [
+            u'delete_selected'
+    ]
 
     def get_queryset(self, request):
         queryset = super(ActionAdmin, self).get_queryset(request)
@@ -398,6 +402,55 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
         context[u'delete_constraints'] = self.delete_constraints(context[u'object'])
         context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
+
+    @transaction.atomic
+    def delete_selected(self, request, queryset):
+        constraints = []
+        warnings = []
+        outbound = InforequestEmail.objects.none()
+        inbound = InforequestEmail.objects.none()
+        for obj in queryset:
+            obj_constraints = self.delete_constraints(obj)
+            constraints += obj_constraints
+            inforequestemails = self.nested_inforequestemail_queryset(obj)
+            outbound |= inforequestemails[0]
+            inbound |= inforequestemails[1]
+            if not obj_constraints:
+                if not obj.is_last_action and obj.next_action not in queryset:
+                    warnings.append(format_html(squeeze(u"""
+                            {} is not the last action in the branch. Deleting it may cause logical
+                            errors in the inforequest history.
+                            """).format(admin_obj_format(obj))))
+
+        if request.POST.get(u'post'):
+            if constraints:
+                raise PermissionDenied
+
+        template_response = delete_selected(self, request, queryset)
+
+        if request.POST.get(u'post'):
+            n = outbound.count()
+            if n:
+                outbound.delete()
+                self.message_user(request,
+                        u'Successfully deleted {} applicant_action inforequestemails.'.format(n),
+                        messages.SUCCESS)
+            m = inbound.count()
+            if m:
+                inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
+                self.message_user(request,
+                        u'Successfully updated {} obligee_action inforequestemails.'.format(m),
+                        messages.SUCCESS)
+            return None
+
+        template_response.context_data.update({
+                u'outbound': [admin_obj_format(inforequestemail) for inforequestemail in outbound],
+                u'inbound': [admin_obj_format(inforequestemail) for inforequestemail in inbound],
+                u'delete_constraints': constraints,
+                u'warnings': warnings,
+        })
+        return template_response
+    delete_selected.short_description = u'Delete selected actions'
 
     def delete_model(self, request, obj):
         if self.delete_constraints(obj):
