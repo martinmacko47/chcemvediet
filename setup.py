@@ -476,7 +476,7 @@ def load_redirects(configure):
 
     Redirect.objects.all().delete()
     site = Site.objects.get(name=u'chcemvediet')
-    with JsonFile(u'fixtures/redirects_redirect.sk.json', u'r') as data:
+    with JsonFile(u'fixtures/redirects_redirect.sk.json') as data:
         for old_path, new_path in data.items():
             redirect = Redirect(site=site, old_path=old_path, new_path=new_path)
             redirect.save()
