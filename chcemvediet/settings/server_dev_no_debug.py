@@ -126,6 +126,10 @@ LOGGING = {
             u'handlers': [u'mail_admins', u'file_general'],
             u'level': u'WARNING',
             },
+        u'chcemvediet': {
+            u'handlers': [u'mail_admins', u'file_general'],
+            u'level': u'WARNING',
+            },
         },
     u'root': {
         u'handlers': [u'mail_admins', u'file_general'],
