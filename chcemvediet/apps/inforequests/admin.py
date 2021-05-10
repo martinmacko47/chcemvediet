@@ -385,14 +385,14 @@ class ActionAdmin(NoBulkDeleteAdminMixin, DeleteNestedInforequestEmailAdminMixin
         return obj.branch.inforequest
 
     def delete_constraints(self, obj):
-        dependency = []
+        constraints = []
         if obj.type in [Action.TYPES.REQUEST, Action.TYPES.ADVANCED_REQUEST]:
-            dependency.append(format_html(
+            constraints.append(format_html(
                 u'{} is type {}.'.format(admin_obj_format(obj), obj.get_type_display())))
         if len(obj.branch.actions) == 1:
-            dependency.append(format_html(
+            constraints.append(format_html(
                 u'{} is the only action in the branch.'.format(admin_obj_format(obj))))
-        return dependency
+        return constraints
 
     def render_delete_form(self, request, context):
         context[u'delete_constraints'] = self.delete_constraints(context[u'object'])
