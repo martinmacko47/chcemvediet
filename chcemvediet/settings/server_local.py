@@ -66,6 +66,10 @@ LOGGING = {
             u'handlers': [u'console'],
             u'level': u'INFO',
             },
+        u'chcemvediet': {
+            u'handlers': [u'console'],
+            u'level': u'INFO',
+            },
         },
     u'root': {
         u'handlers': [u'console'],
