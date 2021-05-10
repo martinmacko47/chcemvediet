@@ -21,7 +21,7 @@
           <ul>{{ delete_constraints|unordered_list }}</ul>
         </div>
       {% endbefore %}
-      {% set_attributes path=".//form//input[@type='submit']" disabled=False %}
+      {% set_attributes path=".//form//input[@type='submit']" disabled=True %}
     {% endif %}
   {% endamend %}
 {% endblock %}
