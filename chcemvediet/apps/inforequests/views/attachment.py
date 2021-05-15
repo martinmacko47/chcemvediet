@@ -5,7 +5,6 @@ from django.db.models import Q
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.contrib.sessions.models import Session
-from django.core.exceptions import PermissionDenied
 
 from poleno.attachments import views as attachments_views
 from poleno.attachments.models import Attachment
@@ -68,11 +67,6 @@ def attachment_finalization_download(request, attachment_finalization_pk):
     generic_object = attachment_finalization.attachment.generic_object
     if isinstance(generic_object, Action):
         if generic_object.branch.inforequest.published:
-            try:
-                if attachment_finalization.content is None:
-                    raise PermissionDenied
-            except IOError:
-                raise PermissionDenied
             prog = generate_user_pattern(generic_object.branch.inforequest, match_subwords=True)
             filename = anonymize_string(prog, attachment_finalization.name)
             return attachments_views.download(request, attachment_finalization, filename)

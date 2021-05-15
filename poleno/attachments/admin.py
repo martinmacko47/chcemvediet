@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import patterns, url
 from django.contrib import admin
-from django.core.exceptions import PermissionDenied
 from django.http import Http404
 
 from poleno.attachments.views import download
@@ -16,11 +15,8 @@ class DownloadAdminMixin(admin.ModelAdmin):
 
     def download_view(self, request, obj_pk):
         obj = self.model.objects.get_or_404(pk=obj_pk)
-        try:
-            if obj.content is None:
-                raise Http404()
-        except IOError:
-            raise PermissionDenied
+        if not obj.file.name:
+            raise Http404
         return download(request, obj)
 
     def get_urls(self):
