@@ -62,7 +62,7 @@ def attachment_download(request, attachment_pk):
 
 @require_http_methods([u'HEAD', u'GET'])
 def attachment_finalization_download(request, attachment_finalization_pk):
-    attachment_finalization = AttachmentFinalization.objects.get_or_404(
+    attachment_finalization = AttachmentFinalization.objects.successful().get_or_404(
             pk=attachment_finalization_pk)
     generic_object = attachment_finalization.attachment.generic_object
     if isinstance(generic_object, Action):

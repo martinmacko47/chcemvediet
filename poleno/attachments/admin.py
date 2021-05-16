@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import patterns, url
 from django.contrib import admin
+from django.http import Http404
 
 from poleno.attachments.views import download
 from poleno.utils.misc import decorate, filesize
@@ -14,6 +15,8 @@ class DownloadAdminMixin(admin.ModelAdmin):
 
     def download_view(self, request, obj_pk):
         obj = self.model.objects.get_or_404(pk=obj_pk)
+        if not obj.file.name:
+            raise Http404
         return download(request, obj)
 
     def get_urls(self):
