@@ -14,27 +14,26 @@
         <ul>{{ inbound|unordered_list }}</ul>
       {% endif %}
     {% endafter %}
-    {% if not object.is_last_action %}
-      {% before path=".//form" %}
-        <p>
-          <b>Warning:</b> The deleted action is not the last action in the branch. Deleting it may
-          cause logical errors in the inforequest history.
-        </p>
-      {% endbefore %}
-    {% endif %}
     {% if object.type == object.TYPES.EXPIRATION or object.type == object.TYPES.APPEAL_EXPIRATION %}
       {% prepend path=".//form" %}
         <p><label><input name="snooze" type="checkbox" /> Extend snooze of previous action by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today.</label></p>
       {% endprepend %}
     {% endif %}
-    {% if delete_constraints %}
-      {% before path=".//form" %}
+    {% before path=".//form" %}
+      {% if delete_warnings %}
+        <ul class="messagelist">
+          {% for warning in delete_warnings %}
+            <li class="warning">{{ warning }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% if delete_constraints %}
         <div class="errornote">
           <p>Delete not allowed.</p>
           <ul>{{ delete_constraints|unordered_list }}</ul>
         </div>
-      {% endbefore %}
-      {% set_attributes path=".//form//input[@type='submit']" disabled=True %}
-    {% endif %}
+        {% set_attributes path=".//form//input[@type='submit']" disabled=True %}
+      {% endif %}
+    {% endbefore %}
   {% endamend %}
 {% endblock %}

@@ -32,6 +32,11 @@ urlpatterns += i18n_patterns(u'',
     url(r'', include(u'poleno.pages.urls', namespace=u'pages')),
 )
 
+try:
+    admin.site.disable_action(u'delete_selected')
+except KeyError:
+    pass
+
 if settings.DEBUG: # pragma: no cover
     urlpatterns = patterns(u'',
         url(r'^media/(?P<path>.*)$', u'django.views.static.serve', {u'document_root': settings.MEDIA_ROOT, u'show_indexes': True}),

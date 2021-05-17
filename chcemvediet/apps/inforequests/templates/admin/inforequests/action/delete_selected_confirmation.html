@@ -15,9 +15,9 @@
       {% endif %}
     {% endafter %}
     {% before path=".//form" %}
-      {% if warnings %}
+      {% if delete_warnings %}
         <ul class="messagelist">
-          {% for warning in warnings %}
+          {% for warning in delete_warnings %}
             <li class="warning">{{ warning }}</li>
           {% endfor %}
         </ul>
