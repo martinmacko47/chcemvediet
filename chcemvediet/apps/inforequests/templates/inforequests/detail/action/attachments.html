@@ -21,7 +21,7 @@
         </a>
       </div>
     {% else %}
-      {% for attachment_finalization in attachment.attachmentfinalization_set.all %}
+      {% for attachment_finalization in attachment.attachmentfinalization_set.successful %}
         <div class="pln-attachment">
           <a href="{% url 'inforequests:download_attachment_finalization' attachment_finalization=attachment_finalization %}">
             {% anonymize inforequest attachment_finalization.name match_subwords=True %}

@@ -29,6 +29,8 @@ def admin_obj_format(obj, format=u'{tag}', *args, **kwargs):
         return u'--'
     tag = u'<{}: {}>'.format(obj.__class__.__name__, obj.pk)
     res = format.format(obj=obj, tag=tag, *args, **kwargs)
+    if not res:
+        return u'--'
     if link:
         try:
             info = obj._meta.app_label, obj._meta.model_name, link
