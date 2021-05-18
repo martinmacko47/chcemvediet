@@ -37,7 +37,7 @@
     </div>
   </div>
   <div class="form-group">
-    <div class="col-sm-12">
+    <div class="col-sm-12 chv-above-1 chv-bellow-1">
       <script src="https://www.google.com/recaptcha/api.js" async defer></script>
       <div class="g-recaptcha" align="center" data-sitekey="{{ RECAPTCHA_PUBLIC_KEY }}"></div>
     </div>
@@ -52,7 +52,8 @@
       </div>
     </div>
   </div>
-  <div>
+  <div class="visible-md chv-above-1"></div>
+  <div class="chv-above-1">
     <button class="btn chv-btn-wide chv-btn-inv-green" type="submit">
       {% trans 'main:homepage:login:button' %}
     </button>
@@ -72,6 +73,8 @@
     {% trans 'main:homepage:login:reset_password' %}
   </a>
 </p>
-<hr>
-<h3>{% trans 'main:homepage:login:social_buttons' %}</h3>
-{% include "account/snippets/social_login_buttons.html" with process="login" %}
+<div class="visible-sm visible-xs">
+  <hr>
+  <h3>{% trans 'main:homepage:login:social_buttons' %}</h3>
+  {% include "account/snippets/social_login_buttons.html" with process="login" %}
+</div>
