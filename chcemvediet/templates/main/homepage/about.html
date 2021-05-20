@@ -25,36 +25,35 @@
     {% include "main/homepage/casestudy/main.html" %}
   </div>
 </div>
-  {% if user.is_authenticated %}
-    {# FIXME: Show something to authenticated user; See #110 #}
-  {% else %}
-    <div class="row">
-      <div class="col-md-4 col-sm-6 hidden-xs">
-        {% include "main/homepage/texts/why_register.html" %}
-        <div class="text-center chv-above-1">
-          <a class="btn chv-btn-wide chv-btn-inv-blue" href="{% url 'account_signup' %}">
-            {% trans 'main:homepage:signup:button' %}
-          </a>
-        </div>
-        <div class="hidden-lg hidden-md text-center chv-above-1">
-          <ul class="chv-icon-ul chv-inlineblock text-left">
-            {% include "main/homepage/about_links.html" %}
-          </ul>
-        </div>
+{% if not user.is_authenticated %}
+  <div class="row chv-above-1">
+    <div class="visible-lg  visible-md chv-above-1"></div>
+    <div class="col-md-4 col-sm-6 hidden-xs">
+      {% include "main/homepage/texts/why_register.html" %}
+      <div class="text-center chv-above-1">
+        <a class="btn chv-btn-wide chv-btn-inv-blue" href="{% url 'account_signup' %}">
+          {% trans 'main:homepage:signup:button' %}
+        </a>
       </div>
-      <div class="col-md-4 col-sm-6 text-center">
-        {% include "main/homepage/login.html" %}
-      </div>
-      <div class="col-md-4 hidden-sm hidden-xs text-center">
-        <h2 id="{% trans 'main:homepage:about_links:anchor' %}" class="text-center">
-          {% trans 'main:homepage:about_links:heading' %}
-        </h2>
+      <div class="hidden-lg hidden-md text-center chv-above-1">
         <ul class="chv-icon-ul chv-inlineblock text-left">
           {% include "main/homepage/about_links.html" %}
         </ul>
-        <hr>
-        <h3>{% trans 'main:homepage:login:social_buttons' %}</h3>
-        {% include "account/snippets/social_login_buttons.html" with process="login" %}
       </div>
     </div>
-  {% endif %}
+    <div class="col-md-4 col-sm-6 text-center">
+      {% include "main/homepage/login.html" %}
+    </div>
+    <div class="col-md-4 hidden-sm hidden-xs text-center">
+      <h2 id="{% trans 'main:homepage:about_links:anchor' %}" class="text-center">
+        {% trans 'main:homepage:about_links:heading' %}
+      </h2>
+      <ul class="chv-icon-ul chv-inlineblock text-left">
+        {% include "main/homepage/about_links.html" %}
+      </ul>
+      <hr>
+      <h3>{% trans 'main:homepage:login:social_buttons' %}</h3>
+      {% include "account/snippets/social_login_buttons.html" with process="login" %}
+    </div>
+  </div>
+{% endif %}
