@@ -14,7 +14,7 @@
         <ul>{{ inbound|unordered_list }}</ul>
       {% endif %}
     {% endafter %}
-    {% if object.type == object.TYPES.EXPIRATION or object.type == object.TYPES.APPEAL_EXPIRATION %}
+    {% if ADMIN_EXTEND_SNOOZE_BY_DAYS %}
       {% prepend path=".//form" %}
         <p><label><input name="snooze" type="checkbox" /> Extend snooze of previous action by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today.</label></p>
       {% endprepend %}

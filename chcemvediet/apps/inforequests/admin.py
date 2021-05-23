@@ -21,19 +21,19 @@ from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Act
 
 class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
 
-    def get_inforequest(self, obj):
+    def get_inforequest(self, objs):
         raise NotImplementedError
 
-    def nested_inforequestemail_queryset(self, obj):
+    def nested_inforequestemail_queryset(self, objs):
         using = router.db_for_write(self.model)
         collector = NestedObjects(using)
-        collector.collect([obj])
+        collector.collect(objs)
         to_delete = collector.nested()
-        inforequest = self.get_inforequest(obj)
+        inforequests = self.get_inforequest(objs)
         actions = [obj for obj in self.nested_objects_traverse(to_delete)
                    if isinstance(obj, Action)]
         emails = [action.email for action in actions if action.email]
-        inforequestemails_qs = InforequestEmail.objects.filter(inforequest=inforequest,
+        inforequestemails_qs = InforequestEmail.objects.filter(inforequest=inforequests,
                                                                email__in=emails)
         outbound = inforequestemails_qs.filter(type=InforequestEmail.TYPES.APPLICANT_ACTION)
         inbound = inforequestemails_qs.filter(type=InforequestEmail.TYPES.OBLIGEE_ACTION)
@@ -48,14 +48,14 @@ class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
             yield to_delete
 
     def render_delete_form(self, request, context):
-        outbound, inbound = self.nested_inforequestemail_queryset(context[u'object'])
+        outbound, inbound = self.nested_inforequestemail_queryset([context[u'object']])
         context[u'outbound'] = [admin_obj_format(inforequestemail) for inforequestemail in outbound]
         context[u'inbound'] = [admin_obj_format(inforequestemail) for inforequestemail in inbound]
         return super(DeleteNestedInforequestEmailAdminMixin, self).render_delete_form(request,
                                                                                       context)
 
     def delete_model(self, request, obj):
-        outbound, inbound = self.nested_inforequestemail_queryset(obj)
+        outbound, inbound = self.nested_inforequestemail_queryset([obj])
         outbound.delete()
         inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
         super(DeleteNestedInforequestEmailAdminMixin, self).delete_model(request, obj)
@@ -317,8 +317,8 @@ class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         queryset = queryset.select_related(u'advanced_by')
         return queryset
 
-    def get_inforequest(self, obj):
-        return obj.inforequest
+    def get_inforequest(self, objs):
+        return Inforequest.objects.filter(branch__in=objs)
 
     def delete_constraints(self, obj):
         if obj.is_main:
@@ -385,12 +385,15 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         queryset = queryset.select_related(u'email')
         return queryset
 
-    def get_inforequest(self, obj):
-        return obj.branch.inforequest
+    def get_inforequest(self, objs):
+        return Inforequest.objects.filter(branch__action__in=objs)
 
-    def delete_warnings(self, obj):
+    def delete_warnings(self, obj, to_delete=None):
+        if self.delete_constraints(obj):
+            return []
+        to_delete = to_delete or []
         warnings = []
-        if not obj.is_last_action:
+        if not obj.is_last_action and obj.next_action not in to_delete:
             warnings.append(format_html(squeeze(u"""
                     {} is not the last action in the branch. Deleting it may cause logical errors in
                     the inforequest history.
@@ -407,10 +410,18 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
                 u'{} is the only action in the branch.'.format(admin_obj_format(obj))))
         return constraints
 
+    def can_snooze(self, obj):
+        if (obj.type in [Action.TYPES.EXPIRATION, Action.TYPES.APPEAL_EXPIRATION]
+                and obj.previous_action):
+            return True
+        return False
+
     def render_delete_form(self, request, context):
-        context[u'delete_warnings'] = self.delete_warnings(context[u'object'])
-        context[u'delete_constraints'] = self.delete_constraints(context[u'object'])
-        context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
+        obj = context[u'object']
+        context[u'delete_warnings'] = self.delete_warnings(obj)
+        context[u'delete_constraints'] = self.delete_constraints(obj)
+        if self.can_snooze(obj):
+            context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
 
     @decorate(short_description=u'Delete selected actions')
@@ -418,15 +429,13 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     def delete_selected(self, request, queryset):
         delete_warnings = []
         delete_constraints = []
-        outbound = InforequestEmail.objects.none()
-        inbound = InforequestEmail.objects.none()
+        snoozed_actions = []
         for obj in queryset:
-            if obj.next_action not in queryset:
-                delete_warnings += self.delete_warnings(obj)
+            delete_warnings += self.delete_warnings(obj, queryset)
             delete_constraints += self.delete_constraints(obj)
-            inforequestemails = self.nested_inforequestemail_queryset(obj)
-            outbound |= inforequestemails[0]
-            inbound |= inforequestemails[1]
+            if self.can_snooze(obj):
+                snoozed_actions.append(obj.previous_action)
+        outbound, inbound = self.nested_inforequestemail_queryset(queryset)
 
         if request.POST.get(u'post'):
             if delete_constraints:
@@ -435,6 +444,10 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         template_response = delete_selected(self, request, queryset)
 
         if request.POST.get(u'post'):
+            if request.POST.get(u'snooze'):
+                for action in snoozed_actions:
+                    action.snooze = local_today() + datetime.timedelta(days=ADMIN_EXTEND_SNOOZE_BY_DAYS)
+                    action.save(update_fields=[u'snooze'])
             outbound.delete()
             inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
             return None
@@ -442,8 +455,9 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         template_response.context_data.update({
                 u'outbound': [admin_obj_format(inforequestemail) for inforequestemail in outbound],
                 u'inbound': [admin_obj_format(inforequestemail) for inforequestemail in inbound],
-            u'delete_warnings': delete_warnings,
-            u'delete_constraints': delete_constraints,
+                u'snoozed_actions': [admin_obj_format(action) for action in snoozed_actions],
+                u'delete_warnings': delete_warnings,
+                u'delete_constraints': delete_constraints,
         })
         return template_response
 
@@ -451,9 +465,7 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         if self.delete_constraints(obj):
             raise PermissionDenied
         if request.POST:
-            if (request.POST.get(u'snooze')
-                    and obj.type in [Action.TYPES.EXPIRATION, Action.TYPES.APPEAL_EXPIRATION]
-                    and obj.previous_action):
+            if request.POST.get(u'snooze') and self.can_snooze(obj):
                 previous = obj.previous_action
                 previous.snooze = local_today() + datetime.timedelta(days=ADMIN_EXTEND_SNOOZE_BY_DAYS)
                 previous.save(update_fields=[u'snooze'])

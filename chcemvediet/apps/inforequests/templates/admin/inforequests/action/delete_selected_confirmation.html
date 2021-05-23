@@ -1,5 +1,5 @@
 {% extends "admin/delete_selected_confirmation.html" %}
-{% load amend before after set_attributes from poleno.amend %}
+{% load amend prepend before after set_attributes from poleno.amend %}
 
 {% block content %}
   {% amend %}
@@ -14,6 +14,16 @@
         <ul>{{ inbound|unordered_list }}</ul>
       {% endif %}
     {% endafter %}
+    {% if snoozed_actions %}
+      {% prepend path=".//form" %}
+        <p>
+          <label><input name="snooze" type="checkbox" /> Extend snooze of previous actions to the
+            following deleted actions by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today:
+          </label>
+        </p>
+        <ul>{{ snoozed_actions|unordered_list }}</ul>
+      {% endprepend %}
+    {% endif %}
     {% before path=".//form" %}
       {% if delete_warnings %}
         <ul class="messagelist">
