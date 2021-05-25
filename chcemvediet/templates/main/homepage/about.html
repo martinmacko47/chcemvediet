@@ -14,7 +14,7 @@
   <div class="col-md-4 col-sm-6 chv-justify">
     {% include "main/homepage/texts/about.html" %}
     <div class="text-center chv-above-1">
-      <a class="btn chv-btn-blue" href="{% page "/o-projekte/" %}">
+      <a class="btn chv-btn-blue" href="{% page '/o-projekte/' %}">
         <i class="chv-icon icon-link-ext"></i>
         &nbsp;
         {% trans 'main:homepage:about:more' %}
@@ -24,10 +24,10 @@
   <div class="col-md-8 col-sm-6">
     {% include "main/homepage/casestudy/main.html" %}
   </div>
-  <div class="chv-hidden-md col-sm-12"></div>
-  {% if user.is_authenticated %}
-    {# FIXME: Show something to authenticated user; See #110 #}
-  {% else %}
+</div>
+{% if not user.is_authenticated %}
+  <div class="visible-lg visible-md chv-above-1"></div>
+  <div class="row chv-above-1">
     <div class="col-md-4 col-sm-6 hidden-xs">
       {% include "main/homepage/texts/why_register.html" %}
       <div class="text-center chv-above-1">
@@ -35,7 +35,7 @@
           {% trans 'main:homepage:signup:button' %}
         </a>
       </div>
-      <div class="text-center chv-above-1">
+      <div class="hidden-lg hidden-md text-center chv-above-1">
         <ul class="chv-icon-ul chv-inlineblock text-left">
           {% include "main/homepage/about_links.html" %}
         </ul>
@@ -44,5 +44,16 @@
     <div class="col-md-4 col-sm-6 text-center">
       {% include "main/homepage/login.html" %}
     </div>
-  {% endif %}
-</div>
+    <div class="col-md-4 hidden-sm hidden-xs text-center">
+      <h2 id="{% trans 'main:homepage:about_links:anchor' %}" class="text-center">
+        {% trans 'main:homepage:about_links:heading' %}
+      </h2>
+      <ul class="chv-icon-ul chv-inlineblock text-left">
+        {% include "main/homepage/about_links.html" %}
+      </ul>
+      <hr>
+      <h3>{% trans 'main:homepage:login:social_buttons' %}</h3>
+      {% include "account/snippets/social_login_buttons.html" with process="login" %}
+    </div>
+  </div>
+{% endif %}

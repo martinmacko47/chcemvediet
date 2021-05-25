@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-02 16:58+0200\n"
+"POT-Creation-Date: 2021-05-18 11:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1346,6 +1346,12 @@ msgstr "Chcem vedieť viac"
 
 msgid "main:homepage:signup:button"
 msgstr "Registrácia"
+
+msgid "main:homepage:about_links:anchor"
+msgstr "dalsie-informacie"
+
+msgid "main:homepage:about_links:heading"
+msgstr "Ďalšie informácie"
 
 msgid "main:homepage:bigstats:users"
 msgstr "Registrovaných <br>užívateľov"
