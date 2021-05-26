@@ -325,6 +325,12 @@
       "css": "minus",
       "code": 59412,
       "src": "fontawesome"
+    },
+    {
+      "uid": "9daa1fdf0838118518a7e22715e83abc",
+      "css": "file-pdf",
+      "code": 61889,
+      "src": "fontawesome"
     }
   ]
 }
