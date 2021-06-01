@@ -71,7 +71,7 @@ hr
   padding-top: ($chv-baseline - 1px)
   margin-bottom: $chv-baseline
   border-top: none
-  border-bottom: 1px solid #eee
+  border-bottom: 1px solid $chv-color-gray-ll
 
 //
 // Base paragraph and heading styles
@@ -87,6 +87,17 @@ a, .btn-link
   text-decoration: none
   &:focus, &:hover
     text-decoration: none
+
+//
+// Footnote style
+//
+
+.chv-footnote
+  padding-top: $chv-baseline - 1
+  border-top: 1px solid $chv-color-gray-ll
+  p
+    @include chv-baseline($chv-fontsize-p - 2, 1, 0, 1)
+    padding-left: 10px
 
 //
 // Override bootstrap close button line height
