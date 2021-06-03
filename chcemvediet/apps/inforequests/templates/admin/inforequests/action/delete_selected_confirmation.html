@@ -25,7 +25,7 @@
         <ul>{{ snoozed_actions|unordered_list }}</ul>
       {% endprepend %}
     {% endif %}
-    {% before path=".//form" %}
+    {% before path=".//form//input[@type='submit']" %}
       {% if delete_warnings %}
         <ul class="messagelist">
           {% for warning in delete_warnings %}

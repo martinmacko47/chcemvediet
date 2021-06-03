@@ -423,8 +423,9 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         obj = context[u'object']
         context[u'delete_warnings'] = self.delete_warnings(obj)
         context[u'delete_constraints'] = self.delete_constraints(obj)
-        context[u'can_snooze_previous_action'] = self.can_snooze_previous_action(obj)
-        context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
+        if self.can_snooze_previous_action(obj):
+            context[u'snoozed_actions'] = [admin_obj_format(obj.previous_action)]
+            context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
 
     @decorate(short_description=u'Delete selected actions')
