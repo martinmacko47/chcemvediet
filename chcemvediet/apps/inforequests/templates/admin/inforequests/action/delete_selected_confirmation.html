@@ -17,8 +17,9 @@
     {% if snoozed_actions %}
       {% prepend path=".//form" %}
         <p>
-          <label><input name="snooze" type="checkbox" /> Extend snooze of previous actions to the
-            following deleted actions by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today:
+          <label><input name="snooze" type="checkbox" /> Extend snooze of previous actions by
+            {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today? All of the following actions will be
+            snoozed:
           </label>
         </p>
         <ul>{{ snoozed_actions|unordered_list }}</ul>

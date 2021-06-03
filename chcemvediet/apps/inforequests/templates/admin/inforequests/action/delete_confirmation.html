@@ -14,7 +14,7 @@
         <ul>{{ inbound|unordered_list }}</ul>
       {% endif %}
     {% endafter %}
-    {% if ADMIN_EXTEND_SNOOZE_BY_DAYS %}
+    {% if can_snooze_previous_action %}
       {% prepend path=".//form" %}
         <p><label><input name="snooze" type="checkbox" /> Extend snooze of previous action by {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today.</label></p>
       {% endprepend %}
