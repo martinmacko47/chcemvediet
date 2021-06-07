@@ -1371,6 +1371,9 @@ msgstr "vybrane-pripady"
 msgid "main:homepage:casestudy:heading"
 msgstr "Vybrané prípady"
 
+msgid "main:homepage:casestudy:more"
+msgstr "Všetky prípady"
+
 msgid "main:homepage:didyouknow:twitter"
 msgstr "Tweet"
 
@@ -1505,6 +1508,9 @@ msgstr "Prihlásiť"
 
 msgid "main:menu:about"
 msgstr "O projekte"
+
+msgid "main:menu:casestudy"
+msgstr "Prípady"
 
 msgid "main:menu:support-us"
 msgstr "Podporte nás"
