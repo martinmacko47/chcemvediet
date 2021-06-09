@@ -8,7 +8,6 @@
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'https'
 PREPEND_WWW = True
 LIBSASS_OUTPUT_STYLE = u'compressed'
 
@@ -137,3 +136,6 @@ LOGGING = {
         u'level': u'WARNING',
         },
     }
+
+# Django-allauth settings
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'https'

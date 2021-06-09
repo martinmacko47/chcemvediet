@@ -8,13 +8,10 @@
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'https'
 PREPEND_WWW = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 LIBSASS_OUTPUT_STYLE = u'compressed'
-INVITATIONS_INVITATION_ONLY = False
-AUTOPUBLISH_INFOREQUESTS = False
 
 # English on production server is disabled for now.
 LANGUAGES = (
@@ -121,3 +118,10 @@ LOGGING = {
         u'level': u'WARNING',
         },
     }
+
+# Django-allauth settings
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'https'
+
+# Chcemvediet settings
+INVITATIONS_INVITATION_ONLY = False
+AUTOPUBLISH_INFOREQUESTS = False

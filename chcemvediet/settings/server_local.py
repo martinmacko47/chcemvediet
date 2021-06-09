@@ -8,7 +8,6 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'http'
 PREPEND_WWW = False
 
 DATABASES = {
@@ -77,3 +76,6 @@ LOGGING = {
         u'level': u'INFO',
         },
     }
+
+# Django-allauth settings
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'http'
