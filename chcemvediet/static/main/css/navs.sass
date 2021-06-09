@@ -5,10 +5,7 @@
   > li
     position: relative
     display: block
-    margin-top: 0px
-    margin-bottom: 0px
-    padding-top: 0px
-    padding-bottom: 0px
+    margin-top: -1px
     a
       border: 0
       color: inherit
@@ -24,7 +21,9 @@
       &:focus,
         border: none
         color: $chv-color-blue
+  > li
+    + li
+      @include chv-baseline($chv-fontsize-li, 1, 0, 0.5)
+      margin-bottom: -1px
   li:not(:last-child)
     border-bottom: 1px solid $nav-tabs-border-color
-  @media (max-width: $screen-xs-max)
-    margin-top: 35px
