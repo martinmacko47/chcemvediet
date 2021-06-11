@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "main/homepage/blogs/base.html" %}
+{% extends base_template|default:"main/homepage/blogs/base.html" %}
 {% load static from staticfiles %}
 
 {% comment %}
@@ -12,4 +12,9 @@
 {% block link %}https://dennikn.sk/blog/je-moznost-poziadat-o-informacie-dostupna-naozaj-pre-kazdeho/{% endblock %}
 {% block img %}{% static "main/images/blog/b.jpg" %}{% endblock %}
 {% block date %}1. apríl 2015{% endblock %}
-{% block text %}Je možnosť požiadať o informácie dostupná naozaj pre každého?{% endblock %}
+{% block heading %}Je možnosť požiadať o informácie dostupná naozaj pre každého?{% endblock %}
+{% block text %}
+  V súčasnosti je komunikácia medzi žiadateľmi o informácie a inštitúciami neverejná. Komplexnejšie
+  porovnanie toho, ako jednotlivé inštitúcie pristupujú k vybavovaniu infožiadosti preto nie je
+  (ľahko) dostupné.
+{% endblock %}

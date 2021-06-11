@@ -1,4 +1,9 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
 
-{% include "main/homepage/casestudy/main.html" %}
-{% include "main/homepage/blogs/items.html" %}
+
+<h1>Vybrané prípady</h1>
+{% include "main/homepage/casestudy/sk/sef_danovych_kriminalistov.html" %}
+{% include "main/homepage/casestudy/sk/ako_infoziadosti_pomahaju.html" %}
+{% include "main/homepage/casestudy/sk/ako_pomaha_nas_portal.html" %}
+{% include "main/homepage/blogs/sk/rozdiely_vo_vybavovani.html" with base_template="main/homepage/casestudy/base.html" %}
+{% include "main/homepage/blogs/sk/dostupnost_pre_kazdeho.html"  with base_template="main/homepage/casestudy/base.html" %}

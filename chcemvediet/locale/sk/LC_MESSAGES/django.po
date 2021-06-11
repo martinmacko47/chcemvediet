@@ -1372,7 +1372,7 @@ msgid "main:homepage:casestudy:heading"
 msgstr "Vybrané prípady"
 
 msgid "main:homepage:casestudy:more"
-msgstr "Všetky prípady"
+msgstr "Viac prípadov"
 
 msgid "main:homepage:didyouknow:twitter"
 msgstr "Tweet"

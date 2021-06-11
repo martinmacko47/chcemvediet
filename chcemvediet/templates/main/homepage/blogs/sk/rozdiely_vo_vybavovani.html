@@ -1,5 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "main/homepage/blogs/base.html" %}
+{% extends base_template|default:"main/homepage/blogs/base.html" %}
 {% load static from staticfiles %}
 
 {% comment %}
@@ -12,4 +12,9 @@
 {% block link %}https://dennikn.sk/blog/96006/rozdiely-vo-vybavovani-infoziadosti-su-velke/{% endblock %}
 {% block img %}{% static "main/images/blog/a.jpg" %}{% endblock %}
 {% block date %}9. apríl 2015{% endblock %}
-{% block text %}Rozdiely vo vybavovaní infožiadostí sú veľké{% endblock %}
+{% block heading %}Rozdiely vo vybavovaní infožiadostí sú veľké.{% endblock %}
+{% block text %}
+  V diskusii k novele infozákona sa veľa hovorí o inštitúciách a o tom, aké sú pre ne infožiadosti
+  administratívnou záťažou. Menej sa už hovorí o žiadateľovi a o tom, čo všetko musí urobiť, ak chce
+  od inštitúcie získať informácie.
+{% endblock %}
