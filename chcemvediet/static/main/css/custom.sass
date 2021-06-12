@@ -198,3 +198,14 @@ a:hover, a:focus
   padding: ($chv-baseline * 2 - 1px)
   margin-bottom: $chv-baseline
   border: solid 1px black
+
+//
+// Footnote component
+//
+
+.chv-footnote
+  padding-top: $chv-baseline - 1
+  border-top: 1px solid $chv-color-gray-ll
+  p
+    @include chv-baseline($chv-fontsize-p-small, 1, 0, 1)
+    padding-left: ($chv-list-indent / 2)
