@@ -23,6 +23,13 @@
   </div>
   <div class="col-md-8 col-sm-6">
     {% include "main/homepage/casestudy/main.html" %}
+    <div class="text-center chv-above-1">
+      <a class="btn chv-btn-blue" href="{% page '/vybrane-pripady/' %}">
+        <i class="chv-icon icon-link-ext"></i>
+        &nbsp;
+        {% trans 'main:homepage:casestudy:more' %}
+      </a>
+    </div>
   </div>
 </div>
 {% if not user.is_authenticated %}
