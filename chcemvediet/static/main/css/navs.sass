@@ -21,9 +21,11 @@
       &:focus,
         border: none
         color: $chv-color-blue
-  > li
     + li
-      @include chv-baseline($chv-fontsize-li, 1, 0, 0.5)
-      margin-bottom: -1px
+      margin-top: 0px
   li:not(:last-child)
     border-bottom: 1px solid $nav-tabs-border-color
+  li:last-child
+    padding-bottom: (0.5 * $chv-baseline - chv_baseline_fix($chv-fontsize-li, 1))
+  @media (max-width: $screen-xs-max)
+    margin-top: 2 * $chv-baseline
