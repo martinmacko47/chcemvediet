@@ -96,12 +96,18 @@ a:hover, a:focus
   &:hover, &:focus
     color: darken(#4d4d4d, 20%)
   @include clearfix()
-  > .chv-casestudy-img
-      display: block
-      float: left
-      height: ($chv-baseline * 8)
-      width: ($chv-baseline * 8)
-      margin-right: $chv-baseline
+  > .img-container
+    position: relative
+    margin-right: $chv-baseline
+    > .chv-casestudy-img
+        display: block
+        float: left
+        height: ($chv-baseline * 8)
+        width: ($chv-baseline * 8)
+    > .overlay-img
+      position: absolute
+      top: 44%
+      left: 37%
   > .chv-casestudy-wrap
     flex-basis: 50%
     flex-grow: 1
