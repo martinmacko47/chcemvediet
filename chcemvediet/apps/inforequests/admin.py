@@ -21,20 +21,20 @@ from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Act
 
 class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
 
-    def get_inforequests(self, objs):
-        raise NotImplementedError
-
     def nested_inforequestemail_queryset(self, objs):
         using = router.db_for_write(self.model)
         collector = NestedObjects(using)
         collector.collect(objs)
         to_delete = collector.nested()
-        inforequests = self.get_inforequests(objs)
         actions = [obj for obj in self.nested_objects_traverse(to_delete)
                    if isinstance(obj, Action)]
-        emails = [action.email for action in actions if action.email]
-        inforequestemails_qs = InforequestEmail.objects.filter(inforequest=inforequests,
-                                                               email__in=emails)
+        inforequestemails_qs = InforequestEmail.objects.none()
+        for action in actions:
+            if action.email:
+                inforequestemails_qs |= InforequestEmail.objects.filter(
+                        inforequest=action.branch.inforequest,
+                        email=action.email,
+                )
         outbound = inforequestemails_qs.filter(type=InforequestEmail.TYPES.APPLICANT_ACTION)
         inbound = inforequestemails_qs.filter(type=InforequestEmail.TYPES.OBLIGEE_ACTION)
         return outbound, inbound
@@ -317,9 +317,6 @@ class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         queryset = queryset.select_related(u'advanced_by')
         return queryset
 
-    def get_inforequests(self, objs):
-        return Inforequest.objects.filter(branch__in=objs)
-
     def delete_constraints(self, obj):
         if obj.is_main:
             return [format_html(u'{} is main.'.format(admin_obj_format(obj)))]
@@ -384,9 +381,6 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         queryset = queryset.select_related(u'branch')
         queryset = queryset.select_related(u'email')
         return queryset
-
-    def get_inforequests(self, objs):
-        return Inforequest.objects.filter(branch__action__in=objs)
 
     def delete_warnings(self, obj, to_delete=None):
         to_delete = to_delete or []
