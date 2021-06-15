@@ -1,5 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+import datetime
 import random
 
 from django.db import IntegrityError
@@ -7,9 +8,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from poleno.attachments.models import Attachment
+from poleno.utils.date import local_datetime_from_local, utc_now
 
 from .. import InforequestsTestCaseMixin
 from ...models import InforequestDraft
+
 
 class InforequestDraftTest(InforequestsTestCaseMixin, TestCase):
     u"""
@@ -21,7 +24,7 @@ class InforequestDraftTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(draft.applicant, self.user1)
 
     def test_applicant_field_may_not_be_null(self):
-        with self.assertRaisesMessage(IntegrityError, u'inforequests_inforequestdraft.applicant_id may not be NULL'):
+        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_inforequestdraft.applicant_id'):
             self._create_inforequest_draft(omit=[u'applicant'])
 
     def test_obligee_field(self):
@@ -47,6 +50,15 @@ class InforequestDraftTest(InforequestsTestCaseMixin, TestCase):
     def test_content_field_default_value_if_omitted(self):
         draft = self._create_inforequest_draft(omit=[u'content'])
         self.assertEqual(draft.content, ())
+
+    def test_modified_field(self):
+        dt = local_datetime_from_local(u'2014-10-05 10:33:00')
+        draft = self._create_inforequest_draft(modified=dt)
+        self.assertAlmostEqual(draft.modified, utc_now(), delta=datetime.timedelta(seconds=10))
+
+    def test_modified_field_default_value_if_omitted(self):
+        draft = self._create_inforequest_draft(omit=[u'modified'])
+        self.assertAlmostEqual(draft.modified, utc_now(), delta=datetime.timedelta(seconds=10))
 
     def test_attachment_set_relation(self):
         draft = self._create_inforequest_draft()
@@ -84,7 +96,8 @@ class InforequestDraftTest(InforequestsTestCaseMixin, TestCase):
         self.assertFalse(InforequestDraft.objects.all().ordered)
 
     def test_prefetch_attachments_staticmethod(self):
-        draft = self._create_inforequest_draft()
+        user = self._create_user()
+        draft = self._create_inforequest_draft(applicant=user)
         attch1 = self._create_attachment(generic_object=draft)
         attch2 = self._create_attachment(generic_object=draft)
 
@@ -99,7 +112,7 @@ class InforequestDraftTest(InforequestsTestCaseMixin, TestCase):
             user = (User.objects
                     .prefetch_related(u'inforequestdraft_set')
                     .prefetch_related(InforequestDraft.prefetch_attachments(u'inforequestdraft_set', Attachment.objects.extra(select=dict(moo=47))))
-                    .get(pk=self.user1.pk))
+                    .get(pk=user.pk))
         with self.assertNumQueries(0):
             self.assertEqual(user.inforequestdraft_set.all()[0].attachments, [attch1, attch2])
             self.assertEqual(user.inforequestdraft_set.all()[0].attachments[0].moo, 47)
@@ -125,7 +138,7 @@ class InforequestDraftTest(InforequestsTestCaseMixin, TestCase):
 
     def test_repr(self):
         draft = self._create_inforequest_draft()
-        self.assertEqual(repr(draft), u'<InforequestDraft: %s>' % draft.pk)
+        self.assertEqual(repr(draft), u'<InforequestDraft: {}>'.format(draft.pk))
 
     def test_owned_by_query_method(self):
         draft1 = self._create_inforequest_draft(applicant=self.user1)
