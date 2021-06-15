@@ -16,6 +16,7 @@
   <span class="chv-hover-bold" data-content="{% trans 'main:menu:about' %}">
     {% trans 'main:menu:about' %}
   </span>
+</a>
 <a class="chv-navbar-item {{ request|active:'inforequests'|yes:'active' }}"
    href="{% url user.is_authenticated|yesno:'inforequests:mine,inforequests:index' %}">
   <span class="chv-hover-bold" data-content="{% trans 'main:menu:inforequests' %}">
@@ -27,7 +28,6 @@
   <span class="chv-hover-bold" data-content="{% trans 'main:menu:obligees' %}">
     {% trans 'main:menu:obligees' %}
   </span>
-</a>
 </a>
 <a class="chv-navbar-item {{ request|page_active:'sk:/vybrane-pripady,en:/casestudy'|yes:'active' }}"
    href="{% page 'sk:/vybrane-pripady' 'en:/casestudy' %}">
