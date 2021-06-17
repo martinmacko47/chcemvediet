@@ -56,7 +56,7 @@ class UploadAttachmentViewTest(CustomTestCase):
         self.assertEqual(attachment.generic_object, self._get_session())
         self.assertEqual(attachment.name, u'filename.txt')
         self.assertEqual(attachment.content_type, u'text/plain')
-        self.assertAlmostEqual(attachment.created, utc_now(), delta=datetime.timedelta(seconds=10))
+        self.assertAlmostEqual(attachment.created, utc_now(), delta=datetime.timedelta(milliseconds=100))
         self.assertEqual(attachment.size, 7)
         self.assertEqual(attachment.content, u'Content')
 

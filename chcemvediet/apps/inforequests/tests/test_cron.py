@@ -95,7 +95,7 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
         message_set = self._call_cron_job()
 
         inforequest = Inforequest.objects.get(pk=inforequest.pk)
-        self.assertAlmostEqual(inforequest.last_undecided_email_reminder, local_datetime_from_local(u'2010-10-20 10:33:00'), delta=datetime.timedelta(seconds=10))
+        self.assertAlmostEqual(inforequest.last_undecided_email_reminder, local_datetime_from_local(u'2010-10-20 10:33:00'), delta=datetime.timedelta(milliseconds=300))
 
     def test_inforequest_last_undecided_email_reminder_is_not_updated_if_reminder_is_not_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
@@ -276,7 +276,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
 
         request = Action.objects.get(pk=request.pk)
-        self.assertAlmostEqual(request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(seconds=10))
+        self.assertAlmostEqual(request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(milliseconds=100))
 
     @unittest.skip('FIXME')
     def test_last_action_last_deadline_reminder_is_not_updated_if_remider_is_not_sent(self):
@@ -487,7 +487,7 @@ class ApplicantDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCa
         message_set = self._call_cron_job()
 
         clarification_request = Action.objects.get(pk=clarification_request.pk)
-        self.assertAlmostEqual(clarification_request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(seconds=10))
+        self.assertAlmostEqual(clarification_request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(milliseconds=100))
 
     @unittest.skip('FIXME')
     def test_last_action_last_deadline_reminder_is_not_updated_if_remider_is_not_sent(self):
