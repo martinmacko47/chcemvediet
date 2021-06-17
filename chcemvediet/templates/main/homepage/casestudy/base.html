@@ -3,18 +3,13 @@
 {% comment %}
  %
  % Context:
- %  -- video: boolean
+ %  -- None
  %
 {% endcomment %}
 
 {% block casestudy %}
   <a class="chv-casestudy" rel="noreferrer noopener" href="{% block link %}{% endblock %}" target="_blank">
-    <div class="img-container">
-      <img class="chv-casestudy-img" src="{% block img %}{% endblock %}">
-      {% if video %}
-        <i class="chv-icon icon-play-circled2 chv-icon-3x chv-color-gray-ll chv-hover-gray-l overlay-img"></i>
-      {% endif %}
-    </div>
+    <img class="chv-casestudy-img" src="{% block img %}{% endblock %}">
     <div class="chv-casestudy-wrap">
       <span class="chv-casestudy-date">{% block date %}{% endblock %}</span>
       <span class="chv-casestudy-heading">{% block heading %}{% endblock %}</span>
