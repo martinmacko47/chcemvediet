@@ -76,3 +76,6 @@ LOGGING = {
         u'level': u'INFO',
         },
     }
+
+# Django-allauth settings
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'http'

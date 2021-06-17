@@ -11,28 +11,33 @@
 {% endcomment %}
 
 
-<a class="chv-navbar-item {{ request|page_active:'sk:/o-projekte,en:/about'|yes:"active" }}"
+<a class="chv-navbar-item {{ request|page_active:'sk:/o-projekte,en:/about'|yes:'active' }}"
    href="{% page 'sk:/o-projekte' 'en:/about' %}">
   <span class="chv-hover-bold" data-content="{% trans 'main:menu:about' %}">
     {% trans 'main:menu:about' %}
   </span>
 </a>
-<a class="chv-navbar-item {{ request|page_active:'sk:/podporte-nas,en:/support-us'|yes:"active" }}"
-   href="{% page 'sk:/podporte-nas' 'en:/support-us' %}">
-  <span class="chv-hover-bold" data-content="{% trans 'main:menu:support-us' %}">
-    {% trans 'main:menu:support-us' %}
-  </span>
-</a>
-
-<a class="chv-navbar-item {{ request|active:'inforequests'|yes:"active" }}"
+<a class="chv-navbar-item {{ request|active:'inforequests'|yes:'active' }}"
    href="{% url user.is_authenticated|yesno:'inforequests:mine,inforequests:index' %}">
   <span class="chv-hover-bold" data-content="{% trans 'main:menu:inforequests' %}">
     {% trans 'main:menu:inforequests' %}
   </span>
 </a>
-<a class="chv-navbar-item {{ request|active:'obligees'|yes:"active" }}"
+<a class="chv-navbar-item {{ request|active:'obligees'|yes:'active' }}"
    href="{% url 'obligees:index' %}">
   <span class="chv-hover-bold" data-content="{% trans 'main:menu:obligees' %}">
     {% trans 'main:menu:obligees' %}
+  </span>
+</a>
+<a class="chv-navbar-item {{ request|page_active:'sk:/vybrane-pripady,en:/casestudy'|yes:'active' }}"
+   href="{% page 'sk:/vybrane-pripady' 'en:/casestudy' %}">
+  <span class="chv-hover-bold" data-content="{% trans 'main:menu:casestudy' %}">
+    {% trans 'main:menu:casestudy' %}
+  </span>
+</a>
+<a class="chv-navbar-item {{ request|page_active:'sk:/podporte-nas,en:/support-us'|yes:'active' }}"
+   href="{% page 'sk:/podporte-nas' 'en:/support-us' %}">
+  <span class="chv-hover-bold" data-content="{% trans 'main:menu:support-us' %}">
+    {% trans 'main:menu:support-us' %}
   </span>
 </a>

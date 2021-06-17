@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 from django.db import IntegrityError
 from django.test import TestCase
+from django.utils.translation import ugettext as __
 
 from poleno.utils.date import utc_datetime_from_local
 
 from .. import InforequestsTestCaseMixin
 from ...models import InforequestEmail
+
 
 class InforequestEmailTest(InforequestsTestCaseMixin, TestCase):
     u"""
@@ -19,7 +21,7 @@ class InforequestEmailTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(rel.inforequest, inforequest)
 
     def test_inforequest_field_may_not_be_null(self):
-        with self.assertRaisesMessage(IntegrityError, u'inforequests_inforequestemail.inforequest_id may not be NULL'):
+        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_inforequestemail.inforequest_id'):
             self._create_inforequest_email(omit=[u'inforequest'])
 
     def test_email_field(self):
@@ -29,16 +31,16 @@ class InforequestEmailTest(InforequestsTestCaseMixin, TestCase):
 
     def test_email_field_may_not_be_null(self):
         inforequest = self._create_inforequest()
-        with self.assertRaisesMessage(IntegrityError, u'inforequests_inforequestemail.email_id may not be NULL'):
+        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_inforequestemail.email_id'):
             self._create_inforequest_email(inforequest=inforequest, omit=[u'email'])
 
     def test_type_field(self):
         tests = (
-                (InforequestEmail.TYPES.APPLICANT_ACTION, u'Applicant Action'),
-                (InforequestEmail.TYPES.OBLIGEE_ACTION,   u'Obligee Action'),
-                (InforequestEmail.TYPES.UNDECIDED,        u'Undecided'),
-                (InforequestEmail.TYPES.UNRELATED,        u'Unrelated'),
-                (InforequestEmail.TYPES.UNKNOWN,          u'Unknown'),
+                (InforequestEmail.TYPES.APPLICANT_ACTION, __(u'inforequests:InforequestEmail:type:APPLICANT_ACTION')),
+                (InforequestEmail.TYPES.OBLIGEE_ACTION,   __(u'inforequests:InforequestEmail:type:OBLIGEE_ACTION')),
+                (InforequestEmail.TYPES.UNDECIDED,        __(u'inforequests:InforequestEmail:type:UNDECIDED')),
+                (InforequestEmail.TYPES.UNRELATED,        __(u'inforequests:InforequestEmail:type:UNRELATED')),
+                (InforequestEmail.TYPES.UNKNOWN,          __(u'inforequests:InforequestEmail:type:UNKNOWN')),
                 )
         # Make sure we are testing all defined inforequest email types
         tested_types = [a for a, _ in tests]
@@ -53,7 +55,7 @@ class InforequestEmailTest(InforequestsTestCaseMixin, TestCase):
 
     def test_type_field_may_not_be_null(self):
         inforequest = self._create_inforequest()
-        with self.assertRaisesMessage(IntegrityError, u'inforequests_inforequestemail.type may not be NULL'):
+        with self.assertRaisesMessage(IntegrityError, u'NOT NULL constraint failed: inforequests_inforequestemail.type'):
             self._create_inforequest_email(inforequest=inforequest, omit=[u'reltype'])
 
     def test_inforequest_inforequestemail_set_backward_relation(self):
@@ -84,7 +86,7 @@ class InforequestEmailTest(InforequestsTestCaseMixin, TestCase):
     def test_repr(self):
         inforequest = self._create_inforequest()
         email, rel = self._create_inforequest_email(inforequest=inforequest)
-        self.assertEqual(repr(rel), u'<InforequestEmail: %s>' % rel.pk)
+        self.assertEqual(repr(rel), u'<InforequestEmail: {}>'.format(rel.pk))
 
     def test_undecided_oldest_newest_and_order_by_query_methods(self):
         inforequest = self._create_inforequest()

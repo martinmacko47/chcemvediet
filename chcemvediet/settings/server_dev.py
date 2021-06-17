@@ -139,3 +139,6 @@ LOGGING = {
         u'level': u'WARNING',
         },
     }
+
+# Django-allauth settings
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = u'https'
