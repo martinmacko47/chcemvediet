@@ -130,7 +130,7 @@ class ActionTest(InforequestsTestCaseMixin, TestCase):
 
     def test_created_field_default_value_if_omitted(self):
         action = self._create_action(omit=[u'created'])
-        self.assertAlmostEqual(action.created, utc_now(), delta=datetime.timedelta(seconds=1))
+        self.assertAlmostEqual(action.created, utc_now(), delta=datetime.timedelta(milliseconds=100))
 
     def test_sent_date_field(self):
         date = naive_date(u'2010-10-05')

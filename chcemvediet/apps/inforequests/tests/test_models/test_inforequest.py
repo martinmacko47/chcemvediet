@@ -1088,7 +1088,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
                 })
         )
         self.assertIn(url, msg.text)
-        self.assertAlmostEqual(inforequest.last_undecided_email_reminder, utc_now(), delta=datetime.timedelta(seconds=10))
+        self.assertAlmostEqual(inforequest.last_undecided_email_reminder, utc_now(), delta=datetime.timedelta(milliseconds=100))
 
     def test_send_obligee_deadline_reminder(self):
         u"""
@@ -1110,7 +1110,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
                 })
         )
         self.assertIn(url, msg.text)
-        self.assertAlmostEqual(request.last_deadline_reminder, utc_now(), delta=datetime.timedelta(seconds=10))
+        self.assertAlmostEqual(request.last_deadline_reminder, utc_now(), delta=datetime.timedelta(milliseconds=100))
 
     def test_send_applicant_deadline_reminder(self):
         u"""
@@ -1132,7 +1132,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
                 })
         )
         self.assertIn(url, msg.text)
-        self.assertAlmostEqual(clarification_request.last_deadline_reminder, utc_now(), delta=datetime.timedelta(seconds=10))
+        self.assertAlmostEqual(clarification_request.last_deadline_reminder, utc_now(), delta=datetime.timedelta(milliseconds=100))
 
     def test_repr(self):
         inforequest = self._create_inforequest(subject=u's' * 40)

@@ -227,8 +227,10 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _create_inforequest_draft(self, **kwargs):
         return self._call_with_defaults(InforequestDraft.objects.create, kwargs, {
                 u'applicant': self.user,
+                u'obligee': self.obligee,
                 u'subject': [u'Default Testing Subject'],
                 u'content': [u'Default Testing Content'],
+                u'modified': None,
                 })
 
     def _create_inforequest(self, **kwargs):
