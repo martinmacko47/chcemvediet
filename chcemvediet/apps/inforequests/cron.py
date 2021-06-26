@@ -9,10 +9,9 @@ from poleno.cron import cron_job, cron_logger
 from poleno.workdays import workdays
 from poleno.utils.translation import translation
 from poleno.utils.date import local_date, local_today
-from poleno.utils.misc import nop
 
 from .constants import DAYS_TO_CLOSE_INFOREQUEST
-from .models import Inforequest, Branch, Action
+from .models import Inforequest, Branch
 
 
 @cron_job(run_at_times=settings.CRON_USER_INTERACTION_TIMES)
