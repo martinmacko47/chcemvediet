@@ -8,6 +8,7 @@ class ChcemvedietConfig(AppConfig):
         from adminplus.sites import AdminSitePlus
         from django.contrib import admin
         admin.site = AdminSitePlus()
+        admin.site.disable_action(u'delete_selected')
         admin.autodiscover()
 
     def workaround_sqlite_format_dtdelta_bug(self):
