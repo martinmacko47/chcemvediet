@@ -309,6 +309,9 @@ class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     inlines = [
             ActionInline,
             ]
+    actions = [
+            u'delete_selected'
+    ]
 
     def get_queryset(self, request):
         queryset = super(BranchAdmin, self).get_queryset(request)
@@ -327,6 +330,28 @@ class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     def render_delete_form(self, request, context):
         context[u'delete_constraints'] = self.delete_constraints([context[u'object']])
         return super(BranchAdmin, self).render_delete_form(request, context)
+
+    @decorate(short_description=u'Delete selected branches')
+    @transaction.atomic
+    def delete_selected(self, request, queryset):
+        outbound, inbound = self.nested_inforequestemail_queryset(queryset)
+        if request.POST.get(u'post'):
+            if self.delete_constraints(queryset):
+                raise PermissionDenied
+
+        template_response = delete_selected(self, request, queryset)
+
+        if request.POST.get(u'post'):
+            outbound.delete()
+            inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
+            return None
+
+        template_response.context_data.update({
+            u'outbound': [admin_obj_format(inforequestemail) for inforequestemail in outbound],
+            u'inbound': [admin_obj_format(inforequestemail) for inforequestemail in inbound],
+            u'delete_constraints': self.delete_constraints(queryset),
+        })
+        return template_response
 
     def delete_model(self, request, obj):
         if self.delete_constraints([obj]):
