@@ -12,7 +12,7 @@ from poleno.utils.date import local_date, local_today
 from poleno.utils.misc import nop
 
 from .constants import DAYS_TO_CLOSE_INFOREQUEST
-from .models import Inforequest, Branch, Action
+from .models import Inforequest, Branch
 
 
 @cron_job(run_at_times=settings.CRON_USER_INTERACTION_TIMES)
@@ -35,6 +35,7 @@ def undecided_email_reminder():
                 days = workdays.between(local_date(email.processed), local_today())
                 if days < 5:
                     continue
+                nop()  # To let tests raise testing exception here.
                 filtered.append(inforequest)
             except Exception:
                 msg = u'Checking if undecided email reminder should be sent failed: {}\n{}'
@@ -56,6 +57,7 @@ def undecided_email_reminder():
             try:
                 with transaction.atomic():
                     inforequest.send_undecided_email_reminder()
+                    nop()  # To let tests raise testing exception here.
                     cron_logger.info(u'Sent undecided email reminder: {}'.format(inforequest))
             except Exception:
                 msg = u'Sending undecided email reminder failed: {}\n{}'
