@@ -1,4 +1,5 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load trans from i18n %}
 
 {% comment %}
  %
@@ -8,5 +9,8 @@
 {% endcomment %}
 
 
+<h2 id="{% trans 'main:homepage:blogs:anchor' %}" class="text-center">
+  {% trans 'main:homepage:blogs:heading' %}
+</h2>
 {% include "main/homepage/blogs/sk/rozdiely_vo_vybavovani.html" %}
 {% include "main/homepage/blogs/sk/dostupnost_pre_kazdeho.html" %}

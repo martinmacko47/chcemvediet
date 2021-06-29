@@ -9,6 +9,8 @@
 {% endcomment %}
 
 
+{% block heading %}{% endblock %}
+
 {% block carousel %}
   {% with carousel_id=idgenerator.next carousel_items=""|make_list %}
     <div id="{{ carousel_id }}" class="carousel chv-carousel-blue slide" data-ride="carousel">
@@ -18,7 +20,7 @@
       {% block indicators %}
         <ol class="carousel-indicators">
           {% for item in carousel_items %}
-            <li class="{{ forloop.first|yes:"active" }}" data-target="#{{ carousel_id }}"
+            <li class="{{ forloop.first|yes:'active' }}" data-target="#{{ carousel_id }}"
                 data-slide-to="{{ forloop.counter0 }}"></li>
           {% endfor %}
         </ol>
