@@ -32,8 +32,8 @@
             <div class="chv-wizard-steps-dots">
               {% for other_step in wizard.steps %}
                 <a class="chv-wizard-steps-dot pln-with-tooltip
-                          {{ other_step|eq:step|yes:"chv-wizard-steps-dot-current" }}
-                          {{ other_step.accessible|yes:"chv-wizard-steps-dot-accessible" }}"
+                          {{ other_step|eq:step|yes:'chv-wizard-steps-dot-current' }}
+                          {{ other_step.accessible|yes:'chv-wizard-steps-dot-accessible' }}"
                    href="{{ other_step.get_url }}" data-toggle="tooltip"
                    title="{{ other_step.label }}">
                 </a>

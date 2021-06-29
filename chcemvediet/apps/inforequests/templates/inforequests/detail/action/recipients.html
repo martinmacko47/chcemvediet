@@ -21,7 +21,7 @@
       &nbsp;
       <span class="label label-default pln-with-tooltip" data-toggle="tooltip"
             data-placement="right" title="{% spaceless %}
-              {% include "inforequests/detail/tooltips/email_queued.txt" %}
+              {% include 'inforequests/detail/tooltips/email_queued.txt' %}
               {% endspaceless %}">
         {{ recipient.get_status_display }}
       </span>
@@ -29,7 +29,7 @@
       &nbsp;
       <span class="label label-danger pln-with-tooltip" data-toggle="tooltip"
             data-placement="right" title="{% spaceless %}
-              {% include "inforequests/detail/tooltips/email_rejected.txt" %}
+              {% include 'inforequests/detail/tooltips/email_rejected.txt' %}
               {% endspaceless %}">
         {{ recipient.get_status_display }}
       </span>
@@ -37,7 +37,7 @@
       &nbsp;
       <span class="label label-danger pln-with-tooltip" data-toggle="tooltip"
             data-placement="right" title="{% spaceless %}
-              {% include "inforequests/detail/tooltips/email_invalid.txt"   %}
+              {% include 'inforequests/detail/tooltips/email_invalid.txt'   %}
               {% endspaceless %}">
         {{ recipient.get_status_display }}
       </span>
@@ -45,7 +45,7 @@
       &nbsp;
       <span class="label label-info pln-with-tooltip" data-toggle="tooltip"
             data-placement="right" title="{% spaceless %}
-              {% include "inforequests/detail/tooltips/email_sent.txt" %}
+              {% include 'inforequests/detail/tooltips/email_sent.txt' %}
               {% endspaceless %}">
         {{ recipient.get_status_display }}
       </span>
@@ -53,7 +53,7 @@
       &nbsp;
       <span class="label label-success pln-with-tooltip" data-toggle="tooltip"
             data-placement="right" title="{% spaceless %}
-              {% include "inforequests/detail/tooltips/email_delivered.txt" %}
+              {% include 'inforequests/detail/tooltips/email_delivered.txt' %}
               {% endspaceless %}">
         {{ recipient.get_status_display }}
       </span>
@@ -61,7 +61,7 @@
       &nbsp;
       <span class="label label-success pln-with-tooltip" data-toggle="tooltip"
             data-placement="right" title="{% spaceless %}
-              {% include "inforequests/detail/tooltips/email_opened.txt" %}
+              {% include 'inforequests/detail/tooltips/email_opened.txt' %}
               {% endspaceless %}">
         {{ recipient.get_status_display }}
       </span>

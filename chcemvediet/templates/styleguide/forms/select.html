@@ -11,7 +11,7 @@
 
 
 {% with field_id=idgenerator.next%}
-  <div class="form-group {{ error|yes:"has-error" }}">
+  <div class="form-group {{ error|yes:'has-error' }}">
     <label class="control-label col-sm-3" for="{{ field_id }}">Select</label>
     <div class="col-sm-9">
       <select id="{{ field_id }}" class="form-control">

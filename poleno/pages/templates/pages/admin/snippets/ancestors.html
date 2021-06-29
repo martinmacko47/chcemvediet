@@ -11,14 +11,14 @@
 
 {% for ancestor in page.ancestors %}
   {% if ancestor.is_disabled %}<del>{% endif %}
-    <a href="{% url "admin:pages_edit" ancestor.lang ancestor.lpath %}">{{ ancestor.label }}</a>
+    <a href="{% url 'admin:pages_edit' ancestor.lang ancestor.lpath %}">{{ ancestor.label }}</a>
   {% if ancestor.is_disabled %}</del>{% endif %}
   &rsaquo;
 {% endfor %}
 
 {% if page.is_disabled %}<del>{% endif %}
   {% if inclusive %}
-    <a href="{% url "admin:pages_edit" page.lang page.lpath %}">{{ page.label }}</a>
+    <a href="{% url 'admin:pages_edit' page.lang page.lpath %}">{{ page.label }}</a>
   {% else %}
     {{ page.label }}
   {% endif %}

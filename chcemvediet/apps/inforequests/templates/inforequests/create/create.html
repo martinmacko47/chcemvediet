@@ -68,7 +68,7 @@
             <button class="btn chv-btn-inv-green pln-with-tooltip chv-width-full chv-width-auto-sm"
                     type="submit" name="button" value="submit" data-toggle="tooltip"
                     title="{% spaceless %}
-                      {% include "inforequests/create/tooltips/submit.txt" %}
+                      {% include 'inforequests/create/tooltips/submit.txt' %}
                       {% endspaceless %}">
               {% include "main/snippets/icons/chv-diag.html" with class="chv-icon-lg" %}
               &nbsp;
@@ -77,7 +77,7 @@
             <button class="btn btn-default pln-with-tooltip chv-width-full chv-width-auto-sm"
                     type="submit" name="button" value="draft" data-toggle="tooltip"
                     title="{% spaceless %}
-                      {% include "inforequests/create/tooltips/draft.txt" %}
+                      {% include 'inforequests/create/tooltips/draft.txt' %}
                       {% endspaceless %}">
               <i class="chv-icon chv-icon-lg icon-floppy"></i>
               &nbsp;
@@ -85,7 +85,7 @@
             </button>
             <a class="btn btn-link pull-right pln-with-tooltip"
                href="{% url 'inforequests:mine' %}" data-toggle="tooltip" title="{% spaceless %}
-                 {% include "inforequests/create/tooltips/cancel.txt" %}
+                 {% include 'inforequests/create/tooltips/cancel.txt' %}
                  {% endspaceless %}">
               <i class="chv-icon chv-icon-lg icon-cancel"></i>
               {% trans 'inforequests:create:cancel' %}

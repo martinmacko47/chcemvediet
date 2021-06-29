@@ -49,17 +49,17 @@
 {% endblock %}
 
 {% block extrastyle %}{{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}" />
 {% endblock %}
 
 {% block content %}
   <p>Real time:
-    <span class="timewarp" data-timestamp="{{ timewarp.real_time|stringformat:"f" }}"></span>
+    <span class="timewarp" data-timestamp="{{ timewarp.real_time|stringformat:'f' }}"></span>
   </p>
   {% if timewarp.is_warped %}
     <p>Warped time:
-      <span class="timewarp" data-timestamp="{{ timewarp.warped_time|stringformat:"f" }}"
-            data-speedup="{{ timewarp.speedup|stringformat:"f" }}"></span>
+      <span class="timewarp" data-timestamp="{{ timewarp.warped_time|stringformat:'f' }}"
+            data-speedup="{{ timewarp.speedup|stringformat:'f' }}"></span>
     </p>
     <p>Speedup: {{ timewarp.speedup }}x</p>
   {% else %}

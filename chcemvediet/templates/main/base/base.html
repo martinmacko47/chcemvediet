@@ -12,7 +12,7 @@
 
 
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en" }}">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
   <head>
     <meta charset="utf-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
@@ -23,7 +23,7 @@
       {% assets "css,scss" local=True %}
     {% endcompress %}
   </head>
-  <body class="{% if DEBUG and "grid" in request.GET %}chv-baseline-grid{% endif %}">
+  <body class="{% if DEBUG and 'grid' in request.GET %}chv-baseline-grid{% endif %}">
     <div class="chv-body-clip">
       <header>
         {% include "main/snippets/header/main.html" %}

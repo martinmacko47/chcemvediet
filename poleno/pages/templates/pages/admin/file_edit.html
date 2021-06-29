@@ -15,7 +15,7 @@
 
 
 {% block addbreadcrumbs %}
-  &rsaquo; <a href="{% url "admin:pages_index" lang %}">{{ lang }}</a>
+  &rsaquo; <a href="{% url 'admin:pages_index' lang %}">{{ lang }}</a>
   &rsaquo; {% include "pages/admin/snippets/ancestors.html" with inclusive=True %}
   &rsaquo; {% if create %}Add Attachment{% else %}{{ file.name }}{% endif %}
 {% endblock %}
@@ -40,7 +40,7 @@
       {% if not create %}
         <p class="deletelink-box">
           <a class="deletelink"
-             href="{% url "admin:pages_file_delete" lang page.lpath file.name %}">
+             href="{% url 'admin:pages_file_delete' lang page.lpath file.name %}">
             Delete
           </a>
         </p>

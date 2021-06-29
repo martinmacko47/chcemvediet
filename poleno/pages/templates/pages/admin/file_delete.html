@@ -13,9 +13,9 @@
 
 
 {% block addbreadcrumbs %}
-  &rsaquo; <a href="{% url "admin:pages_index" lang %}">{{ lang }}</a>
+  &rsaquo; <a href="{% url 'admin:pages_index' lang %}">{{ lang }}</a>
   &rsaquo; {% include "pages/admin/snippets/ancestors.html" with inclusive=True %}
-  &rsaquo; <a href="{% url "admin:pages_file_edit" lang page.lpath file.name %}">{{ file.name }}</a>
+  &rsaquo; <a href="{% url 'admin:pages_file_edit' lang page.lpath file.name %}">{{ file.name }}</a>
   &rsaquo; Delete Attachment
 {% endblock %}
 

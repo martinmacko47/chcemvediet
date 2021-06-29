@@ -9,7 +9,7 @@
 {% endcomment %}
 
 
-<div class="form-group {{ field.errors|yes:"has-error" }}">
+<div class="form-group {{ field.errors|yes:'has-error' }}">
   {% block label %}
     {% if field.label.strip %}
       <label class="control-label col-sm-3" for="{{ field.auto_id }}">
@@ -18,7 +18,7 @@
       </label>
     {% endif %}
   {% endblock %}
-  <div class="col-sm-9 {% block offset %}{{ field.label.strip|no:"col-sm-offset-3" }}{% endblock %}">
+  <div class="col-sm-9 {% block offset %}{{ field.label.strip|no:'col-sm-offset-3' }}{% endblock %}">
     {% block field %}
       {{ field }}
     {% endblock %}

@@ -12,7 +12,7 @@
 {% block content %}
   <ul>
     {% for lang in LANGUAGES %}
-      <li><a href="{% url "admin:pages_index" lang.0 %}">{{ lang.0 }}: {{ lang.1 }}</a></li>
+      <li><a href="{% url 'admin:pages_index' lang.0 %}">{{ lang.0 }}: {{ lang.1 }}</a></li>
     {% endfor %}
   </ul>
 {% endblock %}

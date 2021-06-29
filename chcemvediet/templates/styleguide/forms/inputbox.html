@@ -11,7 +11,7 @@
 
 
 {% with field_id=idgenerator.next%}
-  <div class="form-group {{ error|yes:"has-error" }}">
+  <div class="form-group {{ error|yes:'has-error' }}">
     <label class="control-label col-sm-3" for="{{ field_id }}">Simple input</label>
     <div class="col-sm-9">
       <input id="{{ field_id }}" class="form-control" type="text" placeholder="Simple input box">

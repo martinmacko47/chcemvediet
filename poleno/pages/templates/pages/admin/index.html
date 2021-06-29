@@ -38,7 +38,7 @@
                     {{ page.path }}
                   </a>
                 {% else %}
-                  <a href="{% url "admin:pages_edit" lang page.lpath %}">{{ page.path }}</a>
+                  <a href="{% url 'admin:pages_edit' lang page.lpath %}">{{ page.path }}</a>
                 {% endif %}
               </strong>
               {% if page.is_redirect %} &#8594; {{ page.redirect_path }}{% endif %}
@@ -55,16 +55,16 @@
             <td>
               <ul class="object-tools" style="margin: 0;">
                 <li>
-                  <a href="{% url "admin:pages_edit" lang page.lpath %}">Edit</a>
+                  <a href="{% url 'admin:pages_edit' lang page.lpath %}">Edit</a>
                 </li>
                 <li>
                   {% if page.is_redirect %}
-                    <a href="{% url "admin:pages_create" lang page.lpath %}"
+                    <a href="{% url 'admin:pages_create' lang page.lpath %}"
                        style="visibility: hidden;">
                       Add Subpage
                     </a>
                   {% else %}
-                    <a href="{% url "admin:pages_create" lang page.lpath %}">Add Subpage</a>
+                    <a href="{% url 'admin:pages_create' lang page.lpath %}">Add Subpage</a>
                   {% endif %}
                 </li>
                 <li>
