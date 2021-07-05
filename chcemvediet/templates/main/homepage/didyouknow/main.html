@@ -1,22 +1,15 @@
 {# vim: set filetype=htmldjango shiftwidth=2 :#}
-{% extends "main/snippets/carousel/main.html" %}
 {% load trans from i18n %}
 
 {% comment %}
  %
  % Context:
- %  -- carousel_id: string
+ %  -- None
  %
 {% endcomment %}
 
-{% block heading %}
-  <h2 id="{% trans 'main:homepage:didyouknow:anchor' %}" class="text-center">
-    {% trans 'main:homepage:didyouknow:heading' %}
-  </h2>
-{% endblock %}
 
-{% block items %}
-  {% include "main/homepage/didyouknow/sk/01.html" %}
-  {% include "main/homepage/didyouknow/sk/02.html" %}
-  {% include "main/homepage/didyouknow/sk/03.html" %}
-{% endblock %}
+<h2 id="{% trans 'main:homepage:didyouknow:anchor' %}" class="text-center">
+  {% trans 'main:homepage:didyouknow:heading' %}
+</h2>
+{% include "main/homepage/didyouknow/items.html" %}

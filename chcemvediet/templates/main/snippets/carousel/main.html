@@ -9,8 +9,6 @@
 {% endcomment %}
 
 
-{% block heading %}{% endblock %}
-
 {% block carousel %}
   {% with carousel_id=idgenerator.next carousel_items=""|make_list %}
     <div id="{{ carousel_id }}" class="carousel chv-carousel-blue slide" data-ride="carousel">

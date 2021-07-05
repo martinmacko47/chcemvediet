@@ -1,0 +1,16 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% extends "main/snippets/carousel/main.html" %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- carousel_id: string
+ %
+{% endcomment %}
+
+
+{% block items %}
+  {% include "main/homepage/didyouknow/sk/01.html" %}
+  {% include "main/homepage/didyouknow/sk/02.html" %}
+  {% include "main/homepage/didyouknow/sk/03.html" %}
+{% endblock %}
