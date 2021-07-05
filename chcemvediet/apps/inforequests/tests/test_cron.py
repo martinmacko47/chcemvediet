@@ -1,6 +1,5 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import re
 import unittest
 import mock
 import datetime
@@ -197,9 +196,9 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
                 message_set = self._call_cron_job()
         self.assertEqual(message_set.count(), 2)
         self.assertEqual(len(logger.mock_calls), 3)
-        self.assertRegexpMatches(logger.mock_calls[0][1][0], u'Checking if undecided email reminder should be sent failed: {}'.format(re.escape(repr(inforequests[1]))))
-        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Sent undecided email reminder: {}'.format(re.escape(repr(inforequests[0]))))
-        self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Sent undecided email reminder: {}'.format(re.escape(repr(inforequests[2]))))
+        self.assertIn(u'Checking if undecided email reminder should be sent failed: {}'.format(inforequests[1]), logger.mock_calls[0][1][0])
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[0]), logger.mock_calls[1][1][0])
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[2]), logger.mock_calls[2][1][0])
 
     def test_inforequest_is_skipped_if_exception_raised_while_sending_reminder(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
@@ -213,9 +212,9 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
 
         self.assertEqual(message_set.count(), 2)
         self.assertEqual(len(logger.mock_calls), 3)
-        self.assertRegexpMatches(logger.mock_calls[0][1][0], u'Sent undecided email reminder: {}'.format(re.escape(repr(inforequests[0]))))
-        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Sending undecided email reminder failed: {}'.format(re.escape(repr(inforequests[1]))))
-        self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Sent undecided email reminder: {}'.format(re.escape(repr(inforequests[2]))))
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[0]), logger.mock_calls[0][1][0])
+        self.assertIn(u'Sending undecided email reminder failed: {}'.format(inforequests[1]), logger.mock_calls[1][1][0])
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[2]), logger.mock_calls[2][1][0])
 
 class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin, TestCase):
     u"""
