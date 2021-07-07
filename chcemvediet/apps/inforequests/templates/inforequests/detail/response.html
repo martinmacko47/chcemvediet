@@ -27,7 +27,7 @@
     {% if inforequest.has_undecided_emails %}
       {% include "inforequests/detail/texts/add_email.html" %}
       <a class="btn chv-btn-red"
-          href="{% url "inforequests:obligee_action" inforequest=inforequest %}">
+          href="{% url 'inforequests:obligee_action' inforequest=inforequest %}">
         <i class="chv-icon chv-icon-lg icon-at"></i>
         &nbsp;
         {% trans 'inforequests:detail:response:email:button' %}
@@ -35,7 +35,7 @@
     {% else %}
       {% include "inforequests/detail/texts/add_smail.html" %}
       <a class="btn chv-btn-red"
-          href="{% url "inforequests:obligee_action" inforequest=inforequest %}">
+          href="{% url 'inforequests:obligee_action' inforequest=inforequest %}">
         <i class="chv-icon chv-icon-lg icon-mail"></i>
         &nbsp;
         {% trans 'inforequests:detail:response:smail:button' %}

@@ -23,7 +23,7 @@
               data-type="html" data-target="#{{ modal_id }}"
               data-fail-target="#ajax-fail-modal" data-toggle="tooltip"
               title="{% spaceless %}
-                {% include "inforequests/detail/tooltips/snooze.txt" %}
+                {% include 'inforequests/detail/tooltips/snooze.txt' %}
                 {% endspaceless %}">
         {% trans 'inforequests:detail:action:snooze' %}
       </button>
@@ -38,7 +38,7 @@
     <a class="btn btn-default pln-with-tooltip" data-toggle="tooltip"
        href="{% url 'inforequests:clarification_response' branch=branch %}"
        title="{% spaceless %}
-         {% include "inforequests/detail/tooltips/clarification_response.txt" %}
+         {% include 'inforequests/detail/tooltips/clarification_response.txt' %}
          {% endspaceless %}">
       {% trans 'inforequests:detail:action:clarification_response' %}
     </a>
@@ -50,7 +50,7 @@
     <a class="btn btn-default pln-with-tooltip" data-toggle="tooltip"
        href="{% url 'inforequests:appeal' branch=branch %}"
        title="{% spaceless %}
-         {% include "inforequests/detail/tooltips/appeal.txt" %}
+         {% include 'inforequests/detail/tooltips/appeal.txt' %}
          {% endspaceless %}">
       {% trans 'inforequests:detail:action:appeal' %}
     </a>

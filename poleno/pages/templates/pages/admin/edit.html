@@ -14,7 +14,7 @@
 
 
 {% block addbreadcrumbs %}
-  &rsaquo; <a href="{% url "admin:pages_index" lang %}">{{ lang }}</a>
+  &rsaquo; <a href="{% url 'admin:pages_index' lang %}">{{ lang }}</a>
   &rsaquo; {% include "pages/admin/snippets/ancestors.html" with inclusive=create %}
   {% if create %}&rsaquo; Add Subpage{% endif %}
 {% endblock %}
@@ -50,7 +50,7 @@
                 <td>
                   {% if subpage.is_disabled %}<del>{% endif %}
                     <strong>
-                      <a href="{% url "admin:pages_edit" lang subpage.lpath %}">
+                      <a href="{% url 'admin:pages_edit' lang subpage.lpath %}">
                         {{ subpage.path }}
                       </a>
                     </strong>
@@ -67,7 +67,7 @@
                 <td>
                   <ul class="object-tools" style="margin: 0;">
                     <li>
-                      <a href="{% url "admin:pages_edit" lang subpage.lpath %}">Edit</a>
+                      <a href="{% url 'admin:pages_edit' lang subpage.lpath %}">Edit</a>
                     </li>
                     <li>
                       {% if subpage.is_redirect or subpage.is_disabled %}
@@ -84,7 +84,7 @@
         </table>
       </fieldset>
       <ul class="object-tools" style="margin: 0 0 1em 0;">
-        <li><a href="{% url "admin:pages_create" lang page.lpath %}">Add Subpage</a></li>
+        <li><a href="{% url 'admin:pages_create' lang page.lpath %}">Add Subpage</a></li>
       </ul>
       <div style="clear: both;"></div>
       <fieldset class="module">
@@ -102,7 +102,7 @@
               <tr class="{% cycle 'row1' 'row2' %}">
                 <td>
                   <strong>
-                    <a href="{% url "admin:pages_file_edit" lang page.lpath file.name %}">
+                    <a href="{% url 'admin:pages_file_edit' lang page.lpath file.name %}">
                       {{ file.name }}
                     </a>
                   </strong>
@@ -113,7 +113,7 @@
                 <td>
                   <ul class="object-tools" style="margin: 0;">
                     <li>
-                      <a href="{% url "admin:pages_file_edit" lang page.lpath file.name %}">Edit</a>
+                      <a href="{% url 'admin:pages_file_edit' lang page.lpath file.name %}">Edit</a>
                     </li>
                     <li>
                       <a href="{{ file.url }}">View</a>
@@ -126,7 +126,7 @@
         </table>
       </fieldset>
       <ul class="object-tools" style="margin: 0 0 1em 0;">
-        <li><a href="{% url "admin:pages_file_create" lang page.lpath %}">Add File</a></li>
+        <li><a href="{% url 'admin:pages_file_create' lang page.lpath %}">Add File</a></li>
       </ul>
       <div style="clear: both;"></div>
     {% endif %}
@@ -140,7 +140,7 @@
       </button>
       {% if not create and not page.is_root %}
         <p class="deletelink-box">
-          <a class="deletelink" href="{% url "admin:pages_delete" lang page.lpath %}">Delete</a>
+          <a class="deletelink" href="{% url 'admin:pages_delete' lang page.lpath %}">Delete</a>
         </p>
       {% endif %}
     </div>

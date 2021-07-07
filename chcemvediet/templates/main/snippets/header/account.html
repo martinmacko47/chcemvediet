@@ -18,7 +18,7 @@
         <span class="chv-icon-badge">{{ user.profile.undecided_emails_count }}</span>
       </a>
     {% endif %}
-    <span class="chv-navbar-item chv-navbar-item-gray-blue dropdown {{ active|yes:"active" }}">
+    <span class="chv-navbar-item chv-navbar-item-gray-blue dropdown {{ active|yes:'active' }}">
       <a class="dropdown-toggle" href="#" data-toggle="dropdown">
         <span class="chv-hidden chv-inline-sm">{{ user.email }}  </span>
         {% include "main/snippets/icons/account.html" with class="chv-icon-2x" hover=1 %}

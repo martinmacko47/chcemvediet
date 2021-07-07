@@ -12,7 +12,7 @@
 
 
 {% block addbreadcrumbs %}
-  &rsaquo; <a href="{% url "admin:pages_index" lang %}">{{ lang }}</a>
+  &rsaquo; <a href="{% url 'admin:pages_index' lang %}">{{ lang }}</a>
   &rsaquo; {% include "pages/admin/snippets/ancestors.html" with inclusive=True %}
   &rsaquo; Delete Page
 {% endblock %}
@@ -26,7 +26,7 @@
     {% for subpage in page.walk %}
       <li>
         {% spaceless %}
-          <a href="{% url "admin:pages_edit" lang subpage.lpath %}">{{ subpage.path }}</a>
+          <a href="{% url 'admin:pages_edit' lang subpage.lpath %}">{{ subpage.path }}</a>
           {% if subpage.is_redirect %}
             <span> &#8594; {{ subpage.redirect_path }}</span>
           {% else %}

@@ -13,10 +13,10 @@
   {% csrf_token %}
   <button type="submit" class="chv-table-delete pln-with-tooltip pln-confirm"
           title="{% spaceless %}
-              {% include "inforequests/mine/texts/drafts_delete_tooltip.txt" %}
+              {% include 'inforequests/mine/texts/drafts_delete_tooltip.txt' %}
               {% endspaceless %}"
           data-confirm="{% spaceless %}
-              {% include "inforequests/mine/texts/drafts_delete_confirm.txt" %}
+              {% include 'inforequests/mine/texts/drafts_delete_confirm.txt' %}
               {% endspaceless %}">
     &times;
   </button>

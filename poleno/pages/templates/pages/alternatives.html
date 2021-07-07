@@ -19,7 +19,7 @@
   <ul>
     {% for alt in alternatives %}
       <li>
-        <img src="{% static "main/images/languages/"|add:alt.lang|add:".png" %}">
+        <img src="{% static 'main/images/languages/'|add:alt.lang|add:'.png' %}">
         {{ alt.name }}: <a href="{{ alt.page.url }}">{{ alt.page.title }}</a>
       </li>
     {% endfor %}

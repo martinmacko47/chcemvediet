@@ -10,7 +10,7 @@
 {% endcomment %}
 
 
-<div class="form-group {{ error|yes:"has-error" }}">
+<div class="form-group {{ error|yes:'has-error' }}">
   <label class="control-label col-sm-3">Editable span</label>
   <div class="col-sm-9">
     <div class="panel chv-scheme-gray">
@@ -18,7 +18,7 @@
         <div class="pln-editable-container">
           {% lorem 3 %}
           <span class="pln-with-tooltip pln-tooltip-permanent chv-tooltip-error"
-                title="{{ error|yes:"Error text. Lorem ipsum dolor sit." }}">
+                title="{{ error|yes:'Error text. Lorem ipsum dolor sit.' }}">
             <span class="pln-editable-span" contenteditable="true"></span>
           </span>
           {% lorem 3 %}

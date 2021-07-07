@@ -1,0 +1,15 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load trans from i18n %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- None
+ %
+{% endcomment %}
+
+
+<h2 id="{% trans 'main:homepage:didyouknow:anchor' %}" class="text-center">
+  {% trans 'main:homepage:didyouknow:heading' %}
+</h2>
+{% include "main/homepage/didyouknow/items.html" %}

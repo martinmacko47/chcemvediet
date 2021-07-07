@@ -22,7 +22,7 @@
         <i class="chv-icon chv-icon-lg icon-attach"></i>
         &nbsp;
         {% trans 'attachments:widget:browse' %}
-        <input type="file" name="files" multiple="multiple" data-url="{{ funcs|method:"upload_url"|call }}">
+        <input type="file" name="files" multiple="multiple" data-url="{{ funcs|method:'upload_url'|call }}">
       </div>
     </div>
     <div class="pln-attachments-skel">
@@ -34,7 +34,7 @@
     <div class="pln-attachments-list">
       {% for attachment in attachments %}
         <div class="pln-attachment" data-attachment="{{ attachment.pk }}">
-          <a href="{{ funcs|method:"download_url"|with:attachment|call }}">{{ attachment.name }}</a>
+          <a href="{{ funcs|method:'download_url'|with:attachment|call }}">{{ attachment.name }}</a>
           <button type="button" class="pln-attachment-del"><i class="chv-icon icon-cancel"></i></button>
         </div>
       {% endfor %}

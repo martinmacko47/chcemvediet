@@ -27,7 +27,7 @@
                 <label>
                   <input type="radio" name="email" value="{{ emailaddress.email }}"
                          {% if emailaddress.primary %}checked="checked"{% endif %}>
-                  <span class="{{ emailaddress.verified|no:"text-muted" }}">
+                  <span class="{{ emailaddress.verified|no:'text-muted' }}">
                     {{ emailaddress.email }}
                   </span>
                 </label>
