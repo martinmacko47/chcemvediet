@@ -83,7 +83,7 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
         message_set = self._call_cron_job()
         self.assertEqual(message_set.count(), 5)
 
-    def test_inforequest_last_undecided_email_reminder_is_updated_if_remider_is_sent(self):
+    def test_inforequest_last_undecided_email_reminder_is_updated_if_reminder_is_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         last = utc_datetime_from_local(u'2010-10-10 17:00:00')
         inforequest = self._create_inforequest(last_undecided_email_reminder=last)
@@ -185,7 +185,6 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
         message_set = self._call_cron_job()
         self.assertTrue(message_set.exists())
 
-    @unittest.skip('FIXME')
     def test_inforequest_is_skipped_if_exception_raised_while_checking_it(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequests = [self._create_inforequest() for i in range(3)]
@@ -197,11 +196,10 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
                 message_set = self._call_cron_job()
         self.assertEqual(message_set.count(), 2)
         self.assertEqual(len(logger.mock_calls), 3)
-        self.assertRegexpMatches(logger.mock_calls[0][1][0], u'Checking if undecided email reminder should be sent failed: <Inforequest: %s>' % inforequests[1].pk)
-        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Sent undecided email reminder: <Inforequest: %s>' % inforequests[0].pk)
-        self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Sent undecided email reminder: <Inforequest: %s>' % inforequests[2].pk)
+        self.assertIn(u'Checking if undecided email reminder should be sent failed: {}'.format(inforequests[1]), logger.mock_calls[0][1][0])
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[0]), logger.mock_calls[1][1][0])
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[2]), logger.mock_calls[2][1][0])
 
-    @unittest.skip('FIXME')
     def test_inforequest_is_skipped_if_exception_raised_while_sending_reminder(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequests = [self._create_inforequest() for i in range(3)]
@@ -214,9 +212,9 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
 
         self.assertEqual(message_set.count(), 2)
         self.assertEqual(len(logger.mock_calls), 3)
-        self.assertRegexpMatches(logger.mock_calls[0][1][0], u'Sent undecided email reminder: <Inforequest: %s>' % inforequests[0].pk)
-        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Sending undecided email reminder failed: <Inforequest: %s>' % inforequests[1].pk)
-        self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Sent undecided email reminder: <Inforequest: %s>' % inforequests[2].pk)
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[0]), logger.mock_calls[0][1][0])
+        self.assertIn(u'Sending undecided email reminder failed: {}'.format(inforequests[1]), logger.mock_calls[1][1][0])
+        self.assertIn(u'Sent undecided email reminder: {}'.format(inforequests[2]), logger.mock_calls[2][1][0])
 
 class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin, TestCase):
     u"""
@@ -267,7 +265,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         self.assertEqual(message_set.count(), 3)
 
     @unittest.skip('FIXME')
-    def test_last_action_last_deadline_reminder_is_updated_if_remider_is_sent(self):
+    def test_last_action_last_deadline_reminder_is_updated_if_reminder_is_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         last = utc_datetime_from_local(u'2010-10-10 17:00:00')
         inforequest, _, (request,) = self._create_inforequest_scenario((u'request', dict(last_deadline_reminder=last)))
@@ -279,7 +277,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         self.assertAlmostEqual(request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(milliseconds=100))
 
     @unittest.skip('FIXME')
-    def test_last_action_last_deadline_reminder_is_not_updated_if_remider_is_not_sent(self):
+    def test_last_action_last_deadline_reminder_is_not_updated_if_reminder_is_not_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         last = utc_datetime_from_local(u'2010-11-10 17:00:00')
         inforequest, _, (request,) = self._create_inforequest_scenario((u'request', dict(last_deadline_reminder=last)))
@@ -478,7 +476,7 @@ class ApplicantDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCa
         self.assertEqual(message_set.count(), 3)
 
     @unittest.skip('FIXME')
-    def test_last_action_last_deadline_reminder_is_updated_if_remider_is_sent(self):
+    def test_last_action_last_deadline_reminder_is_updated_if_reminder_is_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, (_, clarification_request) = self._create_inforequest_scenario(
                 (u'clarification_request', dict(last_deadline_reminder=None)))
@@ -490,7 +488,7 @@ class ApplicantDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCa
         self.assertAlmostEqual(clarification_request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(milliseconds=100))
 
     @unittest.skip('FIXME')
-    def test_last_action_last_deadline_reminder_is_not_updated_if_remider_is_not_sent(self):
+    def test_last_action_last_deadline_reminder_is_not_updated_if_reminder_is_not_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, (_, clarification_request) = self._create_inforequest_scenario(
                 (u'clarification_request', dict(last_deadline_reminder=None)))
