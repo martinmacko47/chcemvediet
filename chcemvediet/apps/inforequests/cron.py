@@ -91,7 +91,7 @@ def obligee_deadline_reminder():
                         continue
                     nop()  # To let tests raise testing exception here.
                     filtered.append(branch)
-                except Exception as msg:
+                except Exception:
                     msg = u'Checking if obligee deadline reminder should be sent failed: {}\n{}'
                     trace = unicode(traceback.format_exc(), u'utf-8')
                     cron_logger.error(msg.format(action, trace))
