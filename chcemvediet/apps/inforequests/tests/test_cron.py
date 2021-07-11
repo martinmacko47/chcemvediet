@@ -20,10 +20,6 @@ from ..models import Inforequest, Action
 
 class CronTestCaseMixin(TestCase):
 
-    def _pre_setup(self):
-        super(CronTestCaseMixin, self)._pre_setup()
-        Inforequest.objects.all().delete()
-
     def _call_runcrons(self):
         # ``runcrons`` command runs ``logging.debug()`` that somehow spoils stderr.
         with mock.patch(u'django_cron.logging'):
@@ -39,13 +35,13 @@ class CronTestCaseMixin(TestCase):
                 )
 
         for time, expected in tests:
-            timewarp.jump(date=local_datetime_from_local(u'2010-10-05 %s' % time))
+            timewarp.jump(date=local_datetime_from_local(u'2010-10-05 {}'.format(time)))
             with mock_cron_jobs() as mock_jobs:
                 self._call_runcrons()
             if expected:
-                self.assertEqual(mock_jobs[cronjob].call_count, 1, u'Cron job was not run at %s.' % time)
+                self.assertEqual(mock_jobs[cronjob].call_count, 1, u'Cron job was not run at {}.'.format(time))
             else:
-                self.assertEqual(mock_jobs[cronjob].call_count, 0, u'Cron job not run at %s.' % time)
+                self.assertEqual(mock_jobs[cronjob].call_count, 0, u'Cron job not run at {}.'.format(time))
 
 
 class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin, TestCase):
@@ -325,7 +321,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
                 # snooze is missed at 2010-10-14
-                (u'clarification_response', dict(delivered_date=naive_date(u'2010-10-05'))),
+                u'clarification_response',
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-10 10:33:00'))
@@ -337,7 +333,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
                 # snooze is missed at 2010-10-14
-                (u'clarification_response', dict(delivered_date=naive_date(u'2010-10-05'))),
+                u'clarification_response',
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-14 10:33:00'))
@@ -350,7 +346,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
                 # snooze is missed at 2010-10-14
-                (u'clarification_response', dict(delivered_date=naive_date(u'2010-10-05'), last_deadline_reminder=last)),
+                (u'clarification_response', dict(last_deadline_reminder=last)),
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-20 10:33:00'))
@@ -363,7 +359,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
                 # snooze is missed at 2010-10-14
-                (u'clarification_response', dict(delivered_date=naive_date(u'2010-10-05'), last_deadline_reminder=last)),
+                (u'clarification_response', dict(last_deadline_reminder=last)),
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-20 10:33:00'))
@@ -372,12 +368,12 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
 
     def test_reminder_is_sent_if_last_action_snooze_was_already_missed_when_last_reminder_was_sent_but_it_was_extended_later(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
-        last = utc_datetime_from_local(u'2010-10-12 10:33:00')
+        last = utc_datetime_from_local(u'2010-10-16 10:33:00')
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
-                # snooze was missed at 2010-10-13, but then it was extended by 5 days; it will be
+                # snooze was missed at 2010-10-14, but then it was extended by 4 days; it will be
                 # missed at 2010-10-18 again.
-                (u'extension', dict(delivered_date=naive_date(u'2010-10-05'), extension=5, last_deadline_reminder=last)),
+                (u'clarification_response', dict(last_deadline_reminder=last, snooze=naive_date(u'2010-10-17'))),
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-20 10:33:00'))
