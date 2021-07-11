@@ -253,12 +253,50 @@ class InforequestEmailAdmin(admin.ModelAdmin):
             ]
     inlines = [
             ]
+    actions = [
+            u'delete_selected'
+    ]
 
     def get_queryset(self, request):
         queryset = super(InforequestEmailAdmin, self).get_queryset(request)
         queryset = queryset.select_related(u'inforequest')
         queryset = queryset.select_related(u'email')
         return queryset
+
+    def delete_constraints(self, objs):
+        constraints = []
+        for obj in objs:
+            if hasattr(obj.email, u'action'):
+                if obj.inforequest == obj.email.action.branch.inforequest:
+                    constraints.append(format_html(
+                        u'{} is used in its inforequest.'.format(admin_obj_format(obj))))
+        return constraints
+
+    def render_delete_form(self, request, context):
+        context[u'delete_constraints'] = self.delete_constraints([context[u'object']])
+        return super(InforequestEmailAdmin, self).render_delete_form(request, context)
+
+    @decorate(short_description=u'Delete selected inforequestemails')
+    @transaction.atomic
+    def delete_selected(self, request, queryset):
+        if request.POST.get(u'post'):
+            if self.delete_constraints(queryset):
+                raise PermissionDenied
+
+        template_response = delete_selected(self, request, queryset)
+
+        if request.POST.get(u'post'):
+            return None
+
+        template_response.context_data.update({
+            u'delete_constraints': self.delete_constraints(queryset),
+        })
+        return template_response
+
+    def delete_model(self, request, obj):
+        if self.delete_constraints([obj]):
+            raise PermissionDenied
+        return super(InforequestEmailAdmin, self).delete_model(request, obj)
 
 @admin.register(Branch, site=admin.site)
 class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
