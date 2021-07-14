@@ -10,7 +10,7 @@ from django.test import TestCase
 from poleno.mail.models import Message
 from poleno.timewarp import timewarp
 from poleno.cron.test import mock_cron_jobs
-from poleno.utils.date import local_datetime_from_local, utc_datetime_from_local
+from poleno.utils.date import local_datetime_from_local, utc_datetime_from_local, naive_date
 from poleno.utils.test import created_instances
 
 from . import InforequestsTestCaseMixin
@@ -35,13 +35,13 @@ class CronTestCaseMixin(TestCase):
                 )
 
         for time, expected in tests:
-            timewarp.jump(date=local_datetime_from_local(u'2010-10-05 %s' % time))
+            timewarp.jump(date=local_datetime_from_local(u'2010-10-05 {}'.format(time)))
             with mock_cron_jobs() as mock_jobs:
                 self._call_runcrons()
             if expected:
-                self.assertEqual(mock_jobs[cronjob].call_count, 1, u'Cron job was not run at %s.' % time)
+                self.assertEqual(mock_jobs[cronjob].call_count, 1, u'Cron job was not run at {}.'.format(time))
             else:
-                self.assertEqual(mock_jobs[cronjob].call_count, 0, u'Cron job not run at %s.' % time)
+                self.assertEqual(mock_jobs[cronjob].call_count, 0, u'Cron job not run at {}.'.format(time))
 
 
 class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin, TestCase):
@@ -222,7 +222,7 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
     """
 
     def _call_cron_job(self):
-        with mock.patch(u'chcemvediet.apps.inforequests.cron.workdays.between', side_effect=lambda a,b: (b-a).days):
+        with mock.patch(u'chcemvediet.apps.inforequests.cron.workdays.between', side_effect=lambda a,b,_: (b-a).days):
             with created_instances(Message.objects) as message_set:
                 obligee_deadline_reminder().do()
         return message_set
@@ -231,7 +231,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
     def test_times_job_is_run_at(self):
         self.assert_times_job_is_run_at(u'chcemvediet.apps.inforequests.cron.obligee_deadline_reminder')
 
-    @unittest.skip('FIXME')
     def test_obligee_deadline_reminder(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         user = self._create_user(email=u'smith@example.com')
@@ -246,7 +245,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         self.assertEqual(msg.from_formatted, u'info@example.com')
         self.assertEqual(msg.to_formatted, u'smith@example.com')
 
-    @unittest.skip('FIXME')
     def test_obligee_deadline_reminder_with_multiple_inforequests(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         scenarios = [self._create_inforequest_scenario() for i in range(4)]
@@ -255,7 +253,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
         self.assertEqual(message_set.count(), 4)
 
-    @unittest.skip('FIXME')
     def test_obligee_deadline_reminder_with_inforequest_with_multiple_branches(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, _ = self._create_inforequest_scenario((u'advancement', [], [], []))
@@ -264,7 +261,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
         self.assertEqual(message_set.count(), 3)
 
-    @unittest.skip('FIXME')
     def test_last_action_last_deadline_reminder_is_updated_if_reminder_is_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         last = utc_datetime_from_local(u'2010-10-10 17:00:00')
@@ -274,9 +270,8 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
 
         request = Action.objects.get(pk=request.pk)
-        self.assertAlmostEqual(request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(milliseconds=100))
+        self.assertAlmostEqual(request.last_deadline_reminder, local_datetime_from_local(u'2010-11-20 10:33:00'), delta=datetime.timedelta(milliseconds=300))
 
-    @unittest.skip('FIXME')
     def test_last_action_last_deadline_reminder_is_not_updated_if_reminder_is_not_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         last = utc_datetime_from_local(u'2010-11-10 17:00:00')
@@ -288,7 +283,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         request = Action.objects.get(pk=request.pk)
         self.assertEqual(request.last_deadline_reminder, last)
 
-    @unittest.skip('FIXME')
     def test_reminder_is_not_sent_for_inforequest_with_undecided_email(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, _ = self._create_inforequest_scenario()
@@ -298,7 +292,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
         self.assertFalse(message_set.exists())
 
-    @unittest.skip('FIXME')
     def test_reminder_is_not_sent_for_closed_inforequest_without_undecided_email(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, _ = self._create_inforequest_scenario(dict(closed=True))
@@ -307,7 +300,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
         self.assertFalse(message_set.exists())
 
-    @unittest.skip('FIXME')
     def test_reminder_is_sent_for_not_closed_inforequest_without_undecided_email(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, _ = self._create_inforequest_scenario()
@@ -316,7 +308,6 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
         self.assertTrue(message_set.exists())
 
-    @unittest.skip('FIXME')
     def test_reminder_is_not_sent_if_last_action_does_not_have_obligee_deadline(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, _ = self._create_inforequest_scenario(u'clarification_request')
@@ -325,76 +316,70 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
         message_set = self._call_cron_job()
         self.assertFalse(message_set.exists())
 
-    @unittest.skip('FIXME')
-    def test_reminder_is_not_sent_if_last_action_deadline_is_not_missed(self):
+    def test_reminder_is_not_sent_if_last_action_snooze_is_not_missed(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
-                # deadline is missed at 2010-10-11
-                (u'clarification_response', dict(deadline=5)),
+                # snooze is missed at 2010-10-14
+                u'clarification_response',
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-10 10:33:00'))
         message_set = self._call_cron_job()
         self.assertFalse(message_set.exists())
 
-    @unittest.skip('FIXME')
-    def test_reminder_is_sent_if_last_action_has_missed_obligee_deadline(self):
+    def test_reminder_is_sent_if_last_action_snooze_is_missed(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
-                # deadline is missed at 2010-10-11
-                (u'clarification_response', dict(deadline=5)),
+                # snooze is missed at 2010-10-14
+                u'clarification_response',
                 )
 
-        timewarp.jump(local_datetime_from_local(u'2010-10-11 10:33:00'))
+        timewarp.jump(local_datetime_from_local(u'2010-10-14 10:33:00'))
         message_set = self._call_cron_job()
         self.assertTrue(message_set.exists())
 
-    @unittest.skip('FIXME')
-    def test_reminder_is_not_sent_if_last_action_deadline_was_already_missed_when_last_reminder_was_sent(self):
+    def test_reminder_is_not_sent_if_last_action_snooze_was_already_missed_when_last_reminder_was_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
-        last = utc_datetime_from_local(u'2010-10-11 10:33:00')
+        last = utc_datetime_from_local(u'2010-10-14 10:33:00')
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
-                # deadline is missed at 2010-10-11
-                (u'clarification_response', dict(deadline=5, last_deadline_reminder=last)),
+                # snooze is missed at 2010-10-14
+                (u'clarification_response', dict(last_deadline_reminder=last)),
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-20 10:33:00'))
         message_set = self._call_cron_job()
         self.assertFalse(message_set.exists())
 
-    @unittest.skip('FIXME')
-    def test_reminder_is_sent_if_last_action_deadline_was_not_missed_yet_when_last_reminder_was_sent(self):
+    def test_reminder_is_sent_if_last_action_snooze_was_not_missed_yet_when_last_reminder_was_sent(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         last = utc_datetime_from_local(u'2010-10-10 10:33:00')
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
-                # deadline is missed at 2010-10-11
-                (u'clarification_response', dict(deadline=5, last_deadline_reminder=last)),
+                # snooze is missed at 2010-10-14
+                (u'clarification_response', dict(last_deadline_reminder=last)),
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-20 10:33:00'))
         message_set = self._call_cron_job()
         self.assertTrue(message_set.exists())
 
-    @unittest.skip('FIXME')
-    def test_reminder_is_sent_if_last_action_deadline_was_already_missed_when_last_reminder_was_sent_but_it_was_extended_later(self):
+    def test_reminder_is_sent_if_last_action_snooze_was_already_missed_when_last_reminder_was_sent_but_it_was_extended_later(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
-        last = utc_datetime_from_local(u'2010-10-12 10:33:00')
+        last = utc_datetime_from_local(u'2010-10-16 10:33:00')
         inforequest, _, _ = self._create_inforequest_scenario(
                 u'clarification_request',
-                # deadline was missed at 2010-10-11, but then it was extended by 3 days; it will be
-                # missed at 2010-10-14 again.
-                (u'clarification_response', dict(deadline=5, extension=3, last_deadline_reminder=last)),
+                # snooze was missed at 2010-10-14, but then it was extended by 4 days; it will be
+                # missed at 2010-10-18 again.
+                (u'clarification_response', dict(last_deadline_reminder=last, snooze=naive_date(u'2010-10-17'))),
                 )
 
         timewarp.jump(local_datetime_from_local(u'2010-10-20 10:33:00'))
         message_set = self._call_cron_job()
         self.assertTrue(message_set.exists())
 
-    @unittest.skip('FIXME')
     def test_branch_is_skipped_if_exception_raised_while_checking_it(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, actions = self._create_inforequest_scenario((u'advancement', [], [], []))
@@ -406,11 +391,10 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
                 message_set = self._call_cron_job()
         self.assertEqual(message_set.count(), 2)
         self.assertEqual(len(logger.mock_calls), 3)
-        self.assertRegexpMatches(logger.mock_calls[0][1][0], u'Checking if obligee deadline reminder should be sent failed: <Action: %s>' % action2.pk)
-        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Sent obligee deadline reminder: <Action: %s>' % action1.pk)
-        self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Sent obligee deadline reminder: <Action: %s>' % action3.pk)
+        self.assertIn(u'Checking if obligee deadline reminder should be sent failed: {}'.format(action2), logger.mock_calls[0][1][0])
+        self.assertIn(u'Sent obligee deadline reminder: {}'.format(action1), logger.mock_calls[1][1][0])
+        self.assertIn(u'Sent obligee deadline reminder: {}'.format(action3), logger.mock_calls[2][1][0])
 
-    @unittest.skip('FIXME')
     def test_branch_is_skipped_if_exception_raised_while_sending_reminder(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
         inforequest, _, actions = self._create_inforequest_scenario((u'advancement', [], [], []))
@@ -422,9 +406,9 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
                 message_set = self._call_cron_job()
         self.assertEqual(message_set.count(), 2)
         self.assertEqual(len(logger.mock_calls), 3)
-        self.assertRegexpMatches(logger.mock_calls[0][1][0], u'Sent obligee deadline reminder: <Action: %s>' % action1.pk)
-        self.assertRegexpMatches(logger.mock_calls[1][1][0], u'Sending obligee deadline reminder failed: <Action: %s>' % action2.pk)
-        self.assertRegexpMatches(logger.mock_calls[2][1][0], u'Sent obligee deadline reminder: <Action: %s>' % action3.pk)
+        self.assertIn(u'Sent obligee deadline reminder: {}'.format(action1), logger.mock_calls[0][1][0])
+        self.assertIn(u'Sending obligee deadline reminder failed: {}'.format(action2), logger.mock_calls[1][1][0])
+        self.assertIn(u'Sent obligee deadline reminder: {}'.format(action3), logger.mock_calls[2][1][0])
 
 class ApplicantDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin, TestCase):
     u"""

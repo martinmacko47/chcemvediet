@@ -89,6 +89,7 @@ def obligee_deadline_reminder():
                     last_date = local_date(last) if last else None
                     if last and action.deadline.is_snooze_missed_at(last_date):
                         continue
+                    nop()  # To let tests raise testing exception here.
                     filtered.append(branch)
                 except Exception:
                     msg = u'Checking if obligee deadline reminder should be sent failed: {}\n{}'
@@ -108,6 +109,7 @@ def obligee_deadline_reminder():
             try:
                 with transaction.atomic():
                     branch.inforequest.send_obligee_deadline_reminder(branch.last_action)
+                    nop()  # To let tests raise testing exception here.
                     msg = u'Sent obligee deadline reminder: {}'
                     cron_logger.info(msg.format(branch.last_action))
             except Exception:
