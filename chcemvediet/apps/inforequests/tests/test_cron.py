@@ -3,7 +3,6 @@
 import mock
 import datetime
 
-from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -11,7 +10,7 @@ from poleno.mail.models import Message
 from poleno.timewarp import timewarp
 from poleno.cron.test import mock_cron_jobs
 from poleno.utils.date import local_datetime_from_local, utc_datetime_from_local, naive_date
-from poleno.utils.test import created_instances
+from poleno.utils.test import created_instances, reload_for_context
 
 from . import InforequestsTestCaseMixin
 from ..cron import undecided_email_reminder, obligee_deadline_reminder, applicant_deadline_reminder, close_inforequests
@@ -26,21 +25,14 @@ class CronTestCaseMixin(TestCase):
             call_command(u'runcrons')
 
     def assert_times_job_is_run_at(self, cronjob, times):
-        tests = []
-        hours = [u'{:02d}'.format(i) for i in range(24)]
-        for hour in hours:
-            tests.append((u'{}:10'.format(hour), u'{}:00'.format(hour) in times))
-            tests.append((u'{}:50'.format(hour), False))
-
-        for time, expected in tests:
+        for time, expected in times:
             timewarp.jump(date=local_datetime_from_local(u'2010-10-05 {}'.format(time)))
             with mock_cron_jobs() as mock_jobs:
                 self._call_runcrons()
             if expected:
                 self.assertEqual(mock_jobs[cronjob].call_count, 1, u'Cron job was not run at {}.'.format(time))
             else:
-                self.assertEqual(mock_jobs[cronjob].call_count, 0, u'Cron job not run at {}.'.format(time))
-
+                self.assertEqual(mock_jobs[cronjob].call_count, 0, u'Cron job was run at {}.'.format(time))
 
 class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin, TestCase):
     u"""
@@ -55,10 +47,14 @@ class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseM
 
 
     def test_times_job_is_run_at(self):
-        self.assert_times_job_is_run_at(
-                u'chcemvediet.apps.inforequests.cron.undecided_email_reminder',
-                settings.CRON_USER_INTERACTION_TIMES
-        )
+        with reload_for_context(self.settings(CRON_USER_INTERACTION_TIMES=[u'09:00', u'10:00', u'11:00']), u'chcemvediet.apps.inforequests.cron'):
+            self.assert_times_job_is_run_at(u'chcemvediet.apps.inforequests.cron.undecided_email_reminder', (
+                (u'08:10', False), (u'08:50', False),
+                (u'09:10', True), (u'09:50', False),
+                (u'10:10', True), (u'10:50', False),
+                (u'11:10', True), (u'11:50', False),
+                (u'12:10', False), (u'12:50', False),
+            ))
 
     def test_undecided_email_reminder(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
@@ -230,10 +226,15 @@ class ObligeeDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCase
 
 
     def test_times_job_is_run_at(self):
-        self.assert_times_job_is_run_at(
-                u'chcemvediet.apps.inforequests.cron.obligee_deadline_reminder',
-                settings.CRON_USER_INTERACTION_TIMES
-        )
+        with reload_for_context(self.settings(CRON_USER_INTERACTION_TIMES=[u'09:00', u'10:00', u'11:00']), u'chcemvediet.apps.inforequests.cron'):
+            self.assert_times_job_is_run_at(
+                u'chcemvediet.apps.inforequests.cron.obligee_deadline_reminder', (
+                    (u'08:10', False), (u'08:50', False),
+                    (u'09:10', True), (u'09:50', False),
+                    (u'10:10', True), (u'10:50', False),
+                    (u'11:10', True), (u'11:50', False),
+                    (u'12:10', False), (u'12:50', False),
+                ))
 
     def test_obligee_deadline_reminder(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
@@ -427,10 +428,15 @@ class ApplicantDeadlineReminderCronJobTest(CronTestCaseMixin, InforequestsTestCa
 
 
     def test_times_job_is_run_at(self):
-        self.assert_times_job_is_run_at(
-                u'chcemvediet.apps.inforequests.cron.applicant_deadline_reminder',
-                settings.CRON_USER_INTERACTION_TIMES
-        )
+        with reload_for_context(self.settings(CRON_USER_INTERACTION_TIMES=[u'09:00', u'10:00', u'11:00']), u'chcemvediet.apps.inforequests.cron'):
+            self.assert_times_job_is_run_at(
+                u'chcemvediet.apps.inforequests.cron.applicant_deadline_reminder', (
+                    (u'08:10', False), (u'08:50', False),
+                    (u'09:10', True), (u'09:50', False),
+                    (u'10:10', True), (u'10:50', False),
+                    (u'11:10', True), (u'11:50', False),
+                    (u'12:10', False), (u'12:50', False),
+                ))
 
     def test_applicant_deadline_reminder(self):
         timewarp.jump(local_datetime_from_local(u'2010-10-05 10:33:00'))
@@ -614,10 +620,15 @@ class CloseInforequestsCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin,
 
 
     def test_times_job_is_run_at(self):
-        self.assert_times_job_is_run_at(
-                u'chcemvediet.apps.inforequests.cron.close_inforequests',
-                settings.CRON_IMPORTANT_MAINTENANCE_TIMES
-        )
+        with reload_for_context(self.settings(CRON_IMPORTANT_MAINTENANCE_TIMES=[u'09:00', u'10:00', u'11:00']), u'chcemvediet.apps.inforequests.cron'):
+            self.assert_times_job_is_run_at(
+                u'chcemvediet.apps.inforequests.cron.close_inforequests', (
+                    (u'08:10', False), (u'08:50', False),
+                    (u'09:10', True), (u'09:50', False),
+                    (u'10:10', True), (u'10:50', False),
+                    (u'11:10', True), (u'11:50', False),
+                    (u'12:10', False), (u'12:50', False),
+                ))
 
     def test_close_inforequests(self):
         timewarp.jump(local_datetime_from_local(u'2010-03-05 10:33:00'))

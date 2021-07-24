@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import mock
 import contextlib
+import importlib
 
 from django.utils.http import urlencode
 from django.test import TestCase
@@ -66,6 +67,16 @@ def patch_with_exception(target):
             yield
         except MockException:
             pass
+
+@contextlib.contextmanager
+def reload_for_context(manager, module):
+    module = importlib.import_module(module)
+    try:
+        with manager as context:
+            reload(module)
+            yield context
+    finally:
+        reload(module)
 
 class ViewTestCaseMixin(TestCase):
 
