@@ -266,10 +266,13 @@ class InforequestEmailAdmin(admin.ModelAdmin):
     def delete_constraints(self, objs):
         constraints = []
         for obj in objs:
-            if hasattr(obj.email, u'action'):
-                if obj.inforequest == obj.email.action.branch.inforequest:
-                    constraints.append(format_html(
-                        u'{} is used in its inforequest.'.format(admin_obj_format(obj))))
+            actions = Action.objects.of_inforequest(obj.inforequest).filter(email=obj.email)
+            if actions:
+                constraints.append(format_html(
+                    u'{} is used for {}.'.format(
+                            admin_obj_format(obj),
+                            u', '.join([admin_obj_format(action) for action in actions]),
+                    )))
         return constraints
 
     def render_delete_form(self, request, context):
