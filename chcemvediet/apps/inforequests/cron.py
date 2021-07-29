@@ -142,6 +142,7 @@ def applicant_deadline_reminder():
                     # deadline reminder for the action.
                     if action.last_deadline_reminder:
                         continue
+                    nop()  # To let tests raise testing exception here.
                     filtered.append(branch)
                 except Exception:
                     msg = u'Checking if applicant deadline reminder should be sent failed: {}\n{}'
@@ -160,6 +161,7 @@ def applicant_deadline_reminder():
             try:
                 with transaction.atomic():
                     branch.inforequest.send_applicant_deadline_reminder(branch.last_action)
+                    nop()  # To let tests raise testing exception here.
                     msg = u'Sent applicant deadline reminder: {}'
                     cron_logger.info(msg.format(branch.last_action))
             except Exception:
@@ -187,6 +189,7 @@ def close_inforequests():
             else:
                 # Every branch that has a deadline have been missed for at least
                 # DAYS_TO_CLOSE_INFOREQUEST calendar days.
+                nop()  # To let tests raise testing exception here.
                 filtered.append(inforequest)
         except Exception:
             msg = u'Checking if inforequest should be closed failed: {}\n{}'
@@ -200,6 +203,7 @@ def close_inforequests():
                     branch.add_expiration_if_expired()
                 inforequest.closed = True
                 inforequest.save(update_fields=[u'closed'])
+                nop()  # To let tests raise testing exception here.
                 cron_logger.info(u'Closed inforequest: {}'.format(inforequest))
         except Exception:
             msg = u'Closing inforequest failed: {}\n{}'
