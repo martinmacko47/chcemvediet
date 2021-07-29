@@ -70,6 +70,19 @@ def patch_with_exception(target):
 
 @contextlib.contextmanager
 def reload_for_context(manager, module):
+    u"""
+    Reloads ``module`` after entering and after exiting context created by given context ``manager``. Usefull if you
+    want to override Django settings that are read only during the module initialization. By reloading the module, the
+    overriden settings are read again.
+
+    Note that this cannot be implemented by nested contexts as we need to reload the module both after the original
+    context is entered and as well as after the original context is exited. Nested contexts would reload the module
+    either before the original context was entered or before it was exited, depending on the contexts order.
+
+    Example:
+        with reload_for_context(self.settings(CRON_TIMES=['10:00', '14:00']), 'app.cron') as context:
+            call_command(u'runcrons')
+    """
     module = importlib.import_module(module)
     try:
         with manager as context:

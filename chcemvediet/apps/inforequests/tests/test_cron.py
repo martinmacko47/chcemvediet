@@ -24,8 +24,8 @@ class CronTestCaseMixin(TestCase):
         with mock.patch(u'django_cron.logging'):
             call_command(u'runcrons')
 
-    def assert_times_job_is_run_at(self, cronjob, times):
-        for time, expected in times:
+    def assert_times_job_is_run_at(self, cronjob, tests):
+        for time, expected in tests:
             timewarp.jump(date=local_datetime_from_local(u'2010-10-05 {}'.format(time)))
             with mock_cron_jobs() as mock_jobs:
                 self._call_runcrons()
@@ -33,6 +33,7 @@ class CronTestCaseMixin(TestCase):
                 self.assertEqual(mock_jobs[cronjob].call_count, 1, u'Cron job was not run at {}.'.format(time))
             else:
                 self.assertEqual(mock_jobs[cronjob].call_count, 0, u'Cron job was run at {}.'.format(time))
+
 
 class UndecidedEmailReminderCronJobTest(CronTestCaseMixin, InforequestsTestCaseMixin, TestCase):
     u"""
