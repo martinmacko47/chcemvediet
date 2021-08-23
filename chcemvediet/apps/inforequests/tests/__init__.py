@@ -21,7 +21,7 @@ from ..models import Inforequest, InforequestEmail, Branch, Action
 class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
 
     @contextlib.contextmanager
-    def assertQueriesDuringRender(self, *patterns, **kwargs):
+    def assertQueriesDuringRender(self, patterns, **kwargs):
         u"""
         Use to assert that views prefetch all related models before rendering their templates.
         Views should prefetch their related models to prevent templates from making database
