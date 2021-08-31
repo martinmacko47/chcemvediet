@@ -1,11 +1,17 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django import forms
+from django.conf.urls import patterns, url
 from django.contrib import admin
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 
-from poleno.utils.misc import decorate
 from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
+from poleno.utils.misc import decorate
+from poleno.utils.urls import reverse
 
 from .models import Profile
 
@@ -44,6 +50,10 @@ class ProfileAdmin(admin.ModelAdmin):
                 short_description=u'Undecided E-mails',
                 admin_order_field=u'undecided_emails_count',
                 ),
+            decorate(
+                lambda o: admin_obj_format(o, u'Log in', link=u'login_as'),
+                short_description=u'Admin Login',
+                ),
             ]
     list_filter = [
             u'anonymize_inforequests',
@@ -79,3 +89,20 @@ class ProfileAdmin(admin.ModelAdmin):
         queryset = queryset.select_related(u'user')
         queryset = queryset.select_undecided_emails_count()
         return queryset
+
+    def login_as_view(self, request, id):
+        admin_login_as = request.session.get(u'admin_login_as')
+        user = get_object_or_404(User, pk=id)
+        if not hasattr(user, u'backend'):
+            user.backend = u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend'
+        login(request, user)
+        request.session[u'admin_login_as'] = admin_login_as
+        return HttpResponseRedirect(reverse(u'inforequests:mine'))
+
+    def get_urls(self):
+        info = self.model._meta.app_label, self.model._meta.model_name
+        login_as_view = self.admin_site.admin_view(self.login_as_view)
+        urls = patterns('',
+                url(r'^(.+)/login-as/$', login_as_view, name=u'{}_{}_login_as'.format(*info)),
+                )
+        return urls + super(ProfileAdmin, self).get_urls()

@@ -84,7 +84,7 @@ MIDDLEWARE_CLASSES = (
     )
 
 AUTHENTICATION_BACKENDS = (
-    u'django.contrib.auth.backends.ModelBackend',
+    u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend',
     u'allauth.account.auth_backends.AuthenticationBackend',
     )
 
