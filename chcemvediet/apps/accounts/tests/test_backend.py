@@ -1,33 +1,40 @@
+import mock
+
+from django.conf.urls import patterns, url
+from django.contrib.auth import get_user
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from poleno.utils.urls import reverse
+from poleno.utils.http import _local
 
 
-class AdminLoginAsBackend(TestCase):
+class AdminLoginAsBackendTest(TestCase):
+
+    def mock_view(request):
+        return HttpResponse()
+
+    def set_admin_login_as_attribute_view(request, id):
+        request.session[u'admin_login_as'] = id
+        return HttpResponse()
+
+    urls = tuple(patterns(u'',
+        url(r'^$', mock_view),
+        url(r'^(.+)/login-as/$', set_admin_login_as_attribute_view),
+    ))
 
     def create_users(self):
-        self.user1 = User.objects.create_user(
-                username=u'user1',
-                email=u'user1@example.com',
+        self.user = User.objects.create_user(
+                username=u'user',
+                email=u'user@example.com',
                 password=u'test',
                 )
-        self.user2 = User.objects.create_user(
-                username=u'user2',
-                email=u'user2@example.com',
+        self.superuser = User.objects.create_superuser(
+                username=u'superuser',
+                email=u'superuser@example.com',
                 password=u'test',
                 )
-        self.superuser1 = User.objects.create_superuser(
-                username=u'superuser1',
-                email=u'superuser1@example.com',
-                password=u'test',
-                )
-        self.superuser2 = User.objects.create_superuser(
-            username=u'superuser2',
-            email=u'superuser2@example.com',
-            password=u'test',
-        )
 
     def setUp(self):
         self.settings_override = override_settings(
@@ -41,42 +48,53 @@ class AdminLoginAsBackend(TestCase):
         self.settings_override.disable()
 
 
-    def test_multiple_requests(self):
+    def test_get_user_returns_anonymous_user(self):
+        response = self.client.get(u'/')
+        request = response.wsgi_request
+        user = get_user(request)
+        self.assertIsNotNone(user)
+        self.assertTrue(user.is_anonymous())
+
+    def test_get_user_returns_logged_non_admin_user(self):
         self.assertTrue(self.client.login(
-            username=self.superuser1.username, password=u'test'
+                username=self.user.username, password=u'test'
         ))
-        url1 = reverse(u'admin:accounts_profile_login_as', args=(self.user1.pk,))
-        url2 = reverse(u'admin:accounts_profile_login_as', args=(self.user2.pk,))
-        expected_url = reverse(u'inforequests:mine')
-        self.assertRedirects(self.client.get(url1, follow=True), expected_url)
-        self.assertEqual(self.client.session[u'_auth_user_id'], self.user1.pk)
-        self.assertRedirects(self.client.get(url2, follow=True), expected_url)
-        self.assertEqual(self.client.session[u'_auth_user_id'], self.user2.pk)
+        response = self.client.get(u'/')
+        request = response.wsgi_request
+        _local.request = request
+        user = get_user(request)
+        self.assertEqual(user, self.user)
 
-    def test_logging_back_admin(self):
-        self.client.login(username=self.superuser1.username, password=u'test')
-        url = reverse(u'admin:accounts_profile_login_as', args=(self.user1.pk,))
-        self.client.get(url, follow=True)
-        self.assertEqual(self.client.session[u'_auth_user_id'], self.user1.pk)
-        response = self.client.get(reverse(u'admin:index'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, u'adminplus/index.html')
-        self.assertEqual(self.client.session[u'_auth_user_id'], self.superuser1.pk)
+    def test_get_user_returns_logged_admin_user_on_admin_page(self):
+        with mock.patch(u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend.is_admin_path', return_value=True):
+            self.assertTrue(self.client.login(
+                    username=self.superuser.username, password=u'test'
+            ))
+            response = self.client.get(u'/')
+            request = response.wsgi_request
+            _local.request = request
+            user = get_user(request)
+            self.assertEqual(user, self.superuser)
 
-    def test_staff_user_login_as_other_staff_user(self):
-        self.client.login(username=self.superuser1.username, password=u'test')
-        self.assertEqual(self.client.session[u'_auth_user_id'], self.superuser1.pk)
-        url = reverse(u'admin:accounts_profile_login_as', args=(self.superuser2.pk,))
-        response = self.client.get(url, follow=True)
-        self.assertRedirects(response, reverse(u'inforequests:mine'))
-        self.assertEqual(self.client.session[u'_auth_user_id'], self.superuser2.pk)
-        response2 = self.client.get(reverse(u'admin:index'))
-        self.assertEqual(response2.status_code, 200)
-        self.assertTemplateUsed(response2, u'adminplus/index.html')
-        self.assertEqual(self.client.session[u'_auth_user_id'], self.superuser2.pk)
+    def test_get_user_returns_logged_admin_user_if_admin_login_as_attribute_is_not_set(self):
+        with mock.patch(u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend.is_admin_path', return_value=False):
+            self.assertTrue(self.client.login(
+                    username=self.superuser.username, password=u'test'
+            ))
+            response = self.client.get(u'/')
+            request = response.wsgi_request
+            _local.request = request
+            user = get_user(request)
+            self.assertEqual(user, self.superuser)
 
-    def test_login_to_non_existing_user(self):
-        self.client.login(username=self.superuser1, password=u'test')
-        url = reverse(u'admin:accounts_profile_login_as', args=(344,))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+    def test_get_user_returns_selected_user_if_admin_login_as_attribute_is_set(self):
+        with mock.patch(u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend.is_admin_path', return_value=False):
+            self.assertTrue(self.client.login(
+                    username=self.superuser.username, password=u'test'
+            ))
+            self.client.get(u'/{}/login-as/'.format(self.user.pk))
+            response = self.client.get(u'/')
+            request = response.wsgi_request
+            _local.request = request
+            user = get_user(request)
+            self.assertEqual(user, self.user)
