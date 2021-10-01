@@ -1,10 +1,6 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render  # To let tests mock this function.
-
-from poleno.utils.template import render_to_string  # To let tests mock this function.
-
 from .inforequest import inforequest_index
 from .inforequest import inforequest_mine
 from .inforequest import inforequest_create

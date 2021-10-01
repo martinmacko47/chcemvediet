@@ -21,7 +21,7 @@ from ..models import Inforequest, InforequestEmail, Branch, Action
 class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
 
     @contextlib.contextmanager
-    def assertQueriesDuringRender(self, patterns, **kwargs):
+    def assertQueriesDuringRender(self, *patterns, **kwargs):
         u"""
         Use to assert that views prefetch all related models before rendering their templates.
         Views should prefetch their related models to prevent templates from making database
@@ -39,15 +39,16 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
             return res
         def mock_render_to_string(*args, **kwargs):
             if pre_mock_render_to_string: # pragma: no cover
-                self.pre_mock_render_to_string(*args, **kwargs)
+                pre_mock_render_to_string(*args, **kwargs)
             with CaptureQueriesContext(connection) as captured:
                 res = render_to_string(*args, **kwargs)
             queries.append(captured)
             return res
 
-        with mock.patch(u'chcemvediet.apps.inforequests.views.render', mock_render):
-            with mock.patch(u'chcemvediet.apps.inforequests.views.render_to_string', mock_render_to_string):
-                yield
+        with mock.patch(u'chcemvediet.apps.inforequests.views.inforequest.render', mock_render):
+            with mock.patch(u'chcemvediet.apps.inforequests.views.shortcuts.render', mock_render):
+                with mock.patch(u'chcemvediet.apps.inforequests.views.shortcuts.render_to_string', mock_render_to_string):
+                    yield
 
         self.assertEqual(len(queries), len(patterns), u'%d renders executed, %d expected' % (len(queries), len(patterns)))
         for render_queries, render_patterns in zip(queries, patterns):

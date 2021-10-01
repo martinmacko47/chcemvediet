@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 
+from poleno.utils.misc import squeeze
 from poleno.utils.test import ViewTestCaseMixin
 from poleno.utils.urls import reverse
 
@@ -79,6 +80,59 @@ class MineViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
             list(context[u'unsuccessful_inforequests'])
 
         self._login_user(self.user1)
-        with self.assertQueriesDuringRender([], pre_mock_render=pre_mock_render):
+
+        # main/base/single_column.html
+        patterns = [
+            u'FROM "accounts_profile" WHERE "accounts_profile"."user_id" = %s',
+            squeeze(u"""
+                FROM "mail_message"
+                INNER JOIN "inforequests_inforequestemail" ON \( "mail_message"."id" = "inforequests_inforequestemail"."email_id" \)
+                INNER JOIN "inforequests_inforequest" ON \( "inforequests_inforequestemail"."inforequest_id" = "inforequests_inforequest"."id" \)
+                WHERE \("inforequests_inforequestemail"."type" = %s
+                    AND "inforequests_inforequest"."applicant_id" = %s
+                    AND "inforequests_inforequest"."closed" = %s\)
+                """),
+            u'FROM "invitations_invitationsupply" WHERE "invitations_invitationsupply"."user_id" = %s',
+        ]
+
+        # pending_inforequests
+        patterns.extend([
+            squeeze(u"""
+                FROM "inforequests_action"
+                INNER JOIN "inforequests_branch" ON \( "inforequests_action"."branch_id" = "inforequests_branch"."id" \)
+                WHERE "inforequests_branch"."inforequest_id" = %s
+                """) for _ in range(4)
+        ])
+
+        # successful_inforequests
+        patterns.extend([
+            u'FROM "inforequests_action" WHERE "inforequests_action"."branch_id" = %s',
+            u'FROM "inforequests_branch" WHERE "inforequests_branch"."inforequest_id" = %s',
+            squeeze(u"""
+                FROM "inforequests_action"
+                INNER JOIN "inforequests_branch" ON \( "inforequests_action"."branch_id" = "inforequests_branch"."id" \)
+                WHERE "inforequests_branch"."inforequest_id" = %s
+                """),
+            squeeze(u"""
+                FROM "inforequests_action"
+                INNER JOIN "inforequests_branch" ON \( "inforequests_action"."branch_id" = "inforequests_branch"."id" \)
+                WHERE "inforequests_branch"."inforequest_id" = %s
+                """),
+        ] * 3)
+
+        # unsuccessful_inforequests
+        patterns.extend([
+            squeeze(u"""
+                FROM "inforequests_action"
+                INNER JOIN "inforequests_branch" ON \( "inforequests_action"."branch_id" = "inforequests_branch"."id" \)
+                WHERE "inforequests_branch"."inforequest_id" = %s
+                """),
+            squeeze(u"""
+                FROM "inforequests_action"
+                INNER JOIN "inforequests_branch" ON \( "inforequests_action"."branch_id" = "inforequests_branch"."id" \)
+                WHERE "inforequests_branch"."inforequest_id" = %s
+                """),
+        ] * 3)
+        with self.assertQueriesDuringRender(patterns, pre_mock_render=pre_mock_render):
             response = self.client.get(reverse(u'inforequests:mine'))
         self.assertEqual(response.status_code, 200)
