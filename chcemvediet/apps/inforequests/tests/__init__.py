@@ -71,15 +71,8 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
         self.settings_override = override_settings(
             MEDIA_ROOT=self.tempdir.path,
             EMAIL_BACKEND=u'poleno.mail.backend.EmailBackend',
-            PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
             )
         self.settings_override.enable()
-
-        self.user1 = self._create_user()
-        self.user2 = self._create_user()
-        self.obligee1 = self._create_obligee()
-        self.obligee2 = self._create_obligee()
-        self.obligee3 = self._create_obligee()
 
     def _post_teardown(self):
         self.settings_override.disable()

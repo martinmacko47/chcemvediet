@@ -11,6 +11,7 @@ from django.core.files.base import ContentFile
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
+from django.test.utils import override_settings
 
 from poleno.attachments.models import Attachment
 from poleno.mail.models import Message, Recipient
@@ -35,9 +36,14 @@ class CustomTestRunner(DiscoverRunner):
         super(CustomTestRunner, self).setup_test_environment(**kwargs)
         settings.LANGUAGE_CODE = u'en'
         os.environ[u'RECAPTCHA_TESTING'] = u'True'
+        self.settings_override = override_settings(
+            PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
+        )
+        self.settings_override.enable()
 
     def teardown_test_environment(self, **kwargs):
         del os.environ[u'RECAPTCHA_TESTING']
+        self.settings_override.disable()
         super(CustomTestRunner, self).teardown_test_environment(**kwargs)
 
     def run_tests(self, *args, **kwargs):
@@ -62,6 +68,11 @@ class ChcemvedietTestCaseMixin(TestCase):
         self.inforequest = self._create_inforequest()
         self.branch = self._create_branch()
         self.action = self._create_action()
+        self.user1 = self._create_user()
+        self.user2 = self._create_user()
+        self.obligee1 = self._create_obligee()
+        self.obligee2 = self._create_obligee()
+        self.obligee3 = self._create_obligee()
 
 
     def _call_with_defaults(self, func, kwargs, defaults):
