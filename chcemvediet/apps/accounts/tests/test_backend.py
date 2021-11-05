@@ -1,27 +1,37 @@
-import mock
-
-from django.conf.urls import patterns, url
-from django.contrib.auth import get_user
+from django.contrib.auth.decorators import user_passes_test
+from django.conf.urls import patterns, url, RegexURLPattern
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from poleno.utils.http import _local
-
 
 class AdminLoginAsBackendTest(TestCase):
 
-    def mock_view(request):
+    def public_view(request):
+        if isinstance(request.user, User):
+            pass  # force request.user to evaluate
         return HttpResponse()
 
-    def set_admin_login_as_attribute_view(request, id):
+    @user_passes_test(lambda u: u.is_staff)
+    def admin_view(request):
+        if isinstance(request.user, User):
+            pass
+        return HttpResponse()
+
+    @user_passes_test(lambda u: u.is_staff)
+    def set_admin_login_as_attribute_admin_view(request, id):
         request.session[u'admin_login_as'] = id
+        if isinstance(request.user, User):
+            pass
         return HttpResponse()
 
     urls = tuple(patterns(u'',
-        url(r'^$', mock_view),
-        url(r'^(.+)/login-as/$', set_admin_login_as_attribute_view),
+            url(r'^$', public_view),
+            url(r'admin/', ([
+                    RegexURLPattern(r'^$', admin_view),
+                    RegexURLPattern(r'^(\d+)/login-as/$', set_admin_login_as_attribute_admin_view),
+            ], None, u'admin')),
     ))
 
     def create_users(self):
@@ -48,53 +58,50 @@ class AdminLoginAsBackendTest(TestCase):
         self.settings_override.disable()
 
 
-    def test_get_user_returns_anonymous_user(self):
+    def test_public_route_uses_anonymous_user_if_user_is_not_logged_in(self):
         response = self.client.get(u'/')
-        request = response.wsgi_request
-        user = get_user(request)
-        self.assertIsNotNone(user)
-        self.assertTrue(user.is_anonymous())
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user.is_anonymous())
 
-    def test_get_user_returns_logged_non_admin_user(self):
-        self.assertTrue(self.client.login(
-                username=self.user.username, password=u'test'
-        ))
+    def test_admin_route_uses_anonymous_user_and_fails_if_user_is_not_logged_in(self):
+        response = self.client.get(u'/admin/')
+        self.assertTrue(response.wsgi_request.user.is_anonymous())
+        self.assertEqual(response.status_code, 302)
+
+    def test_public_route_uses_the_user_if_user_is_logged_in(self):
+        self.assertTrue(self.client.login(username=self.user.username, password=u'test'))
         response = self.client.get(u'/')
-        request = response.wsgi_request
-        _local.request = request
-        user = get_user(request)
-        self.assertEqual(user, self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user, self.user)
 
-    def test_get_user_returns_logged_admin_user_on_admin_page(self):
-        with mock.patch(u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend.is_admin_path', return_value=True):
-            self.assertTrue(self.client.login(
-                    username=self.superuser.username, password=u'test'
-            ))
-            response = self.client.get(u'/')
-            request = response.wsgi_request
-            _local.request = request
-            user = get_user(request)
-            self.assertEqual(user, self.superuser)
+    def test_admin_route_uses_the_user_and_fails_if_user_is_logged_in(self):
+        self.assertTrue(self.client.login(username=self.user.username, password=u'test'))
+        response = self.client.get(u'/admin/')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.wsgi_request.user, self.user)
 
-    def test_get_user_returns_logged_admin_user_if_admin_login_as_attribute_is_not_set(self):
-        with mock.patch(u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend.is_admin_path', return_value=False):
-            self.assertTrue(self.client.login(
-                    username=self.superuser.username, password=u'test'
-            ))
-            response = self.client.get(u'/')
-            request = response.wsgi_request
-            _local.request = request
-            user = get_user(request)
-            self.assertEqual(user, self.superuser)
+    def test_public_route_uses_the_admin_if_admin_logged_in(self):
+        self.assertTrue(self.client.login(username=self.superuser.username, password=u'test'))
+        response = self.client.get(u'/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user, self.superuser)
 
-    def test_get_user_returns_selected_user_if_admin_login_as_attribute_is_set(self):
-        with mock.patch(u'chcemvediet.apps.accounts.backends.AdminLoginAsBackend.is_admin_path', return_value=False):
-            self.assertTrue(self.client.login(
-                    username=self.superuser.username, password=u'test'
-            ))
-            self.client.get(u'/{}/login-as/'.format(self.user.pk))
-            response = self.client.get(u'/')
-            request = response.wsgi_request
-            _local.request = request
-            user = get_user(request)
-            self.assertEqual(user, self.user)
+    def test_admin_route_uses_the_admin_if_admin_logged_in(self):
+        self.assertTrue(self.client.login(username=self.superuser.username, password=u'test'))
+        response = self.client.get(u'/admin/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user, self.superuser)
+
+    def test_public_route_uses_the_user_if_admin_logged_in_as_another_user(self):
+        self.assertTrue(self.client.login(username=self.superuser.username, password=u'test'))
+        self.client.get(u'/admin/{}/login-as/'.format(self.user.pk))
+        response = self.client.get(u'/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user, self.user)
+
+    def test_admin_route_uses_the_admin_if_admin_logged_in_as_another_user(self):
+        self.assertTrue(self.client.login(username=self.superuser.username, password=u'test'))
+        self.client.get(u'/admin/{}/login-as/'.format(self.user.pk))
+        response = self.client.get(u'/admin/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user, self.superuser)

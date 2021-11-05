@@ -49,7 +49,7 @@ class ProfileAdmin(admin.ModelAdmin):
                 ),
             decorate(
                 lambda o: admin_obj_format(o, u'Log in', link=u'login_as'),
-                short_description=u'Admin Login',
+                short_description=u'Login As',
                 ),
             ]
     list_filter = [
@@ -95,6 +95,6 @@ class ProfileAdmin(admin.ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
         login_as_view = self.admin_site.admin_view(self.login_as_view)
         urls = patterns('',
-                url(r'^(.+)/login-as/$', login_as_view, name=u'{}_{}_login_as'.format(*info)),
+                url(r'^(\d+)/login-as/$', login_as_view, name=u'{}_{}_login_as'.format(*info)),
                 )
         return urls + super(ProfileAdmin, self).get_urls()
