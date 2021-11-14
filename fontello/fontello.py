@@ -23,12 +23,14 @@ if os.path.exists(BACKUP_CONFIG) and filecmp.cmp(SOURCE_CONFIG, BACKUP_CONFIG):
 
 print(u'Fontello: Uploading config.json...')
 with open(SOURCE_CONFIG) as config:
-    response = requests.post(FONTELLO_HOST, files=dict(config=config))
+    # TODO: Remove `verify=False` after we upgrade
+    response = requests.post(FONTELLO_HOST, files=dict(config=config), verify=False)
 response.raise_for_status()
 session = response.text
 
 print(u'Fontello: Downloading fonts...')
-response = requests.get(u'{}/{}/get'.format(FONTELLO_HOST, session))
+# TODO: Remove `verify=False` after we upgrade
+response = requests.get(u'{}/{}/get'.format(FONTELLO_HOST, session), verify=False)
 response.raise_for_status()
 zipped = StringIO.StringIO(response.content)
 
