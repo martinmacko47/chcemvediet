@@ -38,7 +38,6 @@ class AttachmentsFieldTest(TestCase):
 
         self.settings_override = override_settings(
             MEDIA_ROOT=self.tempdir.path,
-            PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
             )
         self.settings_override.enable()
 

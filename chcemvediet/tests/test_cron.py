@@ -3,7 +3,6 @@
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from poleno.timewarp import timewarp
 from poleno.utils.date import utc_datetime_from_local
@@ -20,13 +19,8 @@ class ClearExpiredSessionsCronjobTest(TestCase):
         super(ClearExpiredSessionsCronjobTest, self)._pre_setup()
         timewarp.enable()
         timewarp.reset()
-        self.settings_override = override_settings(
-            PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
-            )
-        self.settings_override.enable()
 
     def _post_teardown(self):
-        self.settings_override.disable()
         timewarp.reset()
         super(ClearExpiredSessionsCronjobTest, self)._post_teardown()
 

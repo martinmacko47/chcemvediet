@@ -5,7 +5,6 @@ import datetime
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from poleno.utils.urls import reverse
 
@@ -21,19 +20,11 @@ class TimewarpAdminTest(TestCase):
     def setUp(self):
         timewarp.enable()
         timewarp.reset()
-
-        self.settings_override = override_settings(
-            PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
-            )
-        self.settings_override.enable()
-
         self.admin = User.objects.create_superuser(username=u'admin', email=u'admin@example.com', password=u'top_secret')
         self.client.login(username=u'admin', password=u'top_secret')
 
     def tearDown(self):
         timewarp.reset()
-
-        self.settings_override.disable()
 
 
     def _parse_dt(self, value):

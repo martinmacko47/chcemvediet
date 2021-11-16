@@ -105,8 +105,8 @@ class MineViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                 WHERE "inforequests_branch"."inforequest_id" = %s
                 ORDER BY "inforequests_action"."created" DESC, "inforequests_action"."id" DESC
                 LIMIT 1
-                """) for _ in range(4)
-        ]
+                """)
+        ] * 4
         patterns_successful_inforequests = [
             squeeze(u"""
                 FROM "inforequests_action" WHERE "inforequests_action"."branch_id" = %s

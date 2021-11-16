@@ -1,18 +1,13 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import functools
-import mock
-
 from django.contrib.auth.models import User
 from django.test import TestCase
 
 from poleno.utils.test import ViewTestCaseMixin
 from poleno.utils.urls import reverse
 
-from . import AccountsTestCaseMixin
 
-
-class ProfileViewTest(AccountsTestCaseMixin, ViewTestCaseMixin, TestCase):
+class ProfileViewTest(ViewTestCaseMixin, TestCase):
     u"""
     Tests ``profile()`` view registered as "accounts:profile".
     """
