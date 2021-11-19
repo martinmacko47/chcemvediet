@@ -84,8 +84,8 @@ MIDDLEWARE_CLASSES = (
     )
 
 AUTHENTICATION_BACKENDS = (
-    u'chcemvediet.apps.accounts.backends.DjangoModelBackendWithAdminLoginAs',
-    u'chcemvediet.apps.accounts.backends.AllauthAuthenticationBackendWithAdminLoginAs',
+    u'poleno.utils.backends.DjangoModelBackendWithAdminLoginAs',
+    u'poleno.utils.backends.AllauthAuthenticationBackendWithAdminLoginAs',
     )
 
 TEMPLATE_LOADERS = (
