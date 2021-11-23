@@ -108,11 +108,10 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _login_user(self, user=None, password=u'default_testing_secret'):
         if user is None:
             user = self.user
-        if not self.client.login(username=user.username, password=password):
-            raise Exception(
-                    u'The provided credentials are incorrect:\nusername: {} password: {}.'.format(
-                    user.username, password
-                    ))
+        logged_in = self.client.login(username=user.username, password=password)
+        self.assertTrue(logged_in, u'The provided credentials are incorrect:\nusername: {} password: {}.'.format(
+                user.username, password
+                ))
 
     def _logout_user(self):
         self.client.logout()
