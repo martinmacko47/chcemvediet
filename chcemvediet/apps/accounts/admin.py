@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 from poleno.utils.admin_login_as import AdminLoginAsAdminMixin
@@ -10,6 +12,17 @@ from poleno.utils.misc import decorate
 
 from .models import Profile
 
+
+admin.site.unregister(User)
+@admin.register(User, site=admin.site)
+class UserAdmin(AdminLoginAsAdminMixin, DjangoUserAdmin):
+    list_display = DjangoUserAdmin.list_display + (
+            decorate(
+                lambda o: admin_obj_format(o, u'Log in', link=u'login_as'),
+                short_description=u'Login As',
+                ),
+            )
+    LOGIN_AS_REDIRECT_VIEWNAME = u'inforequests:mine'
 
 class ProfileAdminForm(forms.ModelForm):
 
@@ -46,7 +59,7 @@ class ProfileAdmin(AdminLoginAsAdminMixin, admin.ModelAdmin):
                 admin_order_field=u'undecided_emails_count',
                 ),
             decorate(
-                lambda o: admin_obj_format(o, u'Log in', link=u'login_as'),
+                lambda o: admin_obj_format(o.user, u'Log in', link=u'login_as'),
                 short_description=u'Login As',
                 ),
             ]
