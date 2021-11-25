@@ -1,14 +1,12 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
 from django import forms
-from django.conf.urls import patterns, url
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect
 
+from poleno.utils.admin_login_as import AdminLoginAsAdminMixin
 from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
 from poleno.utils.misc import decorate
-from poleno.utils.urls import reverse
 
 from .models import Profile
 
@@ -27,7 +25,7 @@ class ProfileAdminForm(forms.ModelForm):
         return custom_anonymized_strings
 
 @admin.register(Profile, site=admin.site)
-class ProfileAdmin(admin.ModelAdmin):
+class ProfileAdmin(AdminLoginAsAdminMixin, admin.ModelAdmin):
     form = ProfileAdminForm
     date_hierarchy = None
     list_display = [
@@ -80,21 +78,10 @@ class ProfileAdmin(admin.ModelAdmin):
             ]
     inlines = [
             ]
+    LOGIN_AS_REDIRECT_VIEWNAME = u'inforequests:mine'
 
     def get_queryset(self, request):
         queryset = super(ProfileAdmin, self).get_queryset(request)
         queryset = queryset.select_related(u'user')
         queryset = queryset.select_undecided_emails_count()
         return queryset
-
-    def login_as_view(self, request, obj_pk):
-        request.session[u'admin_login_as'] = obj_pk
-        return HttpResponseRedirect(reverse(u'inforequests:mine'))
-
-    def get_urls(self):
-        info = self.model._meta.app_label, self.model._meta.model_name
-        login_as_view = self.admin_site.admin_view(self.login_as_view)
-        urls = patterns('',
-                url(r'^(\d+)/login-as/$', login_as_view, name=u'{}_{}_login_as'.format(*info)),
-                )
-        return urls + super(ProfileAdmin, self).get_urls()

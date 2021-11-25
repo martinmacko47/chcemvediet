@@ -48,7 +48,7 @@ class AdminLoginAsBackendMixinTest(TestCase):
 
     def setUp(self):
         self.settings_override = override_settings(
-            AUTHENTICATION_BACKENDS=(u'poleno.utils.backends.AdminLoginAsBackendMixin',),
+            AUTHENTICATION_BACKENDS=(u'poleno.utils.admin_login_as.AdminLoginAsBackendMixin',),
             PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
         )
         self.settings_override.enable()
