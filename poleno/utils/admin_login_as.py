@@ -58,12 +58,12 @@ class AdminLoginAsAdminMixin(admin.ModelAdmin):
                         lambda o: admin_obj_format(o, u'Log in', link=u'login_as'),
                         ),
                     ]
-            LOGIN_AS_REDIRECT_VIEWNAME = u'application:viewname'
+            login_as_redirect_viewname = u'application:viewname'
             ...
     """
     def login_as_view(self, request, obj_pk):
         request.session[u'admin_login_as'] = obj_pk
-        return HttpResponseRedirect(reverse(self.LOGIN_AS_REDIRECT_VIEWNAME))
+        return HttpResponseRedirect(reverse(self.login_as_redirect_viewname))
 
     def get_urls(self):
         info = self.model._meta.app_label, self.model._meta.model_name

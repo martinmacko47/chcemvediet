@@ -22,7 +22,7 @@ class UserAdmin(AdminLoginAsAdminMixin, DjangoUserAdmin):
                 short_description=u'Login As',
                 ),
             )
-    LOGIN_AS_REDIRECT_VIEWNAME = u'inforequests:mine'
+    login_as_redirect_viewname = u'inforequests:mine'
 
 class ProfileAdminForm(forms.ModelForm):
 
@@ -38,7 +38,7 @@ class ProfileAdminForm(forms.ModelForm):
         return custom_anonymized_strings
 
 @admin.register(Profile, site=admin.site)
-class ProfileAdmin(AdminLoginAsAdminMixin, admin.ModelAdmin):
+class ProfileAdmin(admin.ModelAdmin):
     form = ProfileAdminForm
     date_hierarchy = None
     list_display = [
@@ -91,7 +91,7 @@ class ProfileAdmin(AdminLoginAsAdminMixin, admin.ModelAdmin):
             ]
     inlines = [
             ]
-    LOGIN_AS_REDIRECT_VIEWNAME = u'inforequests:mine'
+    login_as_redirect_viewname = u'inforequests:mine'
 
     def get_queryset(self, request):
         queryset = super(ProfileAdmin, self).get_queryset(request)
