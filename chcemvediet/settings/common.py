@@ -219,7 +219,7 @@ ASSETS = (
     )
 
 # Django-allauth settings
-ACCOUNT_ADAPTER = u'poleno.invitations.adapters.InvitationsAdapter'
+ACCOUNT_ADAPTER = u'chcemvediet.adapters.AccountAdapter'
 ACCOUNT_AUTHENTICATION_METHOD = u'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = u'optional'
