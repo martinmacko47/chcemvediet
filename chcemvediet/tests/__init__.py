@@ -27,6 +27,7 @@ class CustomTestRunner(DiscoverRunner):
      -- Disabled logging while testing.
         Source: http://stackoverflow.com/questions/5255657/how-can-i-disable-logging-while-running-unit-tests-in-python-django
      -- Forced language code 'en'
+     -- Used MD5 password hasher, it's much faster then the production hasher.
      -- Mocked google recaptcha.
         Source: https://pypi.org/project/django-recaptcha/1.0.6/#unit-testing
     """
@@ -34,6 +35,7 @@ class CustomTestRunner(DiscoverRunner):
     def setup_test_environment(self, **kwargs):
         super(CustomTestRunner, self).setup_test_environment(**kwargs)
         settings.LANGUAGE_CODE = u'en'
+        settings.PASSWORD_HASHERS = [u'django.contrib.auth.hashers.MD5PasswordHasher']
         os.environ[u'RECAPTCHA_TESTING'] = u'True'
 
     def teardown_test_environment(self, **kwargs):
@@ -50,6 +52,8 @@ class ChcemvedietTestCaseMixin(TestCase):
         super(ChcemvedietTestCaseMixin, self)._pre_setup()
         self.counter = itertools.count()
         self.user = self._create_user()
+        self.user1 = self._create_user()
+        self.user2 = self._create_user()
         self.message = self._create_message()
         self.recipient = self._create_recipient()
         self.region = self._create_region()
@@ -57,6 +61,9 @@ class ChcemvedietTestCaseMixin(TestCase):
         self.municipality = self._create_municipality()
         self.neighbourhood = self._create_neighbourhood()
         self.obligee = self._create_obligee()
+        self.obligee1 = self._create_obligee()
+        self.obligee2 = self._create_obligee()
+        self.obligee3 = self._create_obligee()
         self.tag = self._create_obligee_tag()
         self.group = self._create_obligee_group()
         self.inforequest = self._create_inforequest()
@@ -101,7 +108,10 @@ class ChcemvedietTestCaseMixin(TestCase):
     def _login_user(self, user=None, password=u'default_testing_secret'):
         if user is None:
             user = self.user
-        self.client.login(username=user.username, password=password)
+        logged_in = self.client.login(username=user.username, password=password)
+        self.assertTrue(logged_in, u'The provided credentials are incorrect:\nusername: {} password: {}.'.format(
+                user.username, password
+                ))
 
     def _logout_user(self):
         self.client.logout()

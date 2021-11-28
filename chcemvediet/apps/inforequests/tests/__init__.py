@@ -39,15 +39,16 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
             return res
         def mock_render_to_string(*args, **kwargs):
             if pre_mock_render_to_string: # pragma: no cover
-                self.pre_mock_render_to_string(*args, **kwargs)
+                pre_mock_render_to_string(*args, **kwargs)
             with CaptureQueriesContext(connection) as captured:
                 res = render_to_string(*args, **kwargs)
             queries.append(captured)
             return res
 
-        with mock.patch(u'chcemvediet.apps.inforequests.views.render', mock_render):
-            with mock.patch(u'chcemvediet.apps.inforequests.views.render_to_string', mock_render_to_string):
-                yield
+        with mock.patch(u'chcemvediet.apps.inforequests.views.inforequest.render', mock_render):
+            with mock.patch(u'chcemvediet.apps.inforequests.views.shortcuts.render', mock_render):
+                with mock.patch(u'chcemvediet.apps.inforequests.views.shortcuts.render_to_string', mock_render_to_string):
+                    yield
 
         self.assertEqual(len(queries), len(patterns), u'%d renders executed, %d expected' % (len(queries), len(patterns)))
         for render_queries, render_patterns in zip(queries, patterns):
@@ -70,15 +71,8 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
         self.settings_override = override_settings(
             MEDIA_ROOT=self.tempdir.path,
             EMAIL_BACKEND=u'poleno.mail.backend.EmailBackend',
-            PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
             )
         self.settings_override.enable()
-
-        self.user1 = self._create_user()
-        self.user2 = self._create_user()
-        self.obligee1 = self._create_obligee()
-        self.obligee2 = self._create_obligee()
-        self.obligee3 = self._create_obligee()
 
     def _post_teardown(self):
         self.settings_override.disable()

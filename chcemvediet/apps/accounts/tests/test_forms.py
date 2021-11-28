@@ -1,17 +1,13 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
-import os
-
 import lxml.html
 from django.contrib.auth.models import User
 from django.test import TestCase
 
 from poleno.utils.urls import reverse
 
-from . import AccountsTestCaseMixin
 
-
-class LoginFormTest(AccountsTestCaseMixin, TestCase):
+class LoginFormTest(TestCase):
     u"""
     Tests ``allauth`` ``account_login`` view using ``LoginForm`` form registered as
     "account_login". Does not check ``account_login`` functionality, only checks functionality
@@ -51,7 +47,7 @@ class LoginFormTest(AccountsTestCaseMixin, TestCase):
         response = self.client.post(reverse(u'account_login'), data, follow=True)
         self.assertFormError(response, u'form', u'recaptcha', u'This field is required.')
 
-class SignupFormTest(AccountsTestCaseMixin, TestCase):
+class SignupFormTest(TestCase):
     u"""
     Tests ``allauth`` ``account_signup`` view using ``SignupForm`` form registered as
     "account_signup". Does not check ``account_signup`` functionality, only checks functionality
@@ -207,7 +203,7 @@ class SignupFormTest(AccountsTestCaseMixin, TestCase):
         response = self.client.post(reverse(u'account_signup'), data, follow=True)
         self.assertFormError(response, u'form', u'recaptcha', u'This field is required.')
 
-class ResetPasswordFormTest(AccountsTestCaseMixin, TestCase):
+class ResetPasswordFormTest(TestCase):
     u"""
     Tests ``allauth`` ``password_reset`` view using ``ResetPasswordForm`` form registered as
     "password_reset". Does not check ``password_reset`` functionality, only checks functionality

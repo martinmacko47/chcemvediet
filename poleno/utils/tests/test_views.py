@@ -66,7 +66,6 @@ class LoginRequiredTest(TestCase):
 
     def setUp(self):
         self.settings_override = override_settings(
-            PASSWORD_HASHERS=(u'django.contrib.auth.hashers.MD5PasswordHasher',),
             TEMPLATE_LOADERS=(u'django.template.loaders.filesystem.Loader',),
         )
         self.settings_override.enable()
