@@ -1,6 +1,9 @@
 # vim: expandtab
 # -*- coding: utf-8 -*-
+from django.contrib.admin.actions import delete_selected
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import NoReverseMatch
+from django.db import transaction
 from django.utils.html import format_html
 from django.contrib import admin
 
@@ -58,3 +61,43 @@ class ReadOnlyAdminInlineMixin(admin.options.InlineModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+class BulkDeleteAdminMixin(admin.ModelAdmin):
+
+    actions = admin.ModelAdmin.actions + [
+            u'delete_selected',
+            ]
+
+    def delete_warnings(self, objs):
+        return []
+
+    def delete_constraints(self, objs):
+        return []
+
+    def render_delete_form(self, request, context):
+        obj = context[u'object']
+        context[u'delete_warnings'] = self.delete_warnings([obj])
+        context[u'delete_constraints'] = self.delete_constraints([obj])
+        return super(BulkDeleteAdminMixin, self).render_delete_form(request, context)
+
+    @transaction.atomic
+    def delete_selected(self, request, queryset):
+        if request.POST.get(u'post'):
+            if self.delete_constraints(queryset):
+                raise PermissionDenied
+
+        template_response = delete_selected(self, request, queryset)
+
+        if request.POST.get(u'post'):
+            return None
+
+        template_response.context_data.update({
+            u'delete_warnings': self.delete_warnings(queryset),
+            u'delete_constraints': self.delete_constraints(queryset),
+        })
+        return template_response
+
+    def delete_model(self, request, obj):
+        if self.delete_constraints([obj]):
+            raise PermissionDenied
+        return super(BulkDeleteAdminMixin, self).delete_model(request, obj)
