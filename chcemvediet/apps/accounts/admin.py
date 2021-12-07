@@ -91,7 +91,6 @@ class ProfileAdmin(admin.ModelAdmin):
             ]
     inlines = [
             ]
-    login_as_redirect_viewname = u'inforequests:mine'
 
     def get_queryset(self, request):
         queryset = super(ProfileAdmin, self).get_queryset(request)
