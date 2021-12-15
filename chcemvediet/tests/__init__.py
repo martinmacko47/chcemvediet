@@ -15,6 +15,7 @@ from django.test.runner import DiscoverRunner
 from poleno.attachments.models import Attachment
 from poleno.mail.models import Message, Recipient
 from poleno.utils.date import local_today, utc_now
+from poleno.utils.misc import squeeze
 
 from ..apps.geounits.models import Region, District, Municipality, Neighbourhood
 from ..apps.inforequests.models import Branch, Inforequest, InforequestEmail, InforequestDraft, Action
@@ -47,6 +48,21 @@ class CustomTestRunner(DiscoverRunner):
         return super(CustomTestRunner, self).run_tests(*args, **kwargs)
 
 class ChcemvedietTestCaseMixin(TestCase):
+
+    def __init__(self, methodName):
+        super(ChcemvedietTestCaseMixin, self).__init__(methodName)
+        self.patterns_single_column = [
+            u'FROM "accounts_profile" WHERE "accounts_profile"."user_id" = %s LIMIT 21',
+            squeeze(u"""
+                SELECT COUNT\(\*\) FROM "mail_message"
+                INNER JOIN "inforequests_inforequestemail" ON \( "mail_message"."id" = "inforequests_inforequestemail"."email_id" \)
+                INNER JOIN "inforequests_inforequest" ON \( "inforequests_inforequestemail"."inforequest_id" = "inforequests_inforequest"."id" \)
+                WHERE \("inforequests_inforequestemail"."type" = %s
+                    AND "inforequests_inforequest"."applicant_id" = %s
+                    AND "inforequests_inforequest"."closed" = %s\)
+                """),
+            u'FROM "invitations_invitationsupply" WHERE "invitations_invitationsupply"."user_id" = %s LIMIT 21',
+        ]
 
     def _pre_setup(self):
         super(ChcemvedietTestCaseMixin, self)._pre_setup()

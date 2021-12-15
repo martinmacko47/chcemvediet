@@ -250,7 +250,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         self.assertEqual(inforequest.slug, ugettext(u'inforequests:Inforequest:fallback_slug'))
 
     def test_prefetch_branches_staticmethod(self):
-        inforequest, branch1, actions = self._create_inforequest_scenario(u'advancement')
+        inforequest, branch1, actions = self._create_inforequest_scenario(self.user1, u'advancement')
         _, (_, ((branch2, _),)) = actions
 
         # Without arguments
@@ -288,7 +288,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
             self.assertEqual(inforequest.branches, [branch1, branch2])
 
     def test_prefetch_main_branch_staticmethod(self):
-        inforequest, branch, _ = self._create_inforequest_scenario(u'advancement')
+        inforequest, branch, _ = self._create_inforequest_scenario(self.user1, u'advancement')
 
         # Without arguments
         with self.assertNumQueries(2):
@@ -372,7 +372,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
         self.assertFalse(inforequest.undecided_emails_set.all().ordered)
 
     def test_prefetch_undecided_emails_staticmethod(self):
-        inforequest, _, _ = self._create_inforequest_scenario()
+        inforequest, _, _ = self._create_inforequest_scenario(self.user1)
         _, rel1 = self._create_inforequest_email(inforequest=inforequest, reltype=InforequestEmail.TYPES.UNKNOWN)
         _, rel2 = self._create_inforequest_email(inforequest=inforequest, reltype=InforequestEmail.TYPES.UNRELATED)
         _, rel3 = self._create_inforequest_email(inforequest=inforequest, reltype=InforequestEmail.TYPES.UNDECIDED)
@@ -661,7 +661,7 @@ class InforequestTest(InforequestsTestCaseMixin, TestCase):
             self.assertIsNone(inforequest.oldest_undecided_email)
 
     def test_prefetch_newest_undecided_email_staticmethod(self):
-        inforequest, _, _ = self._create_inforequest_scenario()
+        inforequest, _, _ = self._create_inforequest_scenario(self.user1)
         _, rel1 = self._create_inforequest_email(inforequest=inforequest, reltype=InforequestEmail.TYPES.UNKNOWN)
         _, rel2 = self._create_inforequest_email(inforequest=inforequest, reltype=InforequestEmail.TYPES.UNRELATED)
         _, rel3 = self._create_inforequest_email(inforequest=inforequest, reltype=InforequestEmail.TYPES.UNDECIDED)
