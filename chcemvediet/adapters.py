@@ -1,10 +1,7 @@
 from allauth.account.adapter import DefaultAccountAdapter
-from django.contrib.auth import get_backends
 
 from poleno.invitations.adapters import InvitationsAdapter
 
-
-backend = get_backends()[0]
 
 class AccountAdapter(InvitationsAdapter, DefaultAccountAdapter):
     def login(self, request, user):
