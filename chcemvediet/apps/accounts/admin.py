@@ -2,13 +2,27 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from poleno.utils.misc import decorate
+from poleno.utils.admin_login_as import AdminLoginAsAdminMixin
 from poleno.utils.admin import simple_list_filter_factory, admin_obj_format
+from poleno.utils.misc import decorate
 
 from .models import Profile
 
+
+admin.site.unregister(User)
+@admin.register(User, site=admin.site)
+class UserAdmin(AdminLoginAsAdminMixin, DjangoUserAdmin):
+    list_display = DjangoUserAdmin.list_display + (
+            decorate(
+                lambda o: admin_obj_format(o, u'Log in', link=u'login_as'),
+                short_description=u'Login As',
+                ),
+            )
+    login_as_redirect_viewname = u'inforequests:mine'
 
 class ProfileAdminForm(forms.ModelForm):
 
@@ -43,6 +57,10 @@ class ProfileAdmin(admin.ModelAdmin):
                 lambda o: o.undecided_emails_count,
                 short_description=u'Undecided E-mails',
                 admin_order_field=u'undecided_emails_count',
+                ),
+            decorate(
+                lambda o: admin_obj_format(o.user, u'Log in', link=u'login_as'),
+                short_description=u'Login As',
                 ),
             ]
     list_filter = [
