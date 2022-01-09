@@ -438,7 +438,6 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
             context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
 
-    @decorate(short_description=u'Delete selected actions')
     @transaction.atomic
     def delete_selected(self, request, queryset):
         snoozed_actions = []

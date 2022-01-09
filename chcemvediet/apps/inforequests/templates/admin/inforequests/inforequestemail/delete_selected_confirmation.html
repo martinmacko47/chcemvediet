@@ -1,0 +1,11 @@
+{% extends "admin/delete_selected_confirmation.html" %}
+{% load amend before from poleno.amend %}
+
+{% block content %}
+  {% amend %}
+    {{ block.super }}
+    {% before path=".//form//input[@type='submit']" %}
+      {% include "utils/admin/bulk_delete_mixin.html" %}
+    {% endbefore %}
+  {% endamend %}
+{% endblock %}
