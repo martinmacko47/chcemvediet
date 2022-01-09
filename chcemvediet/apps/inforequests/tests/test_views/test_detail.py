@@ -9,7 +9,7 @@ from poleno.utils.test import ViewTestCaseMixin
 from poleno.utils.urls import reverse
 
 from .. import InforequestsTestCaseMixin
-from .. import render_query_pattern
+from .. import render_query_patterns
 
 
 class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
@@ -81,7 +81,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
     def test_inforequest_with_single_branch_related_models_are_prefetched_before_render(self):
         inforequest, _, _ = self._create_inforequest_scenario(u'confirmation', u'reversion')
         self._login_user()
-        with self.assertQueriesDuringRender(render_query_pattern.base):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.get(reverse(u'inforequests:detail', args=(inforequest.slug, inforequest.pk)))
 
     def test_inforequest_with_multiple_branches(self):
@@ -126,7 +126,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                     [u'confirmation', (u'advancement', [u'refusal'])]),
                 )
         self._login_user()
-        with self.assertQueriesDuringRender(render_query_pattern.base):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.get(reverse(u'inforequests:detail', args=(inforequest.slug, inforequest.pk)))
 
     def test_inforequest_with_undecided_email(self):
@@ -150,7 +150,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self._create_inforequest_email(inforequest=inforequest)
 
         self._login_user()
-        with self.assertQueriesDuringRender(render_query_pattern.base):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.get(reverse(u'inforequests:detail', args=(inforequest.slug, inforequest.pk)))
 
     def test_inforequest_without_undecided_email(self):
@@ -166,7 +166,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
     def test_inforequest_without_undecided_email_related_models_are_prefetched_before_render(self):
         inforequest, _, _ = self._create_inforequest_scenario()
         self._login_user()
-        with self.assertQueriesDuringRender(render_query_pattern.base):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.get(reverse(u'inforequests:detail', args=(inforequest.slug, inforequest.pk)))
 
     def test_closed_inforequest_with_undecided_email(self):
@@ -198,10 +198,10 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self._create_inforequest_email(inforequest=inforequest)
 
         self._login_user()
-        with self.assertQueriesDuringRender(render_query_pattern.base):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.get(reverse(u'inforequests:detail', args=(inforequest.slug, inforequest.pk)))
 
-    def test_inforequest_with_undecided_email_can_applicant_snooze(self):
+    def test_inforequest_with_undecided_email_cannot_applicant_snooze(self):
         inforequest, _, _ = self._create_inforequest_scenario(
                 (u'request', dict(legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05')))
         )
@@ -224,7 +224,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertTrue(inforequest.last_action.can_applicant_snooze)
         self.assertContains(response, u'type="button" action="{}"'.format(snooze_url))
 
-    def test_closed_inforequest_without_undecided_email_can_applicant_snooze(self):
+    def test_closed_inforequest_without_undecided_email_cannot_applicant_snooze(self):
         inforequest, _, _ = self._create_inforequest_scenario(dict(closed=True),
                 (u'request', dict(legal_date=naive_date(u'2010-10-05'), delivered_date=naive_date(u'2010-10-05')))
         )
@@ -235,7 +235,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertTrue(inforequest.last_action.can_applicant_snooze)
         self.assertNotContains(response, u'type="button" action="{}"'.format(snooze_url))
 
-    def test_inforequest_with_undecided_email_applicant_can_add_clarification_response(self):
+    def test_inforequest_with_undecided_email_applicant_cannot_add_clarification_response(self):
         inforequest, _, _ = self._create_inforequest_scenario(u'clarification_request')
         self._create_inforequest_email(inforequest=inforequest)
         self._login_user()
@@ -252,7 +252,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertTrue(inforequest.can_add_clarification_response)
         self.assertContains(response, u'href="{}"'.format(clarification_response_url))
 
-    def test_closed_inforequest_without_undecided_email_applicant_can_add_clarification_response(self):
+    def test_closed_inforequest_without_undecided_email_applicant_cannot_add_clarification_response(self):
         inforequest, _, _ = self._create_inforequest_scenario(dict(closed=True), u'clarification_request')
         self._login_user()
         response = self.client.get(reverse(u'inforequests:detail', args=(inforequest.slug, inforequest.pk)))
@@ -260,7 +260,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertTrue(inforequest.can_add_clarification_response)
         self.assertNotContains(response, u'href="{}"'.format(clarification_response_url))
 
-    def test_inforequest_with_undecided_email_applicant_can_add_appeal(self):
+    def test_inforequest_with_undecided_email_applicant_cannot_add_appeal(self):
         inforequest, _, _ = self._create_inforequest_scenario(u'advancement')
         self._create_inforequest_email(inforequest=inforequest)
         self._login_user()
@@ -277,7 +277,7 @@ class DetailViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertTrue(inforequest.can_add_appeal)
         self.assertContains(response, u'href="{}"'.format(appeal_url))
 
-    def test_closed_inforequest_without_undecided_email_applicant_can_add_appeal(self):
+    def test_closed_inforequest_without_undecided_email_applicant_cannot_add_appeal(self):
         inforequest, _, _ = self._create_inforequest_scenario(dict(closed=True), u'advancement')
         self._login_user()
         response = self.client.get(reverse(u'inforequests:detail', args=(inforequest.slug, inforequest.pk)))

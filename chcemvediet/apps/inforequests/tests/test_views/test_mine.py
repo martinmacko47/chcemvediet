@@ -6,7 +6,7 @@ from poleno.utils.misc import squeeze
 from poleno.utils.test import ViewTestCaseMixin
 from poleno.utils.urls import reverse
 
-from .. import render_query_pattern
+from .. import render_query_patterns
 from .. import InforequestsTestCaseMixin
 from ...models import Action
 
@@ -134,7 +134,7 @@ class MineViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                 """),
         ] * 3
         patterns = list(
-                render_query_pattern.base +
+                render_query_patterns.base +
                 patterns_pending_inforequests +
                 patterns_successful_inforequests +
                 patterns_unsuccessful_inforequests
