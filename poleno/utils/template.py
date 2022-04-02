@@ -120,7 +120,7 @@ class AppLoader(FilesystemLoader):
 
 class Library(template.Library):
 
-    def simple_pair_tag(self, func=None, takes_context=None, name=None):
+    def simple_pair_tag(self, func=None, takes_context=None, name=None, lazy_content=None):
 
         def compiler(parser, token, params, varargs, varkw, defaults,
                 name, takes_context, node_class):
@@ -147,17 +147,19 @@ class Library(template.Library):
                     self.args = args
                     self.kwargs = kwargs
 
-                def get_resolved_arguments(self, context):
-                    resolved_args = [var.resolve(context) for var in self.args]
-                    if self.takes_context:
-                        resolved_args = [context] + resolved_args
-                    resolved_args = [self.nodelist.render(context)] + resolved_args
-                    resolved_kwargs = dict((k, v.resolve(context)) for k, v in self.kwargs.items())
-                    return resolved_args, resolved_kwargs
-
                 def render(self, context):
-                    resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
-                    return func(*resolved_args, **resolved_kwargs)
+                    resolved_args = [var.resolve(context) for var in self.args]
+                    resolved_kwargs = dict((k, v.resolve(context)) for k, v in self.kwargs.items())
+
+                    if lazy_content:
+                        content = self.nodelist.render
+                    else:
+                        content = self.nodelist.render(context)
+
+                    if self.takes_context:
+                        return func(content, context, *resolved_args, **resolved_kwargs)
+                    else:
+                        return func(content, *resolved_args, **resolved_kwargs)
 
             params, varargs, varkw, defaults = getargspec(func)
             function_name = (name or getattr(func, u'_decorated_function', func).__name__)

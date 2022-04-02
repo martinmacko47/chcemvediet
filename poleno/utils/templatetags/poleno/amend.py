@@ -29,7 +29,7 @@ def _combine_parts(parent, parts):
     return parent
 
 
-@register.simple_pair_tag(takes_context=True)
+@register.simple_pair_tag(takes_context=True, lazy_content=True)
 def amend(content, context):
     u"""
     Edit a snippet of HTML by parsing it, manipulating its element tree and exporting it back to
@@ -43,15 +43,14 @@ def amend(content, context):
 
         Adds a paragraph at the beginning of each form in `template.html`.
     """
-    if u'_amend' not in context:
-        return content
+    with context.push():
+        context[u'_amend'] = []
 
-    fragment = lxml.html.fragment_fromstring(content, create_parent=u'root')
-    for action in context[u'_amend']:
-        fragment = action(fragment)
+        fragment = lxml.html.fragment_fromstring(content(context), create_parent=u'root')
+        for action in context[u'_amend']:
+            fragment = action(fragment)
 
-    del context[u'_amend']
-    return lxml.html.tostring(fragment)[6:-7] # Strip root tag
+        return lxml.html.tostring(fragment)[6:-7] # Strip root tag
 
 @register.simple_pair_tag(takes_context=True)
 def prepend(content, context, path):
@@ -75,9 +74,6 @@ def prepend(content, context, path):
           <li>bbb</li>
         </ul>
     """
-    if u'_amend' not in context:
-        context[u'_amend'] = []
-
     def action(fragment):
         elements = fragment.findall(path)
         for element in elements:
@@ -87,7 +83,8 @@ def prepend(content, context, path):
             _combine_parts(element, subtree_parts + element_parts)
         return fragment
 
-    context[u'_amend'].append(action)
+    if u'_amend' in context:
+        context[u'_amend'].append(action)
     return u''
 
 @register.simple_pair_tag(takes_context=True)
@@ -112,9 +109,6 @@ def append(content, context, path):
           <li>xxx</li>
         </ul>
     """
-    if u'_amend' not in context:
-        context[u'_amend'] = []
-
     def action(fragment):
         elements = fragment.findall(path)
         for element in elements:
@@ -124,7 +118,8 @@ def append(content, context, path):
             _combine_parts(element, element_parts + subtree_parts)
         return fragment
 
-    context[u'_amend'].append(action)
+    if u'_amend' in context:
+        context[u'_amend'].append(action)
     return u''
 
 @register.simple_pair_tag(takes_context=True)
@@ -151,9 +146,6 @@ def before(content, context, path):
           <li>ccc</li>
         </ul>
     """
-    if u'_amend' not in context:
-        context[u'_amend'] = []
-
     def action(fragment):
         elements = fragment.findall(path)
         for element in elements:
@@ -166,7 +158,8 @@ def before(content, context, path):
                     parent_parts[0:2*index+1] + subtree_parts + parent_parts[2*index+1:])
         return fragment
 
-    context[u'_amend'].append(action)
+    if u'_amend' in context:
+        context[u'_amend'].append(action)
     return u''
 
 @register.simple_pair_tag(takes_context=True)
@@ -193,9 +186,6 @@ def after(content, context, path):
           <li>ccc</li>
         </ul>
     """
-    if u'_amend' not in context:
-        context[u'_amend'] = []
-
     def action(fragment):
         elements = fragment.findall(path)
         for element in elements:
@@ -208,7 +198,8 @@ def after(content, context, path):
                     parent_parts[0:2*index+2] + subtree_parts + parent_parts[2*index+2:])
         return fragment
 
-    context[u'_amend'].append(action)
+    if u'_amend' in context:
+        context[u'_amend'].append(action)
     return u''
 
 @register.simple_tag(takes_context=True)
@@ -233,16 +224,14 @@ def delete(context, path):
           <li>ccc</li>
         </ul>
     """
-    if u'_amend' not in context:
-        context[u'_amend'] = []
-
     def action(fragment):
         elements = fragment.findall(path)
         for element in elements:
             element.drop_tree()
         return fragment
 
-    context[u'_amend'].append(action)
+    if u'_amend' in context:
+        context[u'_amend'].append(action)
     return u''
 
 @register.simple_tag(takes_context=True)
@@ -275,9 +264,6 @@ def set_attributes(context, path, **kwargs):
           <li aaa="1" bbb="2" ccc="0">xxx</li>
         </ul>
     """
-    if u'_amend' not in context:
-        context[u'_amend'] = []
-
     def action(fragment):
         elements = fragment.findall(path)
         for element in elements:
@@ -290,5 +276,6 @@ def set_attributes(context, path, **kwargs):
                     element.set(key, str(value))
         return fragment
 
-    context[u'_amend'].append(action)
+    if u'_amend' in context:
+        context[u'_amend'].append(action)
     return u''
