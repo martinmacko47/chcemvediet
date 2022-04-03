@@ -1,0 +1,9 @@
+{% load prepend from poleno.amend %}
+
+<ul>
+  <li>aaa</li>
+  <li>bbb</li>
+</ul>
+
+{% prepend path=".//ul" %}<li>xxx</li>{% endprepend %}
+{% prepend path=".//li" %}!{% endprepend %}
