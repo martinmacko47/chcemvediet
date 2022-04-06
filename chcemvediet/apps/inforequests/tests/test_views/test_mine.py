@@ -6,6 +6,7 @@ from poleno.utils.misc import squeeze
 from poleno.utils.test import ViewTestCaseMixin
 from poleno.utils.urls import reverse
 
+from .. import render_query_patterns
 from .. import InforequestsTestCaseMixin
 from ...models import Action
 
@@ -85,18 +86,6 @@ class MineViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
             list(context[u'unsuccessful_inforequests'])
 
         self._login_user(self.user1)
-        patterns_single_column = [
-            u'FROM "accounts_profile" WHERE "accounts_profile"."user_id" = %s LIMIT 21',
-            squeeze(u"""
-                SELECT COUNT\(\*\) FROM "mail_message"
-                INNER JOIN "inforequests_inforequestemail" ON \( "mail_message"."id" = "inforequests_inforequestemail"."email_id" \)
-                INNER JOIN "inforequests_inforequest" ON \( "inforequests_inforequestemail"."inforequest_id" = "inforequests_inforequest"."id" \)
-                WHERE \("inforequests_inforequestemail"."type" = %s
-                    AND "inforequests_inforequest"."applicant_id" = %s
-                    AND "inforequests_inforequest"."closed" = %s\)
-                """),
-            u'FROM "invitations_invitationsupply" WHERE "invitations_invitationsupply"."user_id" = %s LIMIT 21',
-        ]
         # TODO: Optimize N+1 queries in #419
         patterns_pending_inforequests = [
             squeeze(u"""
@@ -145,7 +134,7 @@ class MineViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                 """),
         ] * 3
         patterns = list(
-                patterns_single_column +
+                render_query_patterns.base +
                 patterns_pending_inforequests +
                 patterns_successful_inforequests +
                 patterns_unsuccessful_inforequests

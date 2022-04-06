@@ -166,8 +166,8 @@ class InforequestsTestCaseMixin(ChcemvedietTestCaseMixin):
         ``_create_message()`` and <recipient_args> arguments for ``_create_recipient()``.
         """
         args = list(args)
-        applicant = args.pop(0) if args and isinstance(args[0], User) else self.user1
-        obligee = args.pop(0) if args and isinstance(args[0], Obligee) else self.obligee1
+        applicant = args.pop(0) if args and isinstance(args[0], User) else self.user
+        obligee = args.pop(0) if args and isinstance(args[0], Obligee) else self.obligee
         extra = args.pop(0) if args and isinstance(args[0], dict) else {}
         inforequest = Inforequest.objects.create(applicant=applicant, **extra)
         branch, actions = self._create_inforequest_scenario__branch(inforequest, obligee, None, u'request', args)
