@@ -1,14 +1,10 @@
 {% extends "admin/delete_selected_confirmation.html" %}
-{% load amend before after from poleno.amend %}
+{% load amend from poleno.amend %}
 
 {% block content %}
   {% amend %}
     {{ block.super }}
-    {% after path="./ul[last()]" %}
-      {% include "admin/inforequests/mixins/delete_nested_inforequest_email_mixin.html" %}
-    {% endafter %}
-    {% before path=".//form//input[@type='submit']" %}
-      {% include "utils/admin/bulk_delete_mixin.html" %}
-    {% endbefore %}
+    {% include "admin/inforequests/mixins/delete_nested_inforequest_email_mixin.html" %}
+    {% include "utils/admin/bulk_delete_mixin.html" %}
   {% endamend %}
 {% endblock %}
