@@ -3,9 +3,7 @@
 import datetime
 
 from django.contrib import admin
-from django.contrib.admin.actions import delete_selected
 from django.contrib.admin.utils import NestedObjects
-from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
@@ -13,13 +11,13 @@ from django.utils.html import format_html
 from poleno.utils.date import local_today
 from poleno.utils.misc import decorate, squeeze
 from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
-                                ReadOnlyAdminInlineMixin)
+                                ReadOnlyAdminInlineMixin, BulkDeleteAdminMixin)
 from chcemvediet.apps.inforequests.constants import ADMIN_EXTEND_SNOOZE_BY_DAYS
 
 from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
 
 
-class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
+class DeleteNestedInforequestEmailAdminMixin(BulkDeleteAdminMixin, admin.ModelAdmin):
 
     def nested_inforequestemail_queryset(self, objs):
         using = router.db_for_write(self.model)
@@ -54,11 +52,27 @@ class DeleteNestedInforequestEmailAdminMixin(admin.ModelAdmin):
         return super(DeleteNestedInforequestEmailAdminMixin, self).render_delete_form(request,
                                                                                       context)
 
+    @transaction.atomic
+    def delete_selected(self, request, queryset):
+        outbound, inbound = self.nested_inforequestemail_queryset(queryset)
+        template_response = super(DeleteNestedInforequestEmailAdminMixin, self).delete_selected(request, queryset)
+
+        if request.POST.get(u'post'):
+            outbound.delete()
+            inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
+            return None
+
+        template_response.context_data.update({
+            u'outbound': [admin_obj_format(inforequestemail) for inforequestemail in outbound],
+            u'inbound': [admin_obj_format(inforequestemail) for inforequestemail in inbound],
+        })
+        return template_response
+
     def delete_model(self, request, obj):
         outbound, inbound = self.nested_inforequestemail_queryset([obj])
+        super(DeleteNestedInforequestEmailAdminMixin, self).delete_model(request, obj)
         outbound.delete()
         inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
-        super(DeleteNestedInforequestEmailAdminMixin, self).delete_model(request, obj)
 
 class BranchFormSet(BaseInlineFormSet):
     def get_queryset(self):
@@ -216,7 +230,7 @@ class InforequestDraftAdmin(admin.ModelAdmin):
         return queryset
 
 @admin.register(InforequestEmail, site=admin.site)
-class InforequestEmailAdmin(admin.ModelAdmin):
+class InforequestEmailAdmin(BulkDeleteAdminMixin, admin.ModelAdmin):
     date_hierarchy = None
     list_display = [
             u'id',
@@ -253,9 +267,6 @@ class InforequestEmailAdmin(admin.ModelAdmin):
             ]
     inlines = [
             ]
-    actions = [
-            u'delete_selected'
-    ]
 
     def get_queryset(self, request):
         queryset = super(InforequestEmailAdmin, self).get_queryset(request)
@@ -274,32 +285,6 @@ class InforequestEmailAdmin(admin.ModelAdmin):
                             u', '.join([admin_obj_format(action) for action in actions]),
                     )))
         return constraints
-
-    def render_delete_form(self, request, context):
-        context[u'delete_constraints'] = self.delete_constraints([context[u'object']])
-        return super(InforequestEmailAdmin, self).render_delete_form(request, context)
-
-    @decorate(short_description=u'Delete selected inforequestemails')
-    @transaction.atomic
-    def delete_selected(self, request, queryset):
-        if request.POST.get(u'post'):
-            if self.delete_constraints(queryset):
-                raise PermissionDenied
-
-        template_response = delete_selected(self, request, queryset)
-
-        if request.POST.get(u'post'):
-            return None
-
-        template_response.context_data.update({
-            u'delete_constraints': self.delete_constraints(queryset),
-        })
-        return template_response
-
-    def delete_model(self, request, obj):
-        if self.delete_constraints([obj]):
-            raise PermissionDenied
-        return super(InforequestEmailAdmin, self).delete_model(request, obj)
 
 @admin.register(Branch, site=admin.site)
 class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
@@ -350,9 +335,6 @@ class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     inlines = [
             ActionInline,
             ]
-    actions = [
-            u'delete_selected'
-    ]
 
     def get_queryset(self, request):
         queryset = super(BranchAdmin, self).get_queryset(request)
@@ -367,37 +349,6 @@ class BranchAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
             if obj.is_main:
                 constraints.append(format_html(u'{} is main.'.format(admin_obj_format(obj))))
         return constraints
-
-    def render_delete_form(self, request, context):
-        context[u'delete_constraints'] = self.delete_constraints([context[u'object']])
-        return super(BranchAdmin, self).render_delete_form(request, context)
-
-    @decorate(short_description=u'Delete selected branches')
-    @transaction.atomic
-    def delete_selected(self, request, queryset):
-        outbound, inbound = self.nested_inforequestemail_queryset(queryset)
-        if request.POST.get(u'post'):
-            if self.delete_constraints(queryset):
-                raise PermissionDenied
-
-        template_response = delete_selected(self, request, queryset)
-
-        if request.POST.get(u'post'):
-            outbound.delete()
-            inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
-            return None
-
-        template_response.context_data.update({
-            u'outbound': [admin_obj_format(inforequestemail) for inforequestemail in outbound],
-            u'inbound': [admin_obj_format(inforequestemail) for inforequestemail in inbound],
-            u'delete_constraints': self.delete_constraints(queryset),
-        })
-        return template_response
-
-    def delete_model(self, request, obj):
-        if self.delete_constraints([obj]):
-            raise PermissionDenied
-        return super(BranchAdmin, self).delete_model(request, obj)
 
 @admin.register(Action, site=admin.site)
 class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
@@ -441,9 +392,6 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
     inlines = [
             BranchInline,
             ]
-    actions = [
-            u'delete_selected'
-    ]
 
     def get_queryset(self, request):
         queryset = super(ActionAdmin, self).get_queryset(request)
@@ -485,49 +433,33 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
 
     def render_delete_form(self, request, context):
         obj = context[u'object']
-        context[u'delete_warnings'] = self.delete_warnings([obj])
-        context[u'delete_constraints'] = self.delete_constraints([obj])
         if self.can_snooze_previous_action(obj):
             context[u'snoozed_actions'] = [admin_obj_format(obj.previous_action)]
             context[u'ADMIN_EXTEND_SNOOZE_BY_DAYS'] = ADMIN_EXTEND_SNOOZE_BY_DAYS
         return super(ActionAdmin, self).render_delete_form(request, context)
 
-    @decorate(short_description=u'Delete selected actions')
     @transaction.atomic
     def delete_selected(self, request, queryset):
         snoozed_actions = []
         for obj in queryset:
             if self.can_snooze_previous_action(obj) and obj.previous_action not in queryset:
                 snoozed_actions.append(obj.previous_action)
-        outbound, inbound = self.nested_inforequestemail_queryset(queryset)
 
-        if request.POST.get(u'post'):
-            if self.delete_constraints(queryset):
-                raise PermissionDenied
-
-        template_response = delete_selected(self, request, queryset)
+        template_response = super(ActionAdmin, self).delete_selected(request, queryset)
 
         if request.POST.get(u'post'):
             if request.POST.get(u'snooze'):
                 for action in snoozed_actions:
                     self.snooze_action(action)
-            outbound.delete()
-            inbound.update(type=InforequestEmail.TYPES.UNDECIDED)
             return None
 
         template_response.context_data.update({
-                u'outbound': [admin_obj_format(inforequestemail) for inforequestemail in outbound],
-                u'inbound': [admin_obj_format(inforequestemail) for inforequestemail in inbound],
                 u'snoozed_actions': [admin_obj_format(action) for action in snoozed_actions],
                 u'ADMIN_EXTEND_SNOOZE_BY_DAYS': ADMIN_EXTEND_SNOOZE_BY_DAYS,
-                u'delete_warnings': self.delete_warnings(queryset),
-                u'delete_constraints': self.delete_constraints(queryset),
         })
         return template_response
 
     def delete_model(self, request, obj):
-        if self.delete_constraints([obj]):
-            raise PermissionDenied
+        super(ActionAdmin, self).delete_model(request, obj)
         if request.POST.get(u'snooze') and self.can_snooze_previous_action(obj):
             self.snooze_action(obj.previous_action)
-        return super(ActionAdmin, self).delete_model(request, obj)

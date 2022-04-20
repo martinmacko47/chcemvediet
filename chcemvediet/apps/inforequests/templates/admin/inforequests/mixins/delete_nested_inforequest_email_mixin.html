@@ -1,0 +1,12 @@
+{% load after from poleno.amend %}
+
+{% after path="./ul[last()]" %}
+  {% if outbound %}
+    <p>The following outbound messages will be deleted:</p>
+    <ul>{{ outbound|unordered_list }}</ul>
+  {% endif %}
+  {% if inbound %}
+    <p>The following inbound messages will be marked undecided:</p>
+    <ul>{{ inbound|unordered_list }}</ul>
+  {% endif %}
+{% endafter %}

@@ -1,27 +1,10 @@
 {% extends "admin/delete_confirmation.html" %}
-{% load amend before after set_attributes from poleno.amend %}
+{% load amend from poleno.amend %}
 
 {% block content %}
   {% amend %}
     {{ block.super }}
-    {% after path="./ul[last()]" %}
-      {% if outbound %}
-        <p>The following outbound messages will be deleted:</p>
-        <ul>{{ outbound|unordered_list }}</ul>
-      {% endif %}
-      {% if inbound %}
-        <p>The following inbound messages will be marked undecided:</p>
-        <ul>{{ inbound|unordered_list }}</ul>
-      {% endif %}
-    {% endafter %}
-    {% if delete_constraints %}
-      {% before path=".//form" %}
-        <div class="errornote">
-          <p>Delete not allowed.</p>
-          <ul>{{ delete_constraints|unordered_list }}</ul>
-        </div>
-      {% endbefore %}
-      {% set_attributes path=".//form//input[@type='submit']" disabled=True %}
-    {% endif %}
+    {% include "admin/inforequests/mixins/delete_nested_inforequest_email_mixin.html" %}
+    {% include "utils/admin/bulk_delete_mixin.html" %}
   {% endamend %}
 {% endblock %}

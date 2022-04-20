@@ -1,0 +1,13 @@
+{% load prepend from poleno.amend %}
+
+{% prepend path=".//form" %}
+  {% if snoozed_actions %}
+    <p>
+      <label><input name="snooze" type="checkbox" /> Extend snooze of previous actions by
+        {{ ADMIN_EXTEND_SNOOZE_BY_DAYS }} days from today? All of the following actions will be
+        snoozed:
+      </label>
+    </p>
+    <ul>{{ snoozed_actions|unordered_list }}</ul>
+  {% endif %}
+{% endprepend %}

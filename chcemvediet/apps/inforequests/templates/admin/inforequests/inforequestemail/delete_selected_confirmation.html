@@ -1,17 +1,9 @@
 {% extends "admin/delete_selected_confirmation.html" %}
-{% load amend before set_attributes from poleno.amend %}
+{% load amend from poleno.amend %}
 
 {% block content %}
   {% amend %}
     {{ block.super }}
-    {% before path=".//form//input[@type='submit']" %}
-      {% if delete_constraints %}
-        <div class="errornote">
-          <p>Delete not allowed.</p>
-          <ul>{{ delete_constraints|unordered_list }}</ul>
-        </div>
-        {% set_attributes path=".//form//input[@type='submit']" disabled=True %}
-      {% endif %}
-    {% endbefore %}
+    {% include "utils/admin/bulk_delete_mixin.html" %}
   {% endamend %}
 {% endblock %}

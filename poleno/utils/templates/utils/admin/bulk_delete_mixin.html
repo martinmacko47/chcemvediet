@@ -1,0 +1,18 @@
+{% load before set_attributes from poleno.amend %}
+
+{% before path=".//form//input[@type='submit']" %}
+  {% if delete_warnings %}
+    <ul class="messagelist">
+      {% for warning in delete_warnings %}
+        <li class="warning">{{ warning }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% if delete_constraints %}
+    <div class="errornote">
+      <p>Delete not allowed.</p>
+      <ul>{{ delete_constraints|unordered_list }}</ul>
+    </div>
+    {% set_attributes path=".//form//input[@type='submit']" disabled=True %}
+  {% endif %}
+{% endbefore %}
