@@ -4,25 +4,26 @@ import re
 import mock
 
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from poleno.mail.models import Message
 from poleno.utils.test import created_instances, patch_with_exception, ViewTestCaseMixin
 from poleno.utils.urls import reverse
 
 from .. import InforequestsTestCaseMixin
+from .. import render_query_patterns
 from ... import forms
 from ...models import InforequestDraft, Inforequest, Action
 
 
 class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
     u"""
-    Tests ``create()`` view registered as "inforequests:create" and
-    "inforequests:create_from_draft".
+    Tests ``inforequest_create()`` view registered as "inforequests:create".
     """
 
     def _create_post_data(self, omit=(), **kwargs):
         defaults = {
-                u'obligee': u'Default Testing Name 1',
+                u'obligee': self.obligee1.name,
                 u'subject': [u'Default Testing Subject'],
                 u'content': [u'Default Testing Content'],
                 u'attachments': u',,,',
@@ -69,14 +70,14 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self._login_user()
         response = self.client.get(reverse(u'inforequests:create'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, u'inforequests/create.html')
+        self.assertTemplateUsed(response, u'inforequests/create/create.html')
 
     def test_user_with_verified_email_gets_inforequest_create_from_draft(self):
         draft = self._create_inforequest_draft()
         self._login_user()
-        response = self.client.get(reverse(u'inforequests:create_from_draft', args=(draft.pk,)))
+        response = self.client.get(reverse(u'inforequests:create', args=(draft.pk,)))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, u'inforequests/create.html')
+        self.assertTemplateUsed(response, u'inforequests/create/create.html')
 
     def test_get_without_draft_shows_form_with_initial_values(self):
         self._login_user()
@@ -91,7 +92,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
 
     def test_get_without_draft_related_models_are_prefetched_before_render(self):
         self._login_user()
-        with self.assertQueriesDuringRender([u'FROM "accounts_profile"']):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.get(reverse(u'inforequests:create'))
 
     def test_get_with_draft_shows_form_with_values_from_draft(self):
@@ -100,7 +101,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         attachment2 = self._create_attachment(generic_object=draft)
 
         self._login_user(self.user1)
-        response = self.client.get(reverse(u'inforequests:create_from_draft', args=(draft.pk,)))
+        response = self.client.get(reverse(u'inforequests:create', args=(draft.pk,)))
 
         form = response.context[u'form']
         self.assertIsInstance(form, forms.InforequestForm)
@@ -115,18 +116,18 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         attachment2 = self._create_attachment(generic_object=draft)
 
         self._login_user(self.user1)
-        with self.assertQueriesDuringRender([u'FROM "accounts_profile"']):
-            response = self.client.get(reverse(u'inforequests:create_from_draft', args=(draft.pk,)))
+        with self.assertQueriesDuringRender(render_query_patterns.base):
+            response = self.client.get(reverse(u'inforequests:create', args=(draft.pk,)))
 
     def test_get_with_invalid_draft_returns_404_not_found(self):
         self._login_user()
-        response = self.client.get(reverse(u'inforequests:create_from_draft', args=(47,)))
+        response = self.client.get(reverse(u'inforequests:create', args=(47,)))
         self.assertEqual(response.status_code, 404)
 
     def test_get_with_draft_owned_by_another_user_returns_404_not_found(self):
         draft = self._create_inforequest_draft(applicant=self.user2)
         self._login_user(self.user1)
-        response = self.client.get(reverse(u'inforequests:create_from_draft', args=(draft.pk,)))
+        response = self.client.get(reverse(u'inforequests:create', args=(draft.pk,)))
         self.assertEqual(response.status_code, 404)
 
     def test_post_with_draft_button_and_valid_data_creates_new_draft_instance(self):
@@ -158,7 +159,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                 attachments=u'%s,%s' % (attachment1.pk, attachment2.pk))
 
         with created_instances(InforequestDraft.objects) as inforequestdraft_set:
-            with patch_with_exception(u'chcemvediet.apps.inforequests.views.HttpResponseRedirect'):
+            with patch_with_exception(u'chcemvediet.apps.inforequests.views.inforequest.HttpResponseRedirect'):
                 response = self.client.post(reverse(u'inforequests:create'), data)
         self.assertFalse(inforequestdraft_set.exists())
 
@@ -174,7 +175,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                 attachments=u'%s,%s' % (attachment1.pk, attachment3.pk))
 
         with created_instances(InforequestDraft.objects) as inforequestdraft_set:
-            response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
+            response = self.client.post(reverse(u'inforequests:create', args=(draft.pk,)), data)
         self.assertFalse(inforequestdraft_set.exists())
 
         draft = InforequestDraft.objects.get(pk=draft.pk)
@@ -196,8 +197,8 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                 attachments=u'%s,%s' % (attachment1.pk, attachment3.pk))
 
         with created_instances(InforequestDraft.objects) as inforequestdraft_set:
-            with patch_with_exception(u'chcemvediet.apps.inforequests.views.HttpResponseRedirect'):
-                response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
+            with patch_with_exception(u'chcemvediet.apps.inforequests.views.inforequest.HttpResponseRedirect'):
+                response = self.client.post(reverse(u'inforequests:create', args=(draft.pk,)), data)
 
         self.assertFalse(inforequestdraft_set.exists())
         draft = InforequestDraft.objects.get(pk=draft.pk)
@@ -227,7 +228,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', obligee=u'Invalid')
         self._login_user(self.user1)
         with created_instances(InforequestDraft.objects) as inforequestdraft_set:
-            response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
+            response = self.client.post(reverse(u'inforequests:create', args=(draft.pk,)), data)
         self.assertFalse(inforequestdraft_set.exists())
         draft = InforequestDraft.objects.get(pk=draft.pk)
         self.assertEqual(draft.subject, [u'Old Subject'])
@@ -237,19 +238,19 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, u'inforequests/create.html')
+        self.assertTemplateUsed(response, u'inforequests/create/create.html')
 
     def test_post_with_draft_button_and_invalid_data_related_models_are_prefetched_before_render(self):
         data = self._create_post_data(button=u'draft', obligee=u'Invalid')
         self._login_user()
-        with self.assertQueriesDuringRender([u'FROM "accounts_profile"']):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.post(reverse(u'inforequests:create'), data)
 
     def test_post_with_submit_button_and_valid_data_creates_inforequest(self):
         self._login_user(self.user1)
         obligee = self._create_obligee(name=u'Obligee')
-        attachment1 = self._create_attachment(generic_object=self._get_session())
-        attachment2 = self._create_attachment(generic_object=self._get_session())
+        attachment1 = self._create_attachment(generic_object=self._get_session(), content=u'Plain text content')
+        attachment2 = self._create_attachment(generic_object=self._get_session(), content=u'<html><body>HTML content</body></html>')
         data = self._create_post_data(button=u'submit', obligee=u'Obligee',
                 subject=[u'Subject'], content=[u'Content'],
                 attachments=u'%s,%s' % (attachment1.pk, attachment2.pk))
@@ -267,7 +268,9 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertEqual(action.type, Action.TYPES.REQUEST)
         self.assertIn(u'Subject', action.subject)
         self.assertIn(u'Content', action.content)
-        self.assertItemsEqual(action.attachment_set.all(), [attachment1, attachment2])
+        attch1, attch2 = action.attachment_set.all()
+        self.assertEqual(attch1.content, attachment1.content)
+        self.assertEqual(attch2.content, attachment2.content)
 
     def test_post_with_submit_button_and_valid_data_does_not_create_inforequest_if_exception_raised(self):
         self._login_user(self.user1)
@@ -279,7 +282,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
                 attachments=u'%s,%s' % (attachment1.pk, attachment2.pk))
 
         with created_instances(Inforequest.objects) as inforequest_set:
-            with patch_with_exception(u'chcemvediet.apps.inforequests.views.HttpResponseRedirect'):
+            with patch_with_exception(u'chcemvediet.apps.inforequests.views.inforequest.HttpResponseRedirect'):
                 response = self.client.post(reverse(u'inforequests:create'), data)
         self.assertFalse(inforequest_set.exists())
 
@@ -308,7 +311,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
 
         self._login_user(user)
         with created_instances(Message.objects) as message_set:
-            with patch_with_exception(u'chcemvediet.apps.inforequests.views.HttpResponseRedirect'):
+            with patch_with_exception(u'chcemvediet.apps.inforequests.views.inforequest.HttpResponseRedirect'):
                 response = self.client.post(reverse(u'inforequests:create'), data)
         self.assertFalse(message_set.exists())
 
@@ -316,15 +319,15 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         draft = self._create_inforequest_draft(applicant=self.user1)
         data = self._create_post_data(button=u'submit')
         self._login_user(self.user1)
-        response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
+        response = self.client.post(reverse(u'inforequests:create', args=(draft.pk,)), data)
         self.assertFalse(InforequestDraft.objects.filter(pk=draft.pk).exists())
 
     def test_post_with_submit_button_and_valid_data_does_not_delete_draft_if_exception_raised(self):
         draft = self._create_inforequest_draft(applicant=self.user1)
         data = self._create_post_data(button=u'submit')
         self._login_user(self.user1)
-        with patch_with_exception(u'chcemvediet.apps.inforequests.views.HttpResponseRedirect'):
-            response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
+        with patch_with_exception(u'chcemvediet.apps.inforequests.views.inforequest.HttpResponseRedirect'):
+            response = self.client.post(reverse(u'inforequests:create', args=(draft.pk,)), data)
         self.assertTrue(InforequestDraft.objects.filter(pk=draft.pk).exists())
 
     def test_post_with_submit_button_and_valid_data_redirects_to_inforequests_detail(self):
@@ -333,7 +336,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         with created_instances(Inforequest.objects) as inforequest_set:
             response = self.client.post(reverse(u'inforequests:create'), data)
         inforequest = inforequest_set.get()
-        self.assertRedirects(response, reverse(u'inforequests:detail', args=(inforequest.pk,)))
+        self.assertRedirects(response, inforequest.get_absolute_url())
 
     def test_post_with_submit_button_and_valid_data_related_models_are_prefetched_before_render(self):
         data = self._create_post_data(button=u'submit')
@@ -359,7 +362,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         draft = self._create_inforequest_draft(applicant=self.user1)
         data = self._create_post_data(button=u'submit', obligee=u'invalid')
         self._login_user()
-        response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
+        response = self.client.post(reverse(u'inforequests:create', args=(draft.pk,)), data)
         self.assertTrue(InforequestDraft.objects.filter(pk=draft.pk).exists())
 
     def test_post_with_submit_button_and_invalid_data_redraws_form(self):
@@ -367,12 +370,12 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, u'inforequests/create.html')
+        self.assertTemplateUsed(response, u'inforequests/create/create.html')
 
     def test_post_with_submit_button_and_invalid_data_related_models_are_prefetched_before_render(self):
         data = self._create_post_data(button=u'submit', obligee=u'invalid')
         self._login_user()
-        with self.assertQueriesDuringRender([u'FROM "accounts_profile"']):
+        with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.post(reverse(u'inforequests:create'), data)
 
     def test_post_with_invalid_button_returns_400_bad_request(self):
@@ -385,7 +388,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'submit', omit=[u'obligee'])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertFormError(response, u'form', u'obligee', 'This field is required.')
+        self.assertFormError(response, u'form', u'obligee', u'This field is required.')
 
     def test_obligee_field_is_not_required_for_draft_button(self):
         data = self._create_post_data(button=u'draft', omit=[u'obligee'])
@@ -397,13 +400,13 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', obligee=u'invalid')
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertFormError(response, u'form', u'obligee', 'Invalid obligee name. Select one form the menu.')
+        self.assertFormError(response, u'form', u'obligee', _(u'obligees:ObligeeField:error:invalid_obligee'))
 
     def test_subject_field_is_required_for_submit_button(self):
         data = self._create_post_data(button=u'submit', omit=[u'subject'])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertFormError(response, u'form', u'subject', 'This field is required.')
+        self.assertFormError(response, u'form', u'subject', u'This field is required.')
 
     def test_subject_field_is_not_required_for_draft_button(self):
         data = self._create_post_data(button=u'draft', omit=[u'subject'])
@@ -415,13 +418,13 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', subject=[u'x'*256])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertFormError(response, u'form', u'subject', 'Ensure this value has at most 50 characters (it has 256).')
+        self.assertFormError(response, u'form', u'subject', u'Ensure this value has at most 50 characters (it has 256).')
 
     def test_content_field_is_required_for_submit_button(self):
         data = self._create_post_data(button=u'submit', omit=[u'content'])
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertFormError(response, u'form', u'content', 'This field is required.')
+        self.assertFormError(response, u'form', u'content', u'This field is required.')
 
     def test_content_field_is_not_required_for_draft_button(self):
         data = self._create_post_data(button=u'draft', omit=[u'content'])
@@ -435,7 +438,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         with created_instances(Inforequest.objects) as inforequest_set:
             response = self.client.post(reverse(u'inforequests:create'), data)
         inforequest = inforequest_set.get()
-        self.assertRedirects(response, reverse(u'inforequests:detail', args=(inforequest.pk,)))
+        self.assertRedirects(response, inforequest.get_absolute_url())
 
     def test_attachments_field_is_not_required_for_draft_button(self):
         data = self._create_post_data(button=u'draft', omit=[u'attachments'])
@@ -447,7 +450,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', attachments=u',47,')
         self._login_user()
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertFormError(response, u'form', u'attachments', 'Invalid attachments.')
+        self.assertFormError(response, u'form', u'attachments', u'Invalid attachments.')
 
     def test_attachments_field_with_attachment_owned_by_another_session_is_invalid(self):
         self._login_user(self.user1)
@@ -457,7 +460,7 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         data = self._create_post_data(button=u'draft', attachments=u',%s,' % attachment.pk)
         self._login_user(self.user1)
         response = self.client.post(reverse(u'inforequests:create'), data)
-        self.assertFormError(response, u'form', u'attachments', 'Invalid attachments.')
+        self.assertFormError(response, u'form', u'attachments', u'Invalid attachments.')
 
     def test_attachments_field_with_attachment_assigned_to_another_draft_is_invalid(self):
         draft1 = self._create_inforequest_draft()
@@ -465,8 +468,8 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         attachment = self._create_attachment(generic_object=draft2)
         data = self._create_post_data(button=u'draft', attachments=u',%s,' % attachment.pk)
         self._login_user()
-        response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft1.pk,)), data)
-        self.assertFormError(response, u'form', u'attachments', 'Invalid attachments.')
+        response = self.client.post(reverse(u'inforequests:create', args=(draft1.pk,)), data)
+        self.assertFormError(response, u'form', u'attachments', u'Invalid attachments.')
 
     def test_attachments_field_with_attachment_owned_by_session_is_valid(self):
         self._login_user()
@@ -480,15 +483,15 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         attachment = self._create_attachment(generic_object=draft)
         data = self._create_post_data(button=u'draft', attachments=u',%s,' % attachment.pk)
         self._login_user()
-        response = self.client.post(reverse(u'inforequests:create_from_draft', args=(draft.pk,)), data)
+        response = self.client.post(reverse(u'inforequests:create', args=(draft.pk,)), data)
         self.assertRedirects(response, reverse(u'inforequests:mine'))
 
     def test_attachments_field_upload_and_download_url_funcs(self):
         draft = self._create_inforequest_draft(applicant=self.user1)
         attachment = self._create_attachment(generic_object=draft)
 
-        self._login_user()
-        response = self.client.get(reverse(u'inforequests:create_from_draft', args=(draft.pk,)))
+        self._login_user(self.user1)
+        response = self.client.get(reverse(u'inforequests:create', args=(draft.pk,)))
         self.assertEqual(response.status_code, 200)
 
         form = response.context[u'form']
