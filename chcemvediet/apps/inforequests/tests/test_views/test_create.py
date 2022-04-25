@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import re
 import mock
-import unittest
 
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
@@ -19,7 +18,7 @@ from ...models import InforequestDraft, Inforequest, Action
 
 class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
     u"""
-    Tests ``create()`` view registered as "inforequests:create".
+    Tests ``inforequest_create()`` view registered as "inforequests:create".
     """
 
     def _create_post_data(self, omit=(), **kwargs):
@@ -247,12 +246,11 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         with self.assertQueriesDuringRender(render_query_patterns.base):
             response = self.client.post(reverse(u'inforequests:create'), data)
 
-    @unittest.skip(u'FIXME')
     def test_post_with_submit_button_and_valid_data_creates_inforequest(self):
         self._login_user(self.user1)
         obligee = self._create_obligee(name=u'Obligee')
-        attachment1 = self._create_attachment(generic_object=self._get_session())
-        attachment2 = self._create_attachment(generic_object=self._get_session())
+        attachment1 = self._create_attachment(generic_object=self._get_session(), content=u'Plain text content')
+        attachment2 = self._create_attachment(generic_object=self._get_session(), content=u'<html><body>HTML content</body></html>')
         data = self._create_post_data(button=u'submit', obligee=u'Obligee',
                 subject=[u'Subject'], content=[u'Content'],
                 attachments=u'%s,%s' % (attachment1.pk, attachment2.pk))
@@ -270,7 +268,9 @@ class CreateViewTest(InforequestsTestCaseMixin, ViewTestCaseMixin, TestCase):
         self.assertEqual(action.type, Action.TYPES.REQUEST)
         self.assertIn(u'Subject', action.subject)
         self.assertIn(u'Content', action.content)
-        self.assertItemsEqual(action.attachment_set.all(), [attachment1, attachment2])
+        attch1, attch2 = action.attachment_set.all()
+        self.assertEqual(attch1.content, attachment1.content)
+        self.assertEqual(attch2.content, attachment2.content)
 
     def test_post_with_submit_button_and_valid_data_does_not_create_inforequest_if_exception_raised(self):
         self._login_user(self.user1)
