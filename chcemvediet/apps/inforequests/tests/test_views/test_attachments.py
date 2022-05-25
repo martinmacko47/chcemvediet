@@ -124,29 +124,34 @@ class DownloadAttachmentViewTest(CustomTestCase):
         response = client2.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_attachment_assigned_to_action_of_non_published_or_anonymized_inforequest_returns_to_anonymous_user_404_not_found(self):
+    def test_attachment_assigned_to_action_of_non_published_and_non_anonymized_inforequest_returns_to_anonymous_user_404_not_found(self):
         self._login_user(self.user1)
         self.user1.profile.anonymize_inforequests = False
         self.user1.profile.save()
-        _, _, (request1,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        _, _, (request,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        attachment = self._create_attachment(generic_object=request)
+
+        client2 = Client()
+        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
+        response = client2.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_attachment_assigned_to_action_of_anonymized_inforequest_returns_to_anonymous_user_404_not_found(self):
+        self._login_user(self.user1)
         self.user1.profile.anonymize_inforequests = True
         self.user1.profile.save()
-        _, _, (request2,) = self._create_inforequest_scenario(self.user1, dict(published=True))
-        _, _, (request3,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        _, _, (request1,) = self._create_inforequest_scenario(self.user1, dict(published=True))
+        _, _, (request2,) = self._create_inforequest_scenario(self.user1, dict(published=False))
         attachment1 = self._create_attachment(generic_object=request1)
         attachment2 = self._create_attachment(generic_object=request2)
-        attachment3 = self._create_attachment(generic_object=request3)
 
         client2 = Client()
         url1 = reverse(u'inforequests:download_attachment', args=(attachment1.pk,))
         url2 = reverse(u'inforequests:download_attachment', args=(attachment2.pk,))
-        url3 = reverse(u'inforequests:download_attachment', args=(attachment3.pk,))
         response1 = client2.get(url1)
         response2 = client2.get(url2)
-        response3 = client2.get(url3)
         self.assertEqual(response1.status_code, 404)
         self.assertEqual(response2.status_code, 404)
-        self.assertEqual(response3.status_code, 404)
 
     def test_attachment_owned_by_user_returns_404_not_found(self):
         self._login_user(self.user1)
@@ -226,30 +231,36 @@ class DownloadAttachmentViewTest(CustomTestCase):
         response = client2.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_attachment_assigned_to_action_of_non_published_or_anonymized_inforequest_owned_by_another_user_returns_404_not_found(self):
+    def test_attachment_assigned_to_action_of_non_published_and_non_anonymized_inforequest_owned_by_another_user_returns_404_not_found(self):
         self._login_user(self.user1)
         self.user1.profile.anonymize_inforequests = False
         self.user1.profile.save()
-        _, _, (request1,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        _, _, (request,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        attachment = self._create_attachment(generic_object=request)
+
+        client2 = Client()
+        client2.login(username=self.user2.username, password=u'default_testing_secret')
+        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
+        response = client2.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_attachment_assigned_to_action_of_anonymized_inforequest_owned_by_another_user_returns_404_not_found(self):
+        self._login_user(self.user1)
         self.user1.profile.anonymize_inforequests = True
         self.user1.profile.save()
-        _, _, (request2,) = self._create_inforequest_scenario(self.user1, dict(published=True))
-        _, _, (request3,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        _, _, (request1,) = self._create_inforequest_scenario(self.user1, dict(published=True))
+        _, _, (request2,) = self._create_inforequest_scenario(self.user1, dict(published=False))
         attachment1 = self._create_attachment(generic_object=request1)
         attachment2 = self._create_attachment(generic_object=request2)
-        attachment3 = self._create_attachment(generic_object=request3)
 
         client2 = Client()
         client2.login(username=self.user2.username, password=u'default_testing_secret')
         url1 = reverse(u'inforequests:download_attachment', args=(attachment1.pk,))
         url2 = reverse(u'inforequests:download_attachment', args=(attachment2.pk,))
-        url3 = reverse(u'inforequests:download_attachment', args=(attachment3.pk,))
         response1 = client2.get(url1)
         response2 = client2.get(url2)
-        response3 = client2.get(url3)
         self.assertEqual(response1.status_code, 404)
         self.assertEqual(response2.status_code, 404)
-        self.assertEqual(response3.status_code, 404)
 
     def test_attachment_assigned_to_action_of_inforequest_owned_by_another_user_returns_404_not_found(self):
         self._login_user(self.user1)
