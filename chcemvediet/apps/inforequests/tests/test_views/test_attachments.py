@@ -5,6 +5,7 @@ import datetime
 
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
+from django.test import Client
 
 from poleno.attachments.models import Attachment
 from poleno.utils.date import utc_now
@@ -21,26 +22,22 @@ class UploadAttachmentViewTest(CustomTestCase):
 
     def test_allowed_http_methods(self):
         url = reverse(u'inforequests:upload_attachment')
-
         allowed = [u'POST']
         self.assert_allowed_http_methods(allowed, url)
 
     def test_non_ajax_request_returns_400_bad_request(self):
         url = reverse(u'inforequests:upload_attachment')
-
         response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
-    def test_anonymous_user_gets_403_firbidden(self):
+    def test_anonymous_user_gets_403_forbidden(self):
         url = reverse(u'inforequests:upload_attachment')
-
         response = self.client.post(url, HTTP_X_REQUESTED_WITH=u'XMLHttpRequest')
         self.assertEqual(response.status_code, 403)
 
     def test_authenticated_user_gets_200_ok(self):
         self._login_user()
         url = reverse(u'inforequests:upload_attachment')
-
         response = self.client.post(url, HTTP_X_REQUESTED_WITH=u'XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
 
@@ -88,19 +85,17 @@ class DownloadAttachmentViewTest(CustomTestCase):
         self._login_user()
         attachment = self._create_attachment()
         url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
-
         allowed = [u'HEAD', u'GET']
         self.assert_allowed_http_methods(allowed, url)
 
-    def test_anonymous_user_gets_403_firbidden(self):
+    def test_anonymous_user_gets_404_not_found(self):
         self._login_user()
         attachment = self._create_attachment()
-        self._logout_user()
 
+        client2 = Client()
         url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
-
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        response = client2.get(url)
+        self.assertEqual(response.status_code, 404)
 
     def test_authenticated_user_gets_200_ok(self):
         self._login_user()
@@ -117,6 +112,47 @@ class DownloadAttachmentViewTest(CustomTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_attachment_assigned_to_action_of_published_and_non_anonymized_inforequest_returns_to_anonymous_user_200_ok(self):
+        self._login_user(self.user1)
+        self.user1.profile.anonymize_inforequests = False
+        self.user1.profile.save()
+        _, _, (request,) = self._create_inforequest_scenario(self.user1, dict(published=True))
+        attachment = self._create_attachment(generic_object=request)
+
+        client2 = Client()
+        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
+        response = client2.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_attachment_assigned_to_action_of_non_published_and_non_anonymized_inforequest_returns_to_anonymous_user_404_not_found(self):
+        self._login_user(self.user1)
+        self.user1.profile.anonymize_inforequests = False
+        self.user1.profile.save()
+        _, _, (request,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        attachment = self._create_attachment(generic_object=request)
+
+        client2 = Client()
+        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
+        response = client2.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_attachment_assigned_to_action_of_anonymized_inforequest_returns_to_anonymous_user_404_not_found(self):
+        self._login_user(self.user1)
+        self.user1.profile.anonymize_inforequests = True
+        self.user1.profile.save()
+        _, _, (request1,) = self._create_inforequest_scenario(self.user1, dict(published=True))
+        _, _, (request2,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        attachment1 = self._create_attachment(generic_object=request1)
+        attachment2 = self._create_attachment(generic_object=request2)
+
+        client2 = Client()
+        url1 = reverse(u'inforequests:download_attachment', args=(attachment1.pk,))
+        url2 = reverse(u'inforequests:download_attachment', args=(attachment2.pk,))
+        response1 = client2.get(url1)
+        response2 = client2.get(url2)
+        self.assertEqual(response1.status_code, 404)
+        self.assertEqual(response2.status_code, 404)
+
     def test_attachment_owned_by_user_returns_404_not_found(self):
         self._login_user(self.user1)
         attachment = self._create_attachment(generic_object=self.user1)
@@ -126,14 +162,14 @@ class DownloadAttachmentViewTest(CustomTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_attachment_owned_by_another_session_returns_404_not_found(self):
-        self._login_user()
+        self._login_user(self.user)
         attachment = self._create_attachment()
-        self._logout_user()
 
-        self._login_user()
+        client2 = Client()
+        client2.login(username=self.user.username, password=u'default_testing_secret')
         url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
 
-        response = self.client.get(url)
+        response = client2.get(url)
         self.assertEqual(response.status_code, 404)
 
     def test_attachment_owned_by_session_returns_200_ok(self):
@@ -182,6 +218,50 @@ class DownloadAttachmentViewTest(CustomTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_attachment_assigned_to_action_of_published_and_non_anonymized_inforequest_owned_by_another_user_returns_200_ok(self):
+        self._login_user(self.user1)
+        self.user1.profile.anonymize_inforequests = False
+        self.user1.profile.save()
+        _, _, (request,) = self._create_inforequest_scenario(self.user1, dict(published=True))
+        attachment = self._create_attachment(generic_object=request)
+
+        client2 = Client()
+        client2.login(username=self.user2.username, password=u'default_testing_secret')
+        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
+        response = client2.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_attachment_assigned_to_action_of_non_published_and_non_anonymized_inforequest_owned_by_another_user_returns_404_not_found(self):
+        self._login_user(self.user1)
+        self.user1.profile.anonymize_inforequests = False
+        self.user1.profile.save()
+        _, _, (request,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        attachment = self._create_attachment(generic_object=request)
+
+        client2 = Client()
+        client2.login(username=self.user2.username, password=u'default_testing_secret')
+        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
+        response = client2.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_attachment_assigned_to_action_of_anonymized_inforequest_owned_by_another_user_returns_404_not_found(self):
+        self._login_user(self.user1)
+        self.user1.profile.anonymize_inforequests = True
+        self.user1.profile.save()
+        _, _, (request1,) = self._create_inforequest_scenario(self.user1, dict(published=True))
+        _, _, (request2,) = self._create_inforequest_scenario(self.user1, dict(published=False))
+        attachment1 = self._create_attachment(generic_object=request1)
+        attachment2 = self._create_attachment(generic_object=request2)
+
+        client2 = Client()
+        client2.login(username=self.user2.username, password=u'default_testing_secret')
+        url1 = reverse(u'inforequests:download_attachment', args=(attachment1.pk,))
+        url2 = reverse(u'inforequests:download_attachment', args=(attachment2.pk,))
+        response1 = client2.get(url1)
+        response2 = client2.get(url2)
+        self.assertEqual(response1.status_code, 404)
+        self.assertEqual(response2.status_code, 404)
+
     def test_attachment_assigned_to_action_of_inforequest_owned_by_another_user_returns_404_not_found(self):
         self._login_user(self.user1)
         _, _, (request,) = self._create_inforequest_scenario(self.user2)
@@ -195,26 +275,6 @@ class DownloadAttachmentViewTest(CustomTestCase):
         self._login_user(self.user1)
         _, _, (request,) = self._create_inforequest_scenario(self.user1)
         attachment = self._create_attachment(generic_object=request)
-        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
-
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_attachment_assigned_to_action_draft_of_inforequest_owned_by_another_user_returns_404_not_found(self):
-        self._login_user(self.user1)
-        inforequest, _, _ = self._create_inforequest_scenario(self.user2)
-        draft = self._create_action_draft(inforequest=inforequest)
-        attachment = self._create_attachment(generic_object=draft)
-        url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
-
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-
-    def test_attachment_assigned_to_action_draft_of_inforequest_owned_by_user_returns_200_ok(self):
-        self._login_user(self.user1)
-        inforequest, _, _ = self._create_inforequest_scenario(self.user1)
-        draft = self._create_action_draft(inforequest=inforequest)
-        attachment = self._create_attachment(generic_object=draft)
         url = reverse(u'inforequests:download_attachment', args=(attachment.pk,))
 
         response = self.client.get(url)
