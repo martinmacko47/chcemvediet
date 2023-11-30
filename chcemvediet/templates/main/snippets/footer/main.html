@@ -22,6 +22,12 @@
         {% include "main/snippets/footer/partners.html" %}
       </div>
       <div class="col-md-4 col-md-offset-1 chv-above-1">
+        <h3 id="{% trans 'main:footer:donate:anchor' %}">
+          {% trans 'main:footer:donate:heading' %}
+        </h3>
+        <div>
+          <a class="btn chv-btn-blue" href="{% page '/podporte-nas/' %}">{% trans 'main:footer:donate' %}</a>
+        </div>
         <h3 id="{% trans 'main:footer:donors:anchor' %}">
           {% trans 'main:footer:donors:heading' %}
         </h3>
@@ -29,7 +35,6 @@
           <a class="btn chv-btn-gray" href="{% page '/projekt-podporili/' %}">
             {% trans 'main:footer:donors:show' %}
           </a>
-          <a class="btn chv-btn-blue" href="{% page '/podporte-nas/' %}">{% trans 'main:footer:donate' %}</a>
         </div>
       </div>
     </div>
