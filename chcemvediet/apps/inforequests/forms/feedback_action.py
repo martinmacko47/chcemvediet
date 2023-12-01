@@ -25,6 +25,7 @@ class FeedbackContent(FeedbackActionStep):
 
         self.fields[u'content'] = forms.CharField(
             label=_(u'inforequests:feedback_action:FeedbackContent:content:label'),
+            required=False,
             widget=forms.Textarea(attrs={
                 u'placeholder':
                     _(u'inforequests:feedback_action:FeedbackContent:content:placeholder'),
@@ -34,8 +35,24 @@ class FeedbackContent(FeedbackActionStep):
         )
 
 
+class FeedbackRating(FeedbackActionStep):
+    label = u''
+    text_template = u'inforequests/feedback_action/texts/rating.html'
+    global_fields = [u'rating']
+    post_step_class = FeedbackContent
+
+    def add_fields(self):
+        super(FeedbackRating, self).add_fields()
+        self.fields[u'rating'] = forms.TypedChoiceField(
+            label=u' ',
+            coerce=int,
+            choices=Feedback.RATING_LEVELS._choices,
+            widget=forms.RadioSelect(),
+        )
+
+
 class FeedbackActionWizard(Wizard):
-    first_step_class = FeedbackContent
+    first_step_class = FeedbackRating
 
     def __init__(self, request, index, inforequest):
         self.inforequest = inforequest
@@ -58,7 +75,8 @@ class FeedbackActionWizard(Wizard):
     def finish(self):
         feedback = Feedback(
             inforequest=self.inforequest,
-            content=self.values[u'content']
+            content=self.values[u'content'],
+            rating=self.values[u'rating']
         )
         feedback.save()
 

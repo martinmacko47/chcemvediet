@@ -477,9 +477,11 @@ class FeedbackAdmin(admin.ModelAdmin):
         ),
         u'created',
         u'content',
+        u'rating'
     ]
     list_filter = [
         u'created',
+        u'rating'
     ]
     ordering = [
         u'-created',
@@ -491,7 +493,8 @@ class FeedbackAdmin(admin.ModelAdmin):
     readonly_fields = [
         u'inforequest',
         u'content',
-        u'created'
+        u'created',
+        u'rating'
     ]
     raw_id_fields = [
         u'inforequest'

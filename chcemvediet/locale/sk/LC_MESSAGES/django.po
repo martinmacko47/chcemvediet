@@ -719,6 +719,27 @@ msgstr "Neúplné sprístupnenie informácie bez vydania rozhodnutia"
 msgid "inforequests:Action:type:DISCLOSURE:FULL"
 msgstr "Úplne sprístupnenie informácie"
 
+msgid "inforequests:Feedback:rating:ATROCIOUS"
+msgstr "Strašný: S portálom som mal závažný problém."
+
+msgid "inforequests:Feedback:rating:VERY_POOR"
+msgstr "Veľmi zlý: Portál mi vadil, spomaľoval ma, alebo som musel prekonať niečo nelogické."
+
+msgid "inforequests:Feedback:rating:POOR"
+msgstr "Zlý: Podarilo sa mi urobiť čo som chcel, ale nevidím v portáli zásadný prínos."
+
+msgid "inforequests:Feedback:rating:MEDIOCRE"
+msgstr "Priemerný: Portál som použil, ešte uvidím."
+
+msgid "inforequests:Feedback:rating:GOOD"
+msgstr "Dobrý: portál mi pomohol, vedel by som si predstaviť zlepšenie."
+
+msgid "inforequests:Feedback:rating:VERY_GOOD"
+msgstr "Veľmi dobrý: portál mi veľmi pomohol, nemám žiadny nápad na zlepšenie."
+
+msgid "inforequests:Feedback:rating:EXCELLENT"
+msgstr "Vynikajúci: Portál mi umožnil čo by som sám nezvládol/sama nezvládla. Zrozumiteľne ma viedol celým procesom."
+
 msgid "inforequests:Inforequest:fallback_slug"
 msgstr "ziadost"
 
