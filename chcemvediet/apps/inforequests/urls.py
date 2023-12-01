@@ -31,6 +31,7 @@ parts = {
     u'snooze':                    lazy_concat(_(u'inforequests:urls:snooze'), u'/'),
     u'attachments':               lazy_concat(_(u'inforequests:urls:attachments'), u'/'),
     u'attachment_finalizations':  lazy_concat(_(u'inforequests:urls:attachment_finalizations'), u'/'),
+    u'feedback_action':           lazy_concat(_(u'inforequests:urls:feedback_action'), u'/')
     }
 
 urlpatterns = patterns(u'',
@@ -44,6 +45,7 @@ urlpatterns = patterns(u'',
     url(lazy_format(r'^{inforequest_slug_pk}{clarification_response}{branch_pk}{step_idx?}$', **parts), views.clarification_response,           name=u'clarification_response'),
     url(lazy_format(r'^{inforequest_slug_pk}{appeal}{branch_pk}{step_idx?}$', **parts),                 views.appeal,                           name=u'appeal'),
     url(lazy_format(r'^{inforequest_slug_pk}{snooze}{branch_pk}{action_pk}$', **parts),                 views.snooze,                           name=u'snooze'),
+    url(lazy_format(r'^{inforequest_slug_pk}{feedback_action}{step_idx?}$', **parts),                    views.feedback_action,                  name=u'feedback_action'),
     url(lazy_format(r'^{attachments}$', **parts),                                                       views.attachment_upload,                name=u'upload_attachment'),
     url(lazy_format(r'^{attachments}{attachment_pk}$', **parts),                                        views.attachment_download,              name=u'download_attachment'),
     url(lazy_format(r'^{attachment_finalizations}{attachment_finalization_pk}$', **parts),              views.attachment_finalization_download, name=u'download_attachment_finalization'),
@@ -65,6 +67,7 @@ def draft_adaptor(draft):
 
 @reverse_adaptor(u'inforequests:detail', u'inforequest')
 @reverse_adaptor(u'inforequests:obligee_action', u'inforequest')
+@reverse_adaptor(u'inforequests:feedback_action', u'inforequest')
 def inforequest_adaptor_slug_and_pk(inforequest):
     return dict(
             inforequest_slug=inforequest.slug,
@@ -107,6 +110,7 @@ def attachment_finalization_adaptor(attachment_finalization):
     return dict(attachment_finalization_pk=attachment_finalization.pk)
 
 @reverse_adaptor(u'inforequests:obligee_action', u'step')
+@reverse_adaptor(u'inforequests:feedback_action', u'step')
 @reverse_adaptor(u'inforequests:clarification_response', u'step')
 @reverse_adaptor(u'inforequests:appeal', u'step')
 def step_adaptor(step):

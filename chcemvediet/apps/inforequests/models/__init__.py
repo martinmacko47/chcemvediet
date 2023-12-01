@@ -6,3 +6,4 @@ from .inforequest import Inforequest
 from .inforequestemail import InforequestEmail
 from .branch import Branch
 from .action import Action
+from .feedback import Feedback

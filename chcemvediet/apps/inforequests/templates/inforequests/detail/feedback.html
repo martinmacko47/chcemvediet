@@ -1,0 +1,31 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% load trans from i18n %}
+{% load url from poleno.utils %}
+
+{% comment %}
+ %
+ % Context:
+ %  -- inforequest: chcemvediet.apps.inforequests.models.Inforequest
+ %
+{% endcomment %}
+
+<div class="chv-bar chv-bar-green">
+    <div class="chv-bar-icon">
+      <span class="chv-icon-stack">
+        <i class="chv-icon icon-circle"></i>
+        <i class="chv-icon chv-icon-inv chv-icon-half icon-help"></i>
+      </span>
+    </div>
+    <div class="chv-bar-heading">
+        {% trans 'inforequests:detail:feedback:heading' %}
+    </div>
+</div>
+<div class="text-center chv-bellow-1">
+  {% include "inforequests/detail/texts/feedback.html" %}
+  <a class="btn chv-btn-green"
+     href="{% url 'inforequests:feedback_action' inforequest=inforequest %}">
+    <i class="chv-icon chv-icon-lg icon-help"></i>
+    &nbsp;
+    {% trans 'inforequests:detail:feedback:button' %}
+  </a>
+</div>
