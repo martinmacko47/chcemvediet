@@ -1034,7 +1034,7 @@ class ObligeeActionWizard(Wizard):
 
     def get_step_url(self, step, anchor=u''):
         return reverse(u'inforequests:obligee_action',
-                kwargs=dict(inforequest=self.inforequest, step=step)) + anchor
+                       kwargs=dict(inforequest=self.inforequest, step=step)) + anchor
 
     def context(self, extra=None):
         res = super(ObligeeActionWizard, self).context(extra)
@@ -1089,16 +1089,16 @@ class ObligeeActionWizard(Wizard):
 
     def finish_help(self):
         msg = render_mail(u'inforequests/mails/obligee_action_help_request',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[settings.SUPPORT_EMAIL],
-                attachments=[(a.name, a.content, a.content_type)
-                    for a in self.values[u'attachments'] or []],
-                dictionary={
-                    u'wizard': self,
-                    u'inforequest': self.inforequest,
-                    u'email': self.email,
-                    },
-                )
+                          from_email=settings.DEFAULT_FROM_EMAIL,
+                          to=[settings.SUPPORT_EMAIL],
+                          attachments=[(a.name, a.content, a.content_type)
+                                       for a in self.values[u'attachments'] or []],
+                          dictionary={
+                              u'wizard': self,
+                              u'inforequest': self.inforequest,
+                              u'email': self.email,
+                          },
+                          )
         msg.send()
 
         if self.email:
