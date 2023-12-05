@@ -26,6 +26,7 @@ class ObligeeActionStep(Step):
 
 # Epilogue
 
+
 class Categorized(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:Categorized:label')
     text_template = u'inforequests/obligee_action/texts/categorized.html'
@@ -122,6 +123,7 @@ class Categorized(ObligeeActionStep):
 
         return cleaned_data
 
+
 class NotCategorized(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:NotCategorized:label')
     text_template = u'inforequests/obligee_action/texts/not_categorized.html'
@@ -181,6 +183,7 @@ class NotCategorized(ObligeeActionStep):
 
 # Pre Appeal
 
+
 class DisclosureReasons(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:DisclosureReasons:label')
     text_template = u'inforequests/obligee_action/texts/disclosure_reasons.html'
@@ -202,6 +205,7 @@ class DisclosureReasons(ObligeeActionStep):
 
         return res
 
+
 class DisclosureLevelFork(ObligeeActionStep):
 
     def pre_transition(self):
@@ -217,6 +221,7 @@ class DisclosureLevelFork(ObligeeActionStep):
 
         return res
 
+
 class CanAddDisclosure(ObligeeActionStep):
 
     def pre_transition(self):
@@ -231,6 +236,7 @@ class CanAddDisclosure(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
+
 
 class CanAddExtension(ObligeeActionStep):
 
@@ -248,6 +254,7 @@ class CanAddExtension(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
+
 
 class IsItExtension(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItExtension:label')
@@ -310,6 +317,7 @@ class IsItExtension(ObligeeActionStep):
 
         return res
 
+
 class CanAddAdvancement(ObligeeActionStep):
 
     def pre_transition(self):
@@ -326,6 +334,7 @@ class CanAddAdvancement(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
+
 
 class IsItAdvancement(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItAdvancement:label')
@@ -398,6 +407,7 @@ class IsItAdvancement(ObligeeActionStep):
 
         return res
 
+
 class RefusalReasons(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:RefusalReasons:label')
     text_template = u'inforequests/obligee_action/texts/refusal_reasons.html'
@@ -419,6 +429,7 @@ class RefusalReasons(ObligeeActionStep):
 
         return res
 
+
 class CanAddRefusal(ObligeeActionStep):
 
     def pre_transition(self):
@@ -433,6 +444,7 @@ class CanAddRefusal(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
+
 
 class IsItDecision(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItDecision:label')
@@ -462,6 +474,7 @@ class IsItDecision(ObligeeActionStep):
             res.next = IsItAdvancement
 
         return res
+
 
 class ContainsInfo(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:ContainsInfo:label')
@@ -497,6 +510,7 @@ class ContainsInfo(ObligeeActionStep):
 
         return res
 
+
 class IsOnTopic(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsOnTopic:label')
     text_template = u'inforequests/obligee_action/texts/is_on_topic.html'
@@ -526,6 +540,7 @@ class IsOnTopic(ObligeeActionStep):
 
         return res
 
+
 class CanAddDisclosureRefusalAdvancementOrExtension(ObligeeActionStep):
 
     def pre_transition(self):
@@ -542,6 +557,7 @@ class CanAddDisclosureRefusalAdvancementOrExtension(ObligeeActionStep):
         return res
 
 # Post Appeal
+
 
 class InvalidReversion(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:InvalidReversion:label')
@@ -569,6 +585,7 @@ class InvalidReversion(ObligeeActionStep):
 
         return res
 
+
 class ReversionReasons(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:ReversionReasons:label')
     text_template = u'inforequests/obligee_action/texts/reversion_reasons.html'
@@ -591,6 +608,7 @@ class ReversionReasons(ObligeeActionStep):
 
         return res
 
+
 class AppealDisclosureLevelFork(ObligeeActionStep):
 
     def pre_transition(self):
@@ -610,6 +628,7 @@ class AppealDisclosureLevelFork(ObligeeActionStep):
 
         return res
 
+
 class CanAddReversion(ObligeeActionStep):
 
     def pre_transition(self):
@@ -624,6 +643,7 @@ class CanAddReversion(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
+
 
 class CanAddRemandment(ObligeeActionStep):
 
@@ -641,6 +661,7 @@ class CanAddRemandment(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
+
 
 class WasItReturned(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:WasItReturned:label')
@@ -671,6 +692,7 @@ class WasItReturned(ObligeeActionStep):
 
         return res
 
+
 class CanAddAffirmation(ObligeeActionStep):
 
     def pre_transition(self):
@@ -687,6 +709,7 @@ class CanAddAffirmation(ObligeeActionStep):
             res.next = NotCategorized
 
         return res
+
 
 class WasItAccepted(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:WasItAccepted:label')
@@ -717,6 +740,7 @@ class WasItAccepted(ObligeeActionStep):
 
         return res
 
+
 class ContainsAppealInfo(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:ContainsAppealInfo:label')
     text_template = u'inforequests/obligee_action/texts/contains_appeal_info.html'
@@ -739,6 +763,7 @@ class ContainsAppealInfo(ObligeeActionStep):
                     ),
                 widget=forms.RadioSelect(),
                 )
+
 
 class IsItAppealDecision(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItAppealDecision:label')
@@ -769,6 +794,7 @@ class IsItAppealDecision(ObligeeActionStep):
 
         return res
 
+
 class CanAddRemandmentAffirmationOrReversion(ObligeeActionStep):
 
     def pre_transition(self):
@@ -787,6 +813,7 @@ class CanAddRemandmentAffirmationOrReversion(ObligeeActionStep):
         return res
 
 # Confirmation and Clarification Request
+
 
 class IsItConfirmation(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItConfirmation:label')
@@ -819,6 +846,7 @@ class IsItConfirmation(ObligeeActionStep):
 
         return res
 
+
 class CanAddConfirmation(ObligeeActionStep):
 
     def pre_transition(self):
@@ -833,6 +861,7 @@ class CanAddConfirmation(ObligeeActionStep):
             res.next = CanAddRemandmentAffirmationOrReversion
 
         return res
+
 
 class IsItQuestion(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItQuestion:label')
@@ -865,6 +894,7 @@ class IsItQuestion(ObligeeActionStep):
 
         return res
 
+
 class CanAddClarificationRequest(ObligeeActionStep):
 
     def pre_transition(self):
@@ -881,6 +911,7 @@ class CanAddClarificationRequest(ObligeeActionStep):
         return res
 
 # Prologue
+
 
 class InputBasics(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:InputBasics:label')
@@ -942,6 +973,7 @@ class InputBasics(ObligeeActionStep):
                 attachment.generic_object = draft
                 attachment.save()
 
+
 class IsByEmail(ObligeeActionStep):
 
     def pre_transition(self):
@@ -955,6 +987,7 @@ class IsByEmail(ObligeeActionStep):
             res.next = InputBasics
 
         return res
+
 
 class SelectBranch(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:SelectBranch:label')
@@ -970,6 +1003,7 @@ class SelectBranch(ObligeeActionStep):
                 inforequest=self.wizard.inforequest,
                 )
 
+
 class HasSingeBranch(ObligeeActionStep):
 
     def pre_transition(self):
@@ -984,6 +1018,7 @@ class HasSingeBranch(ObligeeActionStep):
         return res
 
 # Wizard
+
 
 class ObligeeActionWizard(Wizard):
     first_step_class = HasSingeBranch
