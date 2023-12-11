@@ -521,6 +521,15 @@ msgstr "Popíšte adminovi, čo sa stalo"
 msgid "inforequests:obligee_action:ReversionReasons:label"
 msgstr "Predĺženie lehoty"
 
+msgid "inforequests:obligee_action:ShouldUseWizard:label"
+msgstr "Použiť sprievodcu?"
+
+msgid "inforequests:obligee_action:ShouldUseWizard:yes"
+msgstr "Áno, chcem použiť sprievodcu."
+
+msgid "inforequests:obligee_action:ShouldUseWizard:no"
+msgstr "Nie, chcem odpoveď zaradiť priamo."
+
 msgid "inforequests:obligee_action:WasItReturned:label"
 msgstr "Vrátenie"
 

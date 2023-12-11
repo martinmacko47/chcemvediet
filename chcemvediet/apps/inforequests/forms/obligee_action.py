@@ -913,11 +913,41 @@ class CanAddClarificationRequest(ObligeeActionStep):
 # Prologue
 
 
+class ShouldUseWizard(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:ShouldUseWizard:label')
+    text_template = u'inforequests/obligee_action/texts/wizard.html'
+
+    def add_fields(self):
+        super(ShouldUseWizard, self).add_fields()
+
+        self.fields[u'use_wizard'] = forms.TypedChoiceField(
+            label=u' ',
+            coerce=int,
+            choices=(
+                (1, _(u'inforequests:obligee_action:ShouldUseWizard:yes')),
+                (0, _(u'inforequests:obligee_action:ShouldUseWizard:no'))
+            ),
+            widget=forms.RadioSelect(),
+        )
+
+    def post_transition(self):
+        res = super(ShouldUseWizard, self).post_transition()
+
+        if not self.is_valid():
+            res.next = CanAddClarificationRequest
+        elif not self.cleaned_data[u'use_wizard']:
+            pass
+        else:
+            res.next = CanAddClarificationRequest
+
+        return res
+
+
 class InputBasics(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:InputBasics:label')
     text_template = u'inforequests/obligee_action/texts/basics.html'
     global_fields = [u'delivered_date', u'attachments']
-    post_step_class = CanAddClarificationRequest
+    post_step_class = ShouldUseWizard
 
     def add_fields(self):
         super(InputBasics, self).add_fields()
@@ -982,7 +1012,7 @@ class IsByEmail(ObligeeActionStep):
         if self.wizard.email:
             res.globals[u'delivered_date'] = local_date(self.wizard.email.processed)
             res.globals[u'attachments'] = None
-            res.next = CanAddClarificationRequest
+            res.next = ShouldUseWizard
         else:
             res.next = InputBasics
 
