@@ -530,6 +530,36 @@ msgstr "Áno, chcem použiť sprievodcu."
 msgid "inforequests:obligee_action:ShouldUseWizard:no"
 msgstr "Nie, chcem odpoveď zaradiť priamo."
 
+msgid "inforequests:obligee_action:DirectClassification:label"
+msgstr "Priame zaradenie odpovede"
+
+msgid "inforequests:obligee_action:DirectClassification:question"
+msgstr "Výzva na doplnenie žiadosti: odpoveď je otázka a inštitúcia vyžaduje doplnenie žiadosti o ďalšie informácie."
+
+msgid "inforequests:obligee_action:DirectClassification:confirmation"
+msgstr "Potvrdenie prijatia žiadosti: odpoveď je iba potvrdenie, že inštitúcia dostala moju žiadosť."
+
+msgid "inforequests:obligee_action:DirectClassification:appeal_decision"
+msgstr "Odpoveď je rozhodnutie o mojom odvolaní."
+
+msgid "inforequests:obligee_action:DirectClassification:contains_info:full"
+msgstr "Sprístupnenie informácií: inštitúcia mi poslala všetky požadované informácie."
+
+msgid "inforequests:obligee_action:DirectClassification:contains_info:partial"
+msgstr "Čiastočné sprístupnenie informácií: inštitúcia mi poslala časť požadovaných informácií."
+
+msgid "inforequests:obligee_action:DirectClassification:contains_info:none"
+msgstr "Nesprístupnenie informácií: inštitúcia mi neposlala žiadne informácie."
+
+msgid "inforequests:obligee_action:DirectClassification:off_topic"
+msgstr "Správa sa nijak netýka mojej žiadosti."
+
+msgid "inforequests:obligee_action:DirectClassification:advancement"
+msgstr "Postúpenie žiadosti: inštitúcia postupuje moju žiadosť inej inštitúcii."
+
+msgid "inforequests:obligee_action:DirectClassification:extension"
+msgstr "Predĺženie lehoty: inštitúcia predlžuje lehotu na vybavenie žiadosti."
+
 msgid "inforequests:obligee_action:WasItReturned:label"
 msgstr "Vrátenie"
 

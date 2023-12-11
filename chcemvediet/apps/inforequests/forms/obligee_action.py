@@ -20,6 +20,18 @@ from chcemvediet.apps.inforequests.models import Action, InforequestEmail
 from chcemvediet.apps.inforequests.forms import BranchField, RefusalReasonField
 
 
+def set_clarification_request(res):
+    res.globals[u'result'] = u'action'
+    res.globals[u'action'] = Action.TYPES.CLARIFICATION_REQUEST
+    res.next = Categorized
+
+
+def set_confirmation(res):
+    res.globals[u'result'] = u'action'
+    res.globals[u'action'] = Action.TYPES.CONFIRMATION
+    res.next = Categorized
+
+
 class ObligeeActionStep(Step):
     template = u'inforequests/obligee_action/wizard.html'
     form_template = u'main/forms/form_horizontal.html'
@@ -259,7 +271,7 @@ class CanAddExtension(ObligeeActionStep):
 class IsItExtension(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItExtension:label')
     text_template = u'inforequests/obligee_action/texts/is_extension.html'
-    global_fields = [u'extension']
+    global_fields = [u'is_extension', u'extension']
 
     def add_fields(self):
         super(IsItExtension, self).add_fields()
@@ -271,6 +283,7 @@ class IsItExtension(ObligeeActionStep):
                     (1, _(u'inforequests:obligee_action:IsItExtension:yes')),
                     (0, _(u'inforequests:obligee_action:IsItExtension:no')),
                     ),
+                initial=1 if self.wizard.values.get(u'is_extension') else None,
                 widget=forms.RadioSelect(attrs={
                     u'class': u'pln-toggle-changed',
                     u'data-container': u'form',
@@ -339,7 +352,7 @@ class CanAddAdvancement(ObligeeActionStep):
 class IsItAdvancement(ObligeeActionStep):
     label = _(u'inforequests:obligee_action:IsItAdvancement:label')
     text_template = u'inforequests/obligee_action/texts/is_advancement.html'
-    global_fields = [u'advanced_to']
+    global_fields = [u'is_advancement', u'advanced_to']
 
     def add_fields(self):
         super(IsItAdvancement, self).add_fields()
@@ -351,6 +364,7 @@ class IsItAdvancement(ObligeeActionStep):
                     (1, _(u'inforequests:obligee_action:IsItAdvancement:yes')),
                     (0, _(u'inforequests:obligee_action:IsItAdvancement:no')),
                     ),
+                initial=1 if self.wizard.values.get(u'is_advancement') else None,
                 widget=forms.RadioSelect(attrs={
                     u'class': u'pln-toggle-changed',
                     u'data-container': u'form',
@@ -838,9 +852,7 @@ class IsItConfirmation(ObligeeActionStep):
         if not self.is_valid():
             res.next = CanAddRemandmentAffirmationOrReversion
         elif self.cleaned_data[u'is_confirmation']:
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.CONFIRMATION
-            res.next = Categorized
+            set_confirmation(res)
         else:
             res.next = CanAddRemandmentAffirmationOrReversion
 
@@ -886,9 +898,7 @@ class IsItQuestion(ObligeeActionStep):
         if not self.is_valid():
             res.next = CanAddConfirmation
         elif self.cleaned_data[u'is_question']:
-            res.globals[u'result'] = u'action'
-            res.globals[u'action'] = Action.TYPES.CLARIFICATION_REQUEST
-            res.next = Categorized
+            set_clarification_request(res)
         else:
             res.next = CanAddConfirmation
 
@@ -911,6 +921,91 @@ class CanAddClarificationRequest(ObligeeActionStep):
         return res
 
 # Prologue
+
+
+class DirectClassification(ObligeeActionStep):
+    label = _(u'inforequests:obligee_action:DirectClassification:label')
+    text_template = u'inforequests/obligee_action/texts/direct_classification.html'
+
+    def add_fields(self):
+        super(DirectClassification, self).add_fields()
+        branch = self.wizard.values.get(u'branch', None)
+
+        choices = []
+
+        if branch and branch.can_add_clarification_request:
+            choices.append(
+                (u'question', _(u'inforequests:obligee_action:DirectClassification:question'))
+            )
+
+        if branch and branch.can_add_confirmation:
+            choices.append(
+                (u'confirmation', _(u'inforequests:obligee_action:DirectClassification:confirmation'))
+            )
+
+        if branch.can_add_remandment_affirmation_or_reversion:
+            choices.append(
+                (u'appeal_decision', _(u'inforequests:obligee_action:DirectClassification:appeal_decision'))
+            )
+
+        if branch.can_add_advancement:
+            choices.append(
+                (u'advancement', _(u'inforequests:obligee_action:DirectClassification:advancement'))
+            )
+
+        if branch.can_add_extension:
+            choices.append(
+                (u'extension', _(u'inforequests:obligee_action:DirectClassification:extension'))
+            )
+
+        choices.extend([
+            (u'contains_info:full', _(u'inforequests:obligee_action:DirectClassification:contains_info:full')),
+            (u'contains_info:partial', _(u'inforequests:obligee_action:DirectClassification:contains_info:partial')),
+            (u'contains_info:none', _(u'inforequests:obligee_action:DirectClassification:contains_info:none')),
+            (u'off_topic', _(u'inforequests:obligee_action:DirectClassification:off_topic')),
+        ])
+
+        self.fields[u'type'] = forms.ChoiceField(
+            label=u' ',
+            choices=choices,
+            widget=forms.RadioSelect(),
+        )
+
+    def post_transition(self):
+        res = super(DirectClassification, self).post_transition()
+
+        if not self.is_valid():
+            res.next = CanAddClarificationRequest
+        elif self.is_type(u'question'):
+            set_clarification_request(res)
+        elif self.is_type(u'confirmation'):
+            set_confirmation(res)
+        elif self.is_type(u'appeal_decision'):
+            res.next = ContainsAppealInfo
+        elif self.is_type(u'contains_info:full'):
+            res.globals[u'disclosure_level'] = Action.DISCLOSURE_LEVELS.FULL
+            res.next = CanAddDisclosure
+        elif self.is_type(u'contains_info:partial'):
+            res.globals[u'disclosure_level'] = Action.DISCLOSURE_LEVELS.PARTIAL
+            res.next = IsItDecision
+        elif self.is_type(u'contains_info:none'):
+            res.globals[u'disclosure_level'] = Action.DISCLOSURE_LEVELS.NONE
+            res.next = IsItDecision
+        elif self.is_type(u'off_topic'):
+            res.next = NotCategorized
+        elif self.is_type(u'advancement'):
+            res.globals[u'is_advancement'] = 1
+            res.next = IsItAdvancement
+        elif self.is_type(u'extension'):
+            res.globals[u'is_extension'] = 1
+            res.next = IsItExtension
+        else:
+            res.next = CanAddClarificationRequest
+
+        return res
+
+    def is_type(self, value):
+        return self.cleaned_data[u'type'] == value
 
 
 class ShouldUseWizard(ObligeeActionStep):
@@ -936,7 +1031,7 @@ class ShouldUseWizard(ObligeeActionStep):
         if not self.is_valid():
             res.next = CanAddClarificationRequest
         elif not self.cleaned_data[u'use_wizard']:
-            pass
+            res.next = DirectClassification
         else:
             res.next = CanAddClarificationRequest
 
