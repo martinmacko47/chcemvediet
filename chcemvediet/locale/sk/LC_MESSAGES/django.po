@@ -1470,6 +1470,12 @@ msgstr "partneri-projektu"
 msgid "main:footer:partners:heading"
 msgstr "Partneri projektu"
 
+msgid "main:footer:donate:anchor"
+msgstr "podporte-nas"
+
+msgid "main:footer:donate:heading"
+msgstr "Podporte nás"
+
 msgid "main:footer:donors:anchor"
 msgstr "individualni-darcovia"
 
