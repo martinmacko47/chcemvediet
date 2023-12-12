@@ -1,0 +1,37 @@
+{# vim: set filetype=htmldjango shiftwidth=2 :#}
+{% extends step.base_template %}
+{% load trans from i18n %}
+
+{% comment %}
+%
+% Context:
+%  -- wizard: chcemvediet.apps.inforequests.forms.feedback_action.FeedbackActionWizard
+%  -- step: chcemvediet.apps.inforequests.forms.feedback_action.FeedbackActionStep
+%  -- inforequest: chcemvediet.apps.inforequests.models.Inforequest
+%
+{% endcomment %}
+
+{% block title %}
+  {% trans 'inforequests:feedback_action:title' %}
+  | {{ block.super }}
+{% endblock %}
+
+{% block header-heading %}
+  {% trans 'inforequests:feedback_action:heading' %}
+{% endblock %}
+
+{% block footer-cancel-href %}{{ inforequest.get_absolute_url }}{% endblock %}
+
+{% block footer-finish-label %}
+  <i class="chv-icon chv-icon-lg icon-chevron-right"></i>
+  &nbsp;
+  {% trans 'inforequests:feedback_action:submit' %}
+{% endblock %}
+
+{% block body-plus-footer %}
+  <div class="row">
+    <div class="col-sm-8">
+      {{ block.super }}
+    </div>
+  </div>
+{% endblock %}

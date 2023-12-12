@@ -365,6 +365,21 @@ msgstr "Prílohy"
 msgid "inforequests:InforequestForm:attachments:help_text"
 msgstr "Priložiť môžete najviac 20 príloh s celkovou velkosťou najviac 15 MB."
 
+msgid "inforequests:feedback_action:FeedbackContent:content:label"
+msgstr "Správa pre nás"
+
+msgid "inforequests:feedback_action:FeedbackContent:content:placeholder"
+msgstr "Správa pre nás"
+
+msgid "inforequests:feedback_action:title"
+msgstr "Spätná väzba"
+
+msgid "inforequests:feedback_action:heading"
+msgstr "Spätná väzba"
+
+msgid "inforequests:feedback_action:submit"
+msgstr "Odoslať spätnú väzbu"
+
 msgid "inforequests:obligee_action:Categorized:label"
 msgstr "Zaradené"
 
@@ -704,6 +719,27 @@ msgstr "Neúplné sprístupnenie informácie bez vydania rozhodnutia"
 msgid "inforequests:Action:type:DISCLOSURE:FULL"
 msgstr "Úplne sprístupnenie informácie"
 
+msgid "inforequests:Feedback:rating:ATROCIOUS"
+msgstr "Strašný: S portálom som mal závažný problém."
+
+msgid "inforequests:Feedback:rating:VERY_POOR"
+msgstr "Veľmi zlý: Portál mi vadil, spomaľoval ma, alebo som musel prekonať niečo nelogické."
+
+msgid "inforequests:Feedback:rating:POOR"
+msgstr "Zlý: Podarilo sa mi urobiť čo som chcel, ale nevidím v portáli zásadný prínos."
+
+msgid "inforequests:Feedback:rating:MEDIOCRE"
+msgstr "Priemerný: Portál som použil, ešte uvidím."
+
+msgid "inforequests:Feedback:rating:GOOD"
+msgstr "Dobrý: portál mi pomohol, vedel by som si predstaviť zlepšenie."
+
+msgid "inforequests:Feedback:rating:VERY_GOOD"
+msgstr "Veľmi dobrý: portál mi veľmi pomohol, nemám žiadny nápad na zlepšenie."
+
+msgid "inforequests:Feedback:rating:EXCELLENT"
+msgstr "Vynikajúci: Portál mi umožnil čo by som sám nezvládol/sama nezvládla. Zrozumiteľne ma viedol celým procesom."
+
 msgid "inforequests:Inforequest:fallback_slug"
 msgstr "ziadost"
 
@@ -878,6 +914,12 @@ msgstr "Reagovať na e-mail"
 msgid "inforequests:detail:response:smail:button"
 msgstr "Prišla mi pošta"
 
+msgid "inforequests:detail:feedback:button"
+msgstr "Poskytnúť spätnú väzbu"
+
+msgid "inforequests:detail:feedback:heading"
+msgstr "Spätná väzba"
+
 msgid "inforequests:index:title"
 msgstr "Zverejnené infožiadosti"
 
@@ -1051,6 +1093,9 @@ msgstr "prilohy"
 
 msgid "inforequests:urls:attachment_finalizations"
 msgstr "prilohy-anonymizovane"
+
+msgid "inforequests:urls:feedback_action"
+msgstr "spatna-vazba"
 
 msgid "obligees:ObligeeField:error:invalid_obligee"
 msgstr "Neplatný názov inštitúcie, zvoľte z menu."

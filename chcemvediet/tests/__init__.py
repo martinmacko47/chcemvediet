@@ -17,7 +17,7 @@ from poleno.mail.models import Message, Recipient
 from poleno.utils.date import local_today, utc_now
 
 from ..apps.geounits.models import Region, District, Municipality, Neighbourhood
-from ..apps.inforequests.models import Branch, Inforequest, InforequestEmail, InforequestDraft, Action
+from ..apps.inforequests.models import Branch, Feedback, Inforequest, InforequestEmail, InforequestDraft, Action
 from ..apps.obligees.models import Obligee, ObligeeTag, ObligeeGroup, ObligeeAlias
 
 
@@ -300,6 +300,13 @@ class ChcemvedietTestCaseMixin(TestCase):
                 u'disclosure_level': None,
                 u'refusal_reason': None,
                 u'last_deadline_reminder': None,
+        })
+
+    def _create_feedback(self, **kwargs):
+        return self._call_with_defaults(Feedback.objects.create, kwargs, {
+            u'inforequest': self.inforequest,
+            u'content': u'Default Testing Content',
+            u'created': utc_now(),
         })
 
     def _render(self, template, **context):

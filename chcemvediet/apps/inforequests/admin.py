@@ -14,7 +14,7 @@ from poleno.utils.admin import (simple_list_filter_factory, admin_obj_format,
                                 ReadOnlyAdminInlineMixin, BulkDeleteAdminMixin)
 from chcemvediet.apps.inforequests.constants import ADMIN_EXTEND_SNOOZE_BY_DAYS
 
-from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action
+from .models import Inforequest, InforequestDraft, InforequestEmail, Branch, Action, Feedback
 
 
 class DeleteNestedInforequestEmailAdminMixin(BulkDeleteAdminMixin, admin.ModelAdmin):
@@ -463,3 +463,41 @@ class ActionAdmin(DeleteNestedInforequestEmailAdminMixin, admin.ModelAdmin):
         super(ActionAdmin, self).delete_model(request, obj)
         if request.POST.get(u'snooze') and self.can_snooze_previous_action(obj):
             self.snooze_action(obj.previous_action)
+
+
+@admin.register(Feedback, site=admin.site)
+class FeedbackAdmin(admin.ModelAdmin):
+    date_hierarchy = u'created'
+    list_display = [
+        u'id',
+        decorate(
+            lambda o: admin_obj_format(o.inforequest),
+            short_description=u'Inforequest',
+            admin_order_field=u'inforequest'
+        ),
+        u'created',
+        u'content',
+        u'rating'
+    ]
+    list_filter = [
+        u'created',
+        u'rating'
+    ]
+    ordering = [
+        u'-created',
+        u'-id',
+        u'inforequest__id'
+    ]
+    exclude = [
+    ]
+    readonly_fields = [
+        u'inforequest',
+        u'content',
+        u'created',
+        u'rating'
+    ]
+    raw_id_fields = [
+        u'inforequest'
+    ]
+
+

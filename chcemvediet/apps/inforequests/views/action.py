@@ -7,12 +7,27 @@ from django.http import Http404, HttpResponseRedirect
 from poleno.utils.urls import reverse
 from poleno.utils.views import require_ajax, login_required
 from chcemvediet.apps.wizards.views import wizard_view
+from chcemvediet.apps.inforequests.forms import FeedbackActionWizard
 from chcemvediet.apps.inforequests.forms import SnoozeForm
 from chcemvediet.apps.inforequests.forms import AppealWizard, ClarificationResponseWizard
 from chcemvediet.apps.inforequests.forms import ObligeeActionWizard
 from chcemvediet.apps.inforequests.models import Inforequest, Action
 
 from .shortcuts import render_form, json_form, json_success
+
+
+@require_http_methods([u'HEAD', u'GET', u'POST'])
+@transaction.atomic
+@login_required(raise_exception=True)
+def feedback_action(request, inforequest_slug, inforequest_pk, step_idx=None):
+    inforequest = (Inforequest.objects
+                   .not_closed().owned_by(request.user).get_or_404(pk=inforequest_pk))
+
+    if inforequest_slug != inforequest.slug:
+        return HttpResponseRedirect(reverse(u'inforequests:feedback_action',
+                                            kwargs=dict(inforequest=inforequest, step_idx=step_idx)))
+
+    return wizard_view(FeedbackActionWizard, request, step_idx, inforequest)
 
 
 @require_http_methods([u'HEAD', u'GET', u'POST'])
