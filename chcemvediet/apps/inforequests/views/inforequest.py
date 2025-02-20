@@ -59,6 +59,7 @@ def inforequest_mine(request):
             .successful()
             .owned_by(request.user)
             .order_by_submission_date()
+            .reverse()
             .prefetch_related(
                 Inforequest.prefetch_main_branch(None,
                     Branch.objects.select_related(u'historicalobligee')))
@@ -67,6 +68,7 @@ def inforequest_mine(request):
             .unsuccessful()
             .owned_by(request.user)
             .order_by_submission_date()
+            .reverse()
             .prefetch_related(
                 Inforequest.prefetch_main_branch(None,
                     Branch.objects.select_related(u'historicalobligee')))
