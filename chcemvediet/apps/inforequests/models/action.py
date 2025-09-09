@@ -379,12 +379,12 @@ class Action(FormatMixin, models.Model):
         if self.type == self.TYPES.REQUEST:
             return Deadline(Deadline.TYPES.OBLIGEE_DEADLINE,
                     self.delivered_date or workdays.advance(self.sent_date, 1),
-                    8, Deadline.UNITS.WORKDAYS, self.snooze)
+                    12, Deadline.UNITS.WORKDAYS, self.snooze)
 
         elif self.type == self.TYPES.CLARIFICATION_RESPONSE:
             return Deadline(Deadline.TYPES.OBLIGEE_DEADLINE,
                     self.delivered_date or workdays.advance(self.sent_date, 1),
-                    8, Deadline.UNITS.WORKDAYS, self.snooze)
+                    12, Deadline.UNITS.WORKDAYS, self.snooze)
 
         elif self.type == self.TYPES.APPEAL:
             return Deadline(Deadline.TYPES.OBLIGEE_DEADLINE,
