@@ -172,6 +172,9 @@ class InforequestAdmin(admin.ModelAdmin):
     inlines = [
             BranchInline,
             ]
+    actions = [
+            u'delete_selected',
+    ]
 
     def get_queryset(self, request):
         queryset = super(InforequestAdmin, self).get_queryset(request)
@@ -222,6 +225,9 @@ class InforequestDraftAdmin(admin.ModelAdmin):
             ]
     inlines = [
             ]
+    actions = [
+            u'delete_selected',
+    ]
 
     def get_queryset(self, request):
         queryset = super(InforequestDraftAdmin, self).get_queryset(request)

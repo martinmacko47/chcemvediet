@@ -44,6 +44,9 @@ class WizardDraftAdmin(admin.ModelAdmin):
             ]
     inlines = [
             ]
+    actions = [
+            u'delete_selected',
+    ]
 
     def get_queryset(self, request):
         queryset = super(WizardDraftAdmin, self).get_queryset(request)
